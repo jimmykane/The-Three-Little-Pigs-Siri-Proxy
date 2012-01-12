@@ -154,13 +154,13 @@ $count = 0;
                     <?= $count ?>
                 </td>
                 <td>
-                    spoofed
+                   <?=$key['assistantid']?>
                 </td>
                 <td>
-                    spoofed
+                   <?=$key['speechid']?>
                 </td>
-                <td>-------
-
+                <td>
+			<?=$key['sessionValidation']?>
                 </td>
                 <td>
                     <?php if ($key['keyload'] >= $config['max_keyload']) { ?>
