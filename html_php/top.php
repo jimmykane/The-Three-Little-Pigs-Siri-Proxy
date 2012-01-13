@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="keywords" content="The Three Little Pigs - Spire Proxy" />
         <meta name="description" content="The Three Little Pigs - Spire Proxy @JimmyKane9. " />
-        <title><?= $page_title ?></title>
+        <title><?php echo $page_title ?></title>
         <link rel="stylesheet" type="text/css" media="screen" href="design/css/style.css" />
         <link rel="shortcut icon" href="design/img/favicon.ico" />
     </head>
