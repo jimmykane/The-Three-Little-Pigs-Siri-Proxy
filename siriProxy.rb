@@ -40,11 +40,11 @@ class SiriProxyConnection < EventMachine::Connection
 	def get_speechId
     begin
       #File.open("../keys/shared/speechId", "r") {|file| self.speechId = file.read}				
-       @@key.availablekeys=$keyDao.listkeys().count  
+      @@key.availablekeys=$keyDao.listkeys().count  
       if @@key.availablekeys > 0
-      self.speechId=@@key.speechid		
-      self.speechId_avail = true
-      puts "[Keys - SiriProy] Key Loaded from Database for SpeechId "
+        self.speechId=@@key.speechid		
+        self.speechId_avail = true
+        puts "[Keys - SiriProy] Key Loaded from Database for SpeechId "
       else
         self.speechId_avail = true
       end
@@ -57,11 +57,11 @@ class SiriProxyConnection < EventMachine::Connection
     begin
       #File.open("../keys/shared/assistantId", "r") {|file| self.assistantId = file.read}
       #puts self.keylist[0].assistantid
-       @@key.availablekeys=$keyDao.listkeys().count  
+      @@key.availablekeys=$keyDao.listkeys().count  
       if @@key.availablekeys > 0
-      self.assistantId=@@key.assistantid				
-      self.assistantId_avail = true
-      puts "[Keys - SiriProy] Key Loaded from Database for AssistantId "
+        self.assistantId=@@key.assistantid				
+        self.assistantId_avail = true
+        puts "[Keys - SiriProy] Key Loaded from Database for AssistantId "
       else
         self.assistantId_avail = false
       end
@@ -76,10 +76,10 @@ class SiriProxyConnection < EventMachine::Connection
       #puts self.keylist[0].assistantid		
       @@key.availablekeys=$keyDao.listkeys().count     
       if @@key.availablekeys > 0
-      self.sessionValidationData= @@key.sessionValidation	
-      self.validationData_avail = true
+        self.sessionValidationData= @@key.sessionValidation	
+        self.validationData_avail = true
       
-      puts "[Keys - SiriProy] Key Loaded from Database for Validation Data"
+        puts "[Keys - SiriProy] Key Loaded from Database for Validation Data"
       else 
         self.validationData_avail = false
       end
@@ -169,7 +169,7 @@ class SiriProxyConnection < EventMachine::Connection
 				puts "[Info - changed header to iphone4s] " + line
 			elsif line.match(/iPad1,1;/)				
 				#older Devices Supported				
-         @@key=Key.new
+        @@key=Key.new
         @@key.availablekeys=$keyDao.listkeys().count      
         if (@@key.availablekeys)>0
           @@key=$keyDao.next_available()
@@ -190,9 +190,9 @@ class SiriProxyConnection < EventMachine::Connection
 				self.is_4S = false				
 				line["iPad/iPad1,1"] = "iPhone/iPhone4,1"
 				puts "[Info - changed header to iphone4s] " + line
-        elsif line.match(/iPod4,1;/)				
+      elsif line.match(/iPod4,1;/)				
 				#older Devices Supported				
-         @@key=Key.new
+        @@key=Key.new
         @@key.availablekeys=$keyDao.listkeys().count      
         if (@@key.availablekeys)>0
           @@key=$keyDao.next_available()
@@ -215,7 +215,7 @@ class SiriProxyConnection < EventMachine::Connection
 				puts "[Info - changed header to iphone4s] " + line
 			else
         #Everithing else like android devices, computer apps etc
-         @@key=Key.new
+        @@key=Key.new
         @@key.availablekeys=$keyDao.listkeys().count      
         if (@@key.availablekeys)>0
           @@key=$keyDao.next_available()
@@ -580,17 +580,20 @@ class SiriProxy
         $confDao.update($conf)
         puts "[Info - SiriProxy] Active connections [#{$conf.active_connections}] Max connections [#{$conf.max_connections}]"
         if $conf.active_connections>=$conf.max_connections 
-           EventMachine.stop
+          EventMachine.stop
         end
       }
       EventMachine::PeriodicTimer.new($conf.keyload_dropdown_interval){
-       if ($keyDao.findoverloaded())
-         @@key=$keyDao.findoverloaded()
-         @@oldkeyload=@@key.keyload   
-         @@key.keyload=@@key.keyload-$conf.keyload_dropdown
-         $keyDao.setkeyload(@@key)
-         puts "[Keys - SiriProxy] Found overloaded Key with id=[#{@@key.id}] and Decreasing keyload from [#{@@oldkeyload}] to [#{@@key.keyload}]"
-       end
+        @@overloaded_keys_count=$keyDao.findoverloaded().count
+        if (@@overloaded_keys_count>0)
+          @@overloaded_keys=$keyDao.findoverloaded()     
+          for i in 0..(@@overloaded_keys_count-1)            
+            @@oldkeyload=@@overloaded_keys[i].keyload   
+            @@overloaded_keys[i].keyload=@@overloaded_keys[i].keyload-$conf.keyload_dropdown
+            $keyDao.setkeyload(@@overloaded_keys[i])
+            puts "[Keys - SiriProxy] Found overloaded Key with id=[#{@@overloaded_keys[i].id}] and Decreasing keyload from [#{@@oldkeyload}] to [#{@@overloaded_keys[i].keyload}]"
+          end
+        end
       }
     end         
 	end

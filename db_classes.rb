@@ -193,7 +193,7 @@ class KeyDao
 		st.execute()
 		result = fetchResults(st)
  		st.close
-    return result[0]    
+    return result 
   end
 
   
