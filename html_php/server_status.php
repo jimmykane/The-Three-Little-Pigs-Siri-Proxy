@@ -40,7 +40,7 @@ $count = 0;
         </td>
         <td>
             <p>
-                <b>(<?= $keys[0]['availablekeys'] ?>)</b>
+                <b>(<?php  echo$keys[0]['availablekeys'] ?>)</b>
             </p>
         </td>
     </tr>
@@ -53,7 +53,7 @@ $count = 0;
 
         <td>
             <p>
-                <b><?= $config['max_connections'] ?></b>
+                <b><?php echo $config['max_connections'] ?></b>
             </p>
         </td>
     </tr>
@@ -66,7 +66,7 @@ $count = 0;
 
         <td>
             <p>
-                <b><?= $config['active_connections'] - 2 #-2 because 1 for guzzoni and 1 for server    ?></b>
+                <b><?php echo $config['active_connections'] - 2 #-2 because 1 for guzzoni and 1 for server    ?></b>
             </p>
         </td>
     </tr>
@@ -79,7 +79,7 @@ $count = 0;
 
         <td>
             <p>
-                <b><?= $config['max_keyload'] ?></b>
+                <b><?php echo $config['max_keyload'] ?></b>
             </p>
         </td>
     </tr>
@@ -92,7 +92,7 @@ $count = 0;
 
         <td>
             <p>
-                <b><?= $config['keyload_dropdown'] ?></b>
+                <b><?php echo $config['keyload_dropdown'] ?></b>
             </p>
         </td>
     </tr>
@@ -105,7 +105,7 @@ $count = 0;
 
         <td>
             <p>
-                <b><?= $config['keyload_dropdown_interval'] ?> sec</b>
+                <b><?php echo $config['keyload_dropdown_interval'] ?> sec</b>
             </p>
         </td>
     </tr>
@@ -151,16 +151,16 @@ $count = 0;
             ?>
             <tr>
                 <td>
-                    <?= $count ?>
+                    <?php echo $count ?>
                 </td>
                 <td>
-                   <?=$key['assistantid']?>
+                   <?php echo $key['assistantid']?>
                 </td>
                 <td>
-                   <?=$key['speechid']?>
+                   <?php echo $key['speechid']?>
                 </td>
                 <td>
-			<?=$key['sessionValidation']?>
+			<?php echo $key['sessionValidation']?>
                 </td>
                 <td>
                     <?php if ($key['keyload'] >= $config['max_keyload']) { ?>
@@ -168,7 +168,7 @@ $count = 0;
 
                     <?php } else { ?>
 
-                        <?= $key['keyload'] ?> / <?= $config['max_keyload'] ?>
+                        <?php echo  $key['keyload'] ?> / <?php echo  $config['max_keyload'] ?>
                         <?php
                     }
                     ?>
@@ -176,7 +176,7 @@ $count = 0;
 
                 </td>
                 <td>
-                    <?= $key['date_added'] ?>
+                    <?php echo  $key['date_added'] ?>
                 </td>
             </tr>
 
