@@ -4,7 +4,7 @@
 	
 	define(HOSTNAME, "jimmykane.dyndns-at-home.com");
 	
-	//include_once("inc/connection.inc.php");
+	include_once("inc/connection.inc.php");
 	include_once("inc/functions.inc.php");
 	include_once("inc/PageManager.class.php");
 	

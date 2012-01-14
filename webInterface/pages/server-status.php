@@ -1,6 +1,6 @@
 <?php
-	//$keys = getkeys();
-	//$config = getconfig();
+	$keys = getkeys();
+	$config = getconfig();
 	//var_dump($keys);
 	$count = 0;
 ?>
