@@ -116,7 +116,7 @@ end
 
 
 
-class PublicKey < Key
+class Key4S < Key
   include Singleton 
 
 end

@@ -273,7 +273,7 @@ class SiriProxyConnection < EventMachine::Connection
   def checkHave4SData
     if self.speechId != nil and self.assistantId != nil and self.sessionValidationData != nil
       #Writing keys to Database
-      key4s=Key.instance
+      key4s=Key4S.instance
       key4s.assistantid=self.assistantId
       key4s.speechid=self.speechId
       key4s.sessionValidation=self.sessionValidationData
