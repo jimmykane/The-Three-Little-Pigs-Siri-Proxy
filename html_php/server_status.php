@@ -115,7 +115,7 @@ $count = 0;
 <p><b>Legent:</b></p>
 <ul>
     <li><b>Speechid</b> The speech identifier send from the iphone4s</li>
-    <li><b>Asiistantid</b> The assistant identifier from the iphone4s</li>
+    <li><b>Assistantid</b> The assistant identifier from the iphone4s</li>
     <li><b>Validation Data</b> The validation data from the iphone4s</li>
     <li><b>Keyload</b> The current load on each key. When the limit is reached the key gets "HOT", and therefore pauses for a short of time (throttles)</li>
     <li><b>Date Added</b> The date and time that the key was added!</li>        
