@@ -78,7 +78,7 @@ end
 
 
 class Key
-  
+  include Singleton
 
   attr_accessor :id, :assistantid,:speechid,:speechid,:expired,:sessionValidation,:keyload,:date_added,:availablekeys
 	
@@ -222,7 +222,7 @@ class KeyDao
 		rows = []
 
 		while row = stmt.fetch do
-			dto = Key.new
+			dto = Key.instance
 			dto.id = row[0]
 			dto.assistantid= row[1]
 			dto.speechid=row[2]

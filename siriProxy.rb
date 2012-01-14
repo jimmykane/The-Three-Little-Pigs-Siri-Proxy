@@ -7,8 +7,6 @@ require 'cfpropertylist'
 require 'pp'
 require 'mysql'
 require 'singleton'
-
-
 require_relative 'tweakSiri'
 require_relative 'interpretSiri'
 require_relative 'db_classes.rb'
@@ -145,7 +143,7 @@ class SiriProxyConnection < EventMachine::Connection
 				self.is_4S = true
 			elsif  line.match(/iPhone3,1;/)
 				#if its iphone4,etc					
-        @@key=Key.new
+        @@key=Key.instance
         @@key.availablekeys=$keyDao.listkeys().count      
         if (@@key.availablekeys)>0          
           @@key=$keyDao.next_available()
@@ -169,7 +167,7 @@ class SiriProxyConnection < EventMachine::Connection
 				puts "[Info - changed header to iphone4s] " + line
 			elsif line.match(/iPad1,1;/)				
 				#older Devices Supported				
-        @@key=Key.new
+        @@key=Key.instance
         @@key.availablekeys=$keyDao.listkeys().count      
         if (@@key.availablekeys)>0
           @@key=$keyDao.next_available()
@@ -192,7 +190,7 @@ class SiriProxyConnection < EventMachine::Connection
 				puts "[Info - changed header to iphone4s] " + line
       elsif line.match(/iPod4,1;/)				
 				#older Devices Supported				
-        @@key=Key.new
+        @@key=Key.instance
         @@key.availablekeys=$keyDao.listkeys().count      
         if (@@key.availablekeys)>0
           @@key=$keyDao.next_available()
@@ -215,7 +213,7 @@ class SiriProxyConnection < EventMachine::Connection
 				puts "[Info - changed header to iphone4s] " + line
 			else
         #Everithing else like android devices, computer apps etc
-        @@key=Key.new
+        @@key=Key.instance
         @@key.availablekeys=$keyDao.listkeys().count      
         if (@@key.availablekeys)>0
           @@key=$keyDao.next_available()
@@ -555,7 +553,7 @@ class SiriProxy
     EM.threadpool_size=$conf.max_threads
     
     #initialize key controller
-    @@key=Key.new
+    @@key=Key.instance
     @@key.keyload=0
 		$keyDao=KeyDao.instance#instansize Dao object controller
 		$keyDao.connect_to_db($my_db)		
