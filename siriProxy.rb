@@ -42,7 +42,7 @@ class SiriProxyConnection < EventMachine::Connection
       if @@key.availablekeys > 0
         self.speechId=@@key.speechid		
         self.speechId_avail = true
-        puts "[Keys - SiriProy] Key Loaded from Database for SpeechId "
+        puts "[Keys - SiriProy] Key [#{@@key.id}] Loaded from Database for SpeechId "
       else
         self.speechId_avail = true
       end
@@ -59,7 +59,7 @@ class SiriProxyConnection < EventMachine::Connection
       if @@key.availablekeys > 0
         self.assistantId=@@key.assistantid				
         self.assistantId_avail = true
-        puts "[Keys - SiriProy] Key Loaded from Database for AssistantId "
+        puts "[Keys - SiriProy] Key [#{@@key.id}] Loaded from Database for AssistantId "
       else
         self.assistantId_avail = false
       end
@@ -72,12 +72,12 @@ class SiriProxyConnection < EventMachine::Connection
     begin
       #File.open("../keys/shared/sessionValidationData", "rb") {|file| self.sessionValidationData = file.read}
       #puts self.keylist[0].assistantid		
-      @@key.availablekeys=$keyDao.listkeys().count     
+      @@key.availablekeys=$keyDao.listkeys().count       
       if @@key.availablekeys > 0
         self.sessionValidationData= @@key.sessionValidation	
         self.validationData_avail = true
       
-        puts "[Keys - SiriProy] Key Loaded from Database for Validation Data"
+        puts "[Keys - SiriProy] Key [#{@@key.id}] Loaded from Database for Validation Data"
       else 
         self.validationData_avail = false
       end
@@ -145,12 +145,12 @@ class SiriProxyConnection < EventMachine::Connection
 				#if its iphone4,etc					
         @@key=Key.instance
         @@key.availablekeys=$keyDao.listkeys().count      
-        if (@@key.availablekeys)>0          
-          @@key=$keyDao.next_available()
-          @@key.availablekeys=$keyDao.listkeys().count  
-          @@oldkeyload=@@key.keyload
-          @@key.keyload=@@key.keyload+10      
+        if (@@key.availablekeys)>0     
+          @@key=$keyDao.next_available()        
+          @@oldkeyload=@@key.keyload          
+          @@key.keyload=@@key.keyload+10  
           $keyDao.setkeyload(@@key)
+         
           puts "[Key - SiriProxy] Next Key with id=[#{@@key.id}] and increasing keyload from [#{@@oldkeyload}] to [#{@@key.keyload}]"
           puts "[Key - SiriProxy] Keys available [#{@@key.availablekeys}]"
         else
@@ -170,10 +170,9 @@ class SiriProxyConnection < EventMachine::Connection
         @@key=Key.instance
         @@key.availablekeys=$keyDao.listkeys().count      
         if (@@key.availablekeys)>0
-          @@key=$keyDao.next_available()
-          @@key.availablekeys=$keyDao.listkeys().count  
-          @@oldkeyload=@@key.keyload
-          @@key.keyload=@@key.keyload+10  
+          @@key=$keyDao.next_available()    
+          @@oldkeyload=@@key.keyload         
+          @@key.keyload=@@key.keyload+10
           $keyDao.setkeyload(@@key)
           puts "[Key - SiriProxy] Next Key with id=[#{@@key.id}] and increasing keyload from [#{@@oldkeyload}] to [#{@@key.keyload}]"
           puts "[Key - SiriProxy] Keys available [#{@@key.availablekeys}]"
@@ -193,8 +192,7 @@ class SiriProxyConnection < EventMachine::Connection
         @@key=Key.instance
         @@key.availablekeys=$keyDao.listkeys().count      
         if (@@key.availablekeys)>0
-          @@key=$keyDao.next_available()
-          @@key.availablekeys=$keyDao.listkeys().count  
+          @@key=$keyDao.next_available()          
           @@oldkeyload=@@key.keyload
           @@key.keyload=@@key.keyload+10  
           $keyDao.setkeyload(@@key)
@@ -216,8 +214,7 @@ class SiriProxyConnection < EventMachine::Connection
         @@key=Key.instance
         @@key.availablekeys=$keyDao.listkeys().count      
         if (@@key.availablekeys)>0
-          @@key=$keyDao.next_available()
-          @@key.availablekeys=$keyDao.listkeys().count  
+          @@key=$keyDao.next_available()          
           @@oldkeyload=@@key.keyload
           @@key.keyload=@@key.keyload+10  
           $keyDao.setkeyload(@@key)
