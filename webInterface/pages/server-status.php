@@ -30,7 +30,7 @@
    	</tr>
     <tr>
         <th>Active connections</th>
-        <td><?php echo $config['active_connections'] - 2 #-2 because 1 for guzzoni and 1 for server   ?></td>
+         <td><?php if($config['active_connections'] >= 2) { echo $config['active_connections'] - 2; } else { echo $config['active_connections']; }  ?></td>
    	</tr>
     <tr>
         <th>Max keyload</th>
