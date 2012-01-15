@@ -1,7 +1,5 @@
 <?php
 
-require_once("dbconnect.php");
-
 function getkeys() {
     extract($GLOBALS);
     $query = "SELECT * FROM `keys` WHERE expired='False' ";
@@ -10,7 +8,7 @@ function getkeys() {
     if ($available_keys_count > 0) {
 
         $keys = $db->GetResultAsArray($result);
-        $keys[0]['availablekeys'] = $available_keys_count;
+        $keys[0]['availablekeys']=$available_keys_count;
         return $keys;
     }
     return false;
