@@ -30,9 +30,6 @@
    	</tr>
     <tr>
         <th>Active connections</th>
-<<<<<<< HEAD
-         <td><?php if($config['active_connections'] >= 2) { echo $config['active_connections'] - 2; } else { echo $config['active_connections']; }  ?></td>
-=======
         <td><?php
 				if($config['active_connections'] >= 2) {
         			echo $config['active_connections'] - 2; #-2 because 1 for guzzoni and 1 for server
@@ -41,7 +38,7 @@
 					echo $config['active_connections'];
 				}
 			?></td>
->>>>>>> 5f978773effc91341ad626d022b96b1ea9d15c16
+
    	</tr>
     <tr>
         <th>Max keyload</th>
