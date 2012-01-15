@@ -2,7 +2,7 @@
 	ini_set('display_errors', 'On');
 	error_reporting(E_ALL ^ E_NOTICE);
 	
-	define(HOSTNAME, "jimmykane.dyndns-at-home.com");
+	define(HOSTNAME, "put your hostname");
 	
 	include_once("inc/connection.inc.php");
 	include_once("inc/functions.inc.php");
@@ -69,25 +69,7 @@
    			Siri Proxy Server brought to you by <a href="http://twitter.com/jimmykane9">@JimmyKane9</a> | Website by <a href="http://twitter.com/wouterds">@WouterDS</a>
    		</div>
    	</div>
-   	<div id="fb-root"></div>
-    <!-- Ads
-    <script type="text/javascript"> 
-    //default pop-under house ad url 
-    clicksor_enable_pop = false; 
-    clicksor_adhere_opt='left'; 
-    clicksor_enable_text_link =true;
-    durl = '';
-    clicksor_layer_border_color = '';
-    clicksor_layer_ad_bg = '';
-    clicksor_layer_ad_link_color = '';
-    clicksor_layer_ad_text_color = '';
-    clicksor_text_link_bg = '';
-    clicksor_text_link_color = '';
-    
-    clicksor_enable_layer_pop = false;
-    </script>
-    <script type="text/javascript" src="http://ads.clicksor.com/newServing/showAd.php?nid=1&amp;pid=217952&amp;sid=351598"></script>
-    -->
+   	<div id="fb-root"></div>    
    	<script>(function(d, s, id) {
    	  var js, fjs = d.getElementsByTagName(s)[0];
    	  if (d.getElementById(id)) return;
