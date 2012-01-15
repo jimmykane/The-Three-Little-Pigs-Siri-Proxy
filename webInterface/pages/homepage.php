@@ -5,16 +5,6 @@ This server is based on the <a href="http://twitter.com/kmsbueromoebel">@kmsbuer
 This server implements a MySQL database connection for storing validation data of Siri capable Devices (4S etc).<br />
 Each Key is throttled through this server enabling several client registrations and assistant object creation.</br>
 This enables more clients to connect. Yes that's correct, <strong>more</strong>.</p>
-
-<p><strong>How to get on the alpha phase? Check <a href="server_status.php">the server status</a>.</strong><br />
-<ol>
-	<li>Just Feed the piggy with some keys.. <a href='piggy_eat.php'>How to do this?</a>.</li>
-    <li>Connect your older device (Non iphone 4S) to this proxy.. <a href="get_connected.php">How to do this?</a></li>
-    <li>Enjoy Siri</li>
-</ol>
-
-<p class="notification yellow">Please do not rape the connection until this server migrates on a VPS.<br />And <strong>if you can</strong>, please donate some money for the maintenance and further development.</p>
-
 <h2>Pictures &amp; Videos</h2>
 <div style="overflow: hidden;">
 	<div style="float: left; width: 600px;">
