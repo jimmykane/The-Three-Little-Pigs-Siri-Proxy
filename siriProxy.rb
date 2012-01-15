@@ -38,11 +38,11 @@ class SiriProxyConnection < EventMachine::Connection
 	def get_speechId
     begin
       #File.open("../keys/shared/speechId", "r") {|file| self.speechId = file.read}				
-      @@key.availablekeys=$keyDao.listkeys().count  
-      if @@key.availablekeys > 0
-        self.speechId=@@key.speechid		
+      available_keys=$keyDao.listkeys().count     
+      if available_keys > 0
+        self.speechId=@@publickey.speechid		
         self.speechId_avail = true
-        puts "[Keys - SiriProy] Key [#{@@key.id}] Loaded from Database for SpeechId "
+        puts "[Keys - SiriProy] Key [#{@publickey.id}] Loaded from Database for SpeechId "
       else
         self.speechId_avail = true
       end
@@ -55,11 +55,11 @@ class SiriProxyConnection < EventMachine::Connection
     begin
       #File.open("../keys/shared/assistantId", "r") {|file| self.assistantId = file.read}
       #puts self.keylist[0].assistantid
-      @@key.availablekeys=$keyDao.listkeys().count  
-      if @@key.availablekeys > 0
-        self.assistantId=@@key.assistantid				
+      available_keys=$keyDao.listkeys().count     
+      if available_keys > 0
+        self.assistantId=@@publickey.assistantid				
         self.assistantId_avail = true
-        puts "[Keys - SiriProy] Key [#{@@key.id}] Loaded from Database for AssistantId "
+        puts "[Keys - SiriProy] Key [#{@@publickey.id}] Loaded from Database for AssistantId "
       else
         self.assistantId_avail = false
       end
@@ -70,19 +70,15 @@ class SiriProxyConnection < EventMachine::Connection
 
 	def get_validationData
     begin
-      #File.open("../keys/shared/sessionValidationData", "rb") {|file| self.sessionValidationData = file.read}
-      #puts self.keylist[0].assistantid		
-      @@key.availablekeys=$keyDao.listkeys().count       
-      if @@key.availablekeys > 0
-        self.sessionValidationData= @@key.sessionValidation	
-        self.validationData_avail = true
-      
-        puts "[Keys - SiriProy] Key [#{@@key.id}] Loaded from Database for Validation Data"
+      #File.open("../keys/shared/sessionValidationData", "rb") {|file| self.sessionValidationData = file.read}       
+      available_keys=$keyDao.listkeys().count           
+      if available_keys > 0
+        self.sessionValidationData= @@publickey.sessionValidation	
+        self.validationData_avail = true      
+        puts "[Keys - SiriProy] Key [#{@@publickey.id}] Loaded from Database for Validation Data"
       else 
         self.validationData_avail = false
-      end
-    
-      
+      end     
     rescue SystemCallError,NoMethodError
       puts "[ERROR - SiriProxy] Error opening the sessionValidationData  file. Connect an iPhone4S first or create them manually!"
     end
@@ -105,7 +101,7 @@ class SiriProxyConnection < EventMachine::Connection
 		self.speechId_avail = false		#speechID available
 		self.assistantId_avail = false		#assistantId available
 		self.validationData_avail = false	#validationData available		
-		puts "[Info - SiriProxy] Got a inbound Connection!" 		
+		puts "[Info - SiriProxy] Created a connection!" 		
 	end
 	
 	def plist_blob(string)
@@ -143,21 +139,20 @@ class SiriProxyConnection < EventMachine::Connection
 				self.is_4S = true
 			elsif  line.match(/iPhone3,1;/)
 				#if its iphone4,etc					
-        @@key=Key.instance
-        @@key.availablekeys=$keyDao.listkeys().count      
-        if (@@key.availablekeys)>0     
-          @@key=$keyDao.next_available()        
-          @@oldkeyload=@@key.keyload          
-          @@key.keyload=@@key.keyload+10  
-          $keyDao.setkeyload(@@key)
-         
-          puts "[Key - SiriProxy] Next Key with id=[#{@@key.id}] and increasing keyload from [#{@@oldkeyload}] to [#{@@key.keyload}]"
-          puts "[Key - SiriProxy] Keys available [#{@@key.availablekeys}]"
+        @@publickey=PublicKey.instance
+        available_keys=$keyDao.listkeys().count      
+        if (available_keys)>0     
+          @@publickey=$keyDao.next_available()        
+          @oldkeyload=@@publickey.keyload          
+          @@publickey.keyload=@@publickey.keyload+10  
+          $keyDao.setkeyload(@@publickey)         
+          puts "[Key - SiriProxy] Next Key with id=[#{@@publickey.id}] and increasing keyload from [#{@oldkeyload}] to [#{@@publickey.keyload}]"
+          puts "[Key - SiriProxy] Keys available [#{available_keys}]"
         else
           puts "[Key - SiriProxy] No keys available in database"
         end
      
-				if @@key==nil
+				if @@publickey==nil
           puts "[Key - SiriProxy] - No Key Iniialized"
         else 
           puts "[Info - SiriProxy] - iPhone 4th generation connected. Using saved keys"
@@ -167,19 +162,20 @@ class SiriProxyConnection < EventMachine::Connection
 				puts "[Info - changed header to iphone4s] " + line
 			elsif line.match(/iPad1,1;/)				
 				#older Devices Supported				
-        @@key=Key.instance
-        @@key.availablekeys=$keyDao.listkeys().count      
-        if (@@key.availablekeys)>0
-          @@key=$keyDao.next_available()    
-          @@oldkeyload=@@key.keyload         
-          @@key.keyload=@@key.keyload+10
-          $keyDao.setkeyload(@@key)
-          puts "[Key - SiriProxy] Next Key with id=[#{@@key.id}] and increasing keyload from [#{@@oldkeyload}] to [#{@@key.keyload}]"
-          puts "[Key - SiriProxy] Keys available [#{@@key.availablekeys}]"
+        @@publickey=PublicKey.instance
+        available_keys=$keyDao.listkeys().count      
+        if (available_keys)>0     
+          @@publickey=$keyDao.next_available()        
+          @oldkeyload=@@publickey.keyload          
+          @@publickey.keyload=@@publickey.keyload+10  
+          $keyDao.setkeyload(@@publickey)         
+          puts "[Key - SiriProxy] Next Key with id=[#{@@publickey.id}] and increasing keyload from [#{@oldkeyload}] to [#{@@publickey.keyload}]"
+          puts "[Key - SiriProxy] Keys available [#{available_keys}]"
         else
           puts "[Key - SiriProxy] No keys available in database"
         end
-				if @@key==nil
+     
+				if @@publickey==nil
 					puts "[Key - SiriProxy] - No Key Available right now ;("
         else 
           puts "[Info - SiriProxy] - iPad 1  generation connected. Using saved keys"						
@@ -189,19 +185,20 @@ class SiriProxyConnection < EventMachine::Connection
 				puts "[Info - changed header to iphone4s] " + line
       elsif line.match(/iPod4,1;/)				
 				#older Devices Supported				
-        @@key=Key.instance
-        @@key.availablekeys=$keyDao.listkeys().count      
-        if (@@key.availablekeys)>0
-          @@key=$keyDao.next_available()          
-          @@oldkeyload=@@key.keyload
-          @@key.keyload=@@key.keyload+10  
-          $keyDao.setkeyload(@@key)
-          puts "[Key - SiriProxy] Next Key with id=[#{@@key.id}] and increasing keyload from [#{@@oldkeyload}] to [#{@@key.keyload}]"
-          puts "[Key - SiriProxy] Keys available [#{@@key.availablekeys}]"
+        @@publickey=PublicKey.instance
+        available_keys=$keyDao.listkeys().count      
+        if (available_keys)>0     
+          @@publickey=$keyDao.next_available()        
+          @oldkeyload=@@publickey.keyload          
+          @@publickey.keyload=@@publickey.keyload+10  
+          $keyDao.setkeyload(@@publickey)         
+          puts "[Key - SiriProxy] Next Key with id=[#{@@publickey.id}] and increasing keyload from [#{@oldkeyload}] to [#{@@publickey.keyload}]"
+          puts "[Key - SiriProxy] Keys available [#{available_keys}]"
         else
           puts "[Key - SiriProxy] No keys available in database"
         end
-				if @@key==nil
+     
+				if @@publickey==nil
 					puts "[Key - SiriProxy] - No Key Available right now ;("
         else 
           puts "[Info - SiriProxy] - iPod touch 4th generation connected. Using saved keys"						
@@ -211,19 +208,20 @@ class SiriProxyConnection < EventMachine::Connection
 				puts "[Info - changed header to iphone4s] " + line
 			else
         #Everithing else like android devices, computer apps etc
-        @@key=Key.instance
-        @@key.availablekeys=$keyDao.listkeys().count      
-        if (@@key.availablekeys)>0
-          @@key=$keyDao.next_available()          
-          @@oldkeyload=@@key.keyload
-          @@key.keyload=@@key.keyload+10  
-          $keyDao.setkeyload(@@key)
-          puts "[Key - SiriProxy] Next Key with id=[#{@@key.id}] and increasing keyload from [#{@@oldkeyload}] to [#{@@key.keyload}]"
-          puts "[Key - SiriProxy] Keys available [#{@@key.availablekeys}]"
+        @@publickey=PublicKey.instance
+        available_keys=$keyDao.listkeys().count      
+        if (available_keys)>0     
+          @@publickey=$keyDao.next_available()        
+          @oldkeyload=@@publickey.keyload          
+          @@publickey.keyload=@@publickey.keyload+10  
+          $keyDao.setkeyload(@@publickey)         
+          puts "[Key - SiriProxy] Next Key with id=[#{@@publickey.id}] and increasing keyload from [#{@oldkeyload}] to [#{@@publickey.keyload}]"
+          puts "[Key - SiriProxy] Keys available [#{available_keys}]"
         else
           puts "[Key - SiriProxy] No keys available in database"
         end
-				if @@key==nil          
+     
+				if @@publickey==nil
 					puts "[Key - SiriProxy] - No Key Available right now ;("
         else 
           puts "[Info - SiriProxy] - Unknow Device Connected. Using saved keys"				
@@ -369,18 +367,18 @@ class SiriProxyConnection < EventMachine::Connection
 	#prepare the recieved object with our data
 	def prep_received_object(object)		
     if object["class"]=="SessionValidationFailed"
+      puts "expired"
       get_validationData	      
       if self.validationData_avail
         puts "[Warning - SiriProxy] The session Validation Expired"          
-        $keyDao.validation_expired(@@key)          
-        puts "[Warning - SiriProxy] The key Marked as Expired"       
-        @@key.availablekeys=$keyDao.listkeys().count  
-        puts @@key.availablekeys
-        if @@key.availablekeys >= 1          
-          @@key=$keyDao.next_available()            
-          puts "[Key - SiriProxy] Changed Key" 
-        elsif @@key.availablekeys <1          
-          puts "[Keys - SiriProxy] Available Keys in Database: [#{@@key.availablekeys}]"
+        $keyDao.validation_expired(@@publickey)          
+        puts "[Warning - SiriProxy] The key [#{@@publickey.id}] Marked as Expired"       
+        available_keys=$keyDao.listkeys().count          
+        if available_keys >= 1          
+          @@publickey=$keyDao.next_available()            
+          puts "[Key - SiriProxy] Changed Key to key {#{[@@publickey.id]}" 
+        elsif available_keys <1          
+          puts "[Keys - SiriProxy] Available Keys in Database: [#{available_keys}]"
           puts "[Key - No keys found in Database Available :(] " 									
         end        
       else 
@@ -550,7 +548,7 @@ class SiriProxy
     EM.threadpool_size=$conf.max_threads
     
     #initialize key controller
-    @@key=Key.instance
+    @@key=Key.new
     @@key.keyload=0
 		$keyDao=KeyDao.instance#instansize Dao object controller
 		$keyDao.connect_to_db($my_db)		
@@ -559,7 +557,7 @@ class SiriProxy
       @@key.availablekeys=$keyDao.listkeys().count      
       puts "[Keys - SiriProxy] Available Keys in Database: [#{@@key.availablekeys}]"
     else
-      puts "[Keys - SiriProxy] Warning starting Server with no key in Database!!! Key count= 0"
+      puts "[Keys - SiriProxy] Initialized Please connect a 4S. No keys available"
       @@key.availablekeys=0
     end
     
