@@ -1,7 +1,7 @@
 <?php
 	$keys = getkeys();
 	$config = getconfig();
-	//var_dump($keys);
+
 	$count = 0;
 ?>
 <h1>Server Status and Statistics</h1>
@@ -22,27 +22,27 @@
    	</tr>
     <tr>
         <th>Available keys</th>
-        <td><?= $keys[0]['availablekeys'] ?></td>
+        <td><?php echo $keys[0]['availablekeys'] ?></td>
    	</tr>
     <tr>
         <th>Maximum connections</th>
-        <td><?= $config['max_connections'] ?></td>
+        <td><?php echo $config['max_connections'] ?></td>
    	</tr>
     <tr>
         <th>Active connections</th>
-        <td><?= $config['active_connections'] - 2 #-2 because 1 for guzzoni and 1 for server   ?></td>
+        <td><?php echo $config['active_connections'] - 2 #-2 because 1 for guzzoni and 1 for server   ?></td>
    	</tr>
     <tr>
         <th>Max keyload</th>
-        <td><?= $config['max_keyload'] ?></td>
+        <td><?php echo $config['max_keyload'] ?></td>
    	</tr>
     <tr>
         <th>Keyload dropdown</th>
-        <td><?= $config['keyload_dropdown'] ?></td>
+        <td><?php echo  $config['keyload_dropdown'] ?></td>
    	</tr>
     <tr>
         <th>Keyload check interval (sec)</th>
-        <td><?= $config['keyload_dropdown_interval'] ?></td>
+        <td><?php echo  $config['keyload_dropdown_interval'] ?></td>
    	</tr>
 </table>
 <br />
