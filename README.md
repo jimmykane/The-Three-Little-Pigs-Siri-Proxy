@@ -104,11 +104,11 @@ Clone this repo locally, then navigate into the The-Three-Little-Pigs directory 
 
 1. Clone the repo
 
-        `git clone https://github.com/jimmykane/Three-Little-pigs-test-plugis`
+        `git clone https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy`
 
 2. Change path to it
 
-        `cd Three-Little-pigs-test-plugis`
+        `cd The-Three-Little-Pigs-Siri-Proxy`
     
 3. Install Rake and Bundler:  
 
