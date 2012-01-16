@@ -1,0 +1,11 @@
+server.passless.crt
+server.passless.key
+.DS_Store
+demoCA/
+newkey.pem
+newreq.pem
+config.yml
+Gemfile.lock
+*.gem
+.bundle
+pkg/*
