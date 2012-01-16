@@ -75,10 +75,7 @@ class SiriProxy
             end
           end
         }
-      rescue Interrupt
-        puts "Closing connections and exiting"
-        EventMachine.stop
-        exit
+      
       
       rescue RuntimeError => err
         if err.message == "no acceptor"
