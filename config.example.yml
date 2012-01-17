@@ -1,9 +1,18 @@
 port: 443
 log_level: 1
+
+#This is your Database config:
 db_host: 'localhost'
 db_user: 'root'
 db_pass: 'pass'
 db_database: 'siri'
+
+#For Generating Certs for iPhones. Has 2 hosts, so that you can use guzzoni on a 4S, 
+#and your server also using the same instance.
+ca_name: 'SiriProxyCA'
+server1: 'guzzoni.apple.com'
+server2: 'your.siri.proxy.server.com'
+
 plugins:
     # NOTE: run bundle after changing plugin configurations to update required gems
 

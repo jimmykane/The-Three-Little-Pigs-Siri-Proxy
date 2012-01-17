@@ -133,37 +133,25 @@ Clone this repo locally, then navigate into the The-Three-Little-Pigs directory 
         db_pass: 'yourpassword'
         db_database: 'siri'
 
-6. Edit your /etc/ssl/openssl.cnf 
+6. Edit your `~/.siriproxy/config.yml` and put your server info for certs
 
-        replace lines:
+        ca_name: 'SiriProxyCA'
+        server1: 'guzzoni.apple.com'
+        server2: 'your.siri.proxy.server.com'
 
-            commonName  = Common Name (eg, YOUR name)
-            commonName_max  = 64
+7. Generate certificates.   
 
-        with:
-
-            0.commonName = Common Name (eg, YOUR name)
-            0.commonName_default = guzzoni.apple.com
-            0.commonName_max = 64
-            1.commonName = Common Name (eg, YOUR name)
-            1.commonName_default = (IP or HOSTNAME of Proxy Server) 
-            1.commonName_max = 64
-            
-       Dont forget to put you ip/hostname above
-
-7. Generate certificates. If you have edited right the above file then enter only the password when prompted. Leave all the other fields default:  
-
-	`bash gencerts.sh`
+	`siriproxy gencerts`
 
 
 
-8. Install `~/.siriproxy/ca.crt` on all your devices including iphone4s etc. This can easily be done by emailing the file to yourself and clicking on it in the iPhone email app. Follow the prompts.
+8. Install `~/.siriproxy/ca.pem` on all your devices including iphone4s etc. This can easily be done by emailing the file to yourself and clicking on it in the iPhone email app. Follow the prompts.
 
 9. Bundle SiriProxy (this should be done every time you change the config.yml):  
 
 	`siriproxy bundle`
 
-10. Create the tables needed for the database. Do this everytime you make a new install/update. Keep in mind that this will delete all DATA on the tables such as keys and config data
+10. Create the tables needed for the database. You will only need to do this once. Keep in mind that this will delete all DATA on the tables such as keys and config data
 
         siriproxy gentables
 

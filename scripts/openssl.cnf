@@ -148,9 +148,10 @@ localityName			= Locality Name (eg, city)
 organizationalUnitName		= Organizational Unit Name (eg, section)
 #organizationalUnitName_default	=
 
-commonName			= Common Name (eg, YOUR name)
-commonName_max			= 64
-
+    0.commonName = Common Name (eg, YOUR name)
+    0.commonName_max = 64
+    1.commonName = Common Name (eg, YOUR name)
+    1.commonName_max = 64
 emailAddress			= Email Address
 emailAddress_max		= 64
 
