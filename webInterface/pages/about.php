@@ -45,6 +45,7 @@ Although it's stored on the database its not used. Each older device that connec
   <li><a href="https://twitter.com/iH8sn0w">@iH8sn0w</a></li>
   <li><a href="https://twitter.com/MuscleNerd">@MuscleNerd</a></li>
   <li><a href="https://twitter.com/comex">@comex</a></li>
+  <li><a href="https://twitter.com/HisyamNasir">@HisyamNasir</a></li>
   <li><a href="https://twitter.com/ChristopoulosZ">@Zach Christopoulos</a></li>
   <li><a href="https://twitter.com/StanHutcheon">@Stan Hutcheon</a></li>
   <li><a href="https://twitter.com/THiZIZMiZZ">@THiZIZMiZZ</a></li>
