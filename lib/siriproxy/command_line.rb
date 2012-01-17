@@ -41,7 +41,7 @@ class SiriProxy::CommandLine
     case command
     when 'server'           then run_server(subcommand)
     when 'gencerts'         then gen_certs
-    when 'gentables'         then gen_tables  
+    when 'gentables'        then gen_tables  
     when 'bundle'           then run_bundle(subcommand)
     when 'console'          then run_console
     when 'update'           then update(subcommand)
@@ -104,10 +104,12 @@ class SiriProxy::CommandLine
   end
     
   def gen_certs
-    ca_name = @ca_name ||= ""
+    ca_name = $APP_CONFIG.ca_name ||= ""
+    server1 = $APP_CONFIG.server1 ||= ""
+    server2 = $APP_CONFIG.server2 ||= ""
     command = File.join(File.dirname(__FILE__), '..', "..", "scripts", 'gen_certs.sh')
     sp_root = File.join(File.dirname(__FILE__), '..', "..")
-    puts `#{command} "#{sp_root}" "#{ca_name}"`
+    puts `#{command} "#{sp_root}" "#{ca_name}" "#{server1}" "#{server2}"`
   end
     
   def gen_tables
@@ -206,7 +208,13 @@ class SiriProxy::CommandLine
         @branch = branch
       end
       opts.on('-n', '--name CA_NAME',  '[gencerts] Define a common name for the CA (default: "SiriProxyCA")') do |ca_name|
-        @ca_name = ca_name
+        $APP_CONFIG.ca_name = ca_name
+      end 
+      opts.on('-serv1', '--name SERVER1',  '[gencerts] Define a Server 1 for the CA (default: "guzzoni.apple.com")') do |server1|
+        $APP_CONFIG.server1 = server1
+      end 
+      opts.on('-serv2', '--name CA_NAME',  '[gencerts] Define a Server 2 for the CA (default: "your.siri.proxy.server.com")') do |server2|
+        $APP_CONFIG.server2 = server2
       end 
       opts.on('-host', '--db_host Hostname',  '[server] Define a host name for mysql (default: "localhost")') do |db_host|
         $APP_CONFIG.db_host = db_host
