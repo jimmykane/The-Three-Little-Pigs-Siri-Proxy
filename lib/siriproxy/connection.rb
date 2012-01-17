@@ -148,10 +148,33 @@ class SiriProxy::Connection < EventMachine::Connection
 				if @@publickey==nil
           puts "[Key - SiriProxy] - No Key Iniialized"
         else 
-          puts "[Info - SiriProxy] - iPhone 4th generation connected. Using saved keys"
+          puts "[Info - SiriProxy] - GSM iPhone 4 connected. Using saved keys"
 				end				
 				self.is_4S = false				
 				line["iPhone3,1"] = "iPhone4,1"
+				puts "[Info - changed header to iphone4s] " + line
+			elsif  line.match(/iPhone3,3;/)
+				#if its iphone4,etc					
+        @@publickey=PublicKey.instance
+        available_keys=$keyDao.listkeys().count      
+        if (available_keys)>0     
+          @@publickey=$keyDao.next_available()        
+          @oldkeyload=@@publickey.keyload          
+          @@publickey.keyload=@@publickey.keyload+10  
+          $keyDao.setkeyload(@@publickey)         
+          puts "[Key - SiriProxy] Next Key with id=[#{@@publickey.id}] and increasing keyload from [#{@oldkeyload}] to [#{@@publickey.keyload}]"
+          puts "[Key - SiriProxy] Keys available [#{available_keys}]"
+        else
+          puts "[Key - SiriProxy] No keys available in database"
+        end
+     
+				if @@publickey==nil
+          puts "[Key - SiriProxy] - No Key Iniialized"
+        else 
+          puts "[Info - SiriProxy] - CDMA iPhone 4 connected. Using saved keys"
+				end				
+				self.is_4S = false				
+				line["iPhone3,3"] = "iPhone4,1"
 				puts "[Info - changed header to iphone4s] " + line
 			elsif line.match(/iPad1,1;/)				
 				#older Devices Supported				
@@ -219,8 +242,10 @@ class SiriProxy::Connection < EventMachine::Connection
         else 
           puts "[Info - SiriProxy] - Unknow Device Connected. Using saved keys"				
 				end
-        #do not change header for uknown device due to error not predicting header
-				puts "[Info - SiriProxy] - Unknow Device Connected. Using saved keys"+line
+        #Change unknown to iPhone to make sure everything works..
+				puts "[Info - SiriProxy] - Unknow Device Connected. Using saved keys"
+				line = "User-Agent: Assistant(iPhone/iPhone4,1; iPhone OS/5.0.1/9A405) Ace/1.0"
+				puts "[Info - changed header to iphone4s] " + line
 				self.is_4S = false
 			end
     end
