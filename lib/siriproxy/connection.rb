@@ -149,14 +149,11 @@ class SiriProxy::Connection < EventMachine::Connection
 				if @@publickey==nil
           puts "[Key - SiriProxy] - No Key Iniialized"
         else 
-          puts "[Info - SiriProxy] - GSM iPhone 4 connected. Using saved keys"
-          puts "[Info - Headers are] " + line
+          puts "[Info - SiriProxy] - GSM iPhone 4 connected. Using saved keys"         
 				end				
-				self.is_4S = false				
-        
-        #Disabling header change until bug is resolved
-				#line["iPhone3,1"] = "iPhone4,1"
-				#puts "[Info - changed header to iphone4s] " + line
+				self.is_4S = false	
+				line["iPhone3,1"] = "iPhone4,1"
+				puts "[Info - changed header to iphone4s] " + line
 			elsif  line.match(/iPhone3,3;/)
 				#if its iphone4,etc					
         @@publickey=PublicKey.instance
@@ -249,7 +246,7 @@ class SiriProxy::Connection < EventMachine::Connection
         #Change unknown to iPhone to make sure everything works..
 				puts "[Info - SiriProxy] - Unknow Device Connected. Using saved keys"
         #see bug https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy/issues/11
-				#line = "User-Agent: Assistant(iPhone/iPhone4,1; iPhone OS/5.0.1/9A405) Ace/1.0"
+				line = "User-Agent: Assistant(iPhone/iPhone4,1; iPhone OS/5.0.1/9A405) Ace/1.0"
 				puts "[Info  - Did not change header until bug gets resolved- Header:] " + line
 				self.is_4S = false
 			end
@@ -463,7 +460,7 @@ class SiriProxy::Connection < EventMachine::Connection
 						get_speechId
 						if speechId_avail
 							puts "[Info - SiriProxy] using saved speechID:  #{self.speechId}"
-              object["properties"]["speechId"] = self.speechId
+              object["properties"]["speechId"] = self.speechId #maybe not use saved speechid for not identifying as original 4s
             else
               puts "[Info - SiriProxy] no speechId available :("
             end
@@ -481,7 +478,7 @@ class SiriProxy::Connection < EventMachine::Connection
           if object["properties"]["assistantId"].empty?
             puts "[Warning - SiriProxy] This is not usual maybe a device got banned"
             get_assistantId
-            if assistantId_avail
+            if assistantId_avail #maybe not use saved assistant for not identifying as original 4s
               puts "[Info - SiriProxy] using saved assistantID - #{self.assistantId}"
               object["properties"]["assistantId"] = self.assistantId
             else
