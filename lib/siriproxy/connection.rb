@@ -455,16 +455,9 @@ class SiriProxy::Connection < EventMachine::Connection
           self.speechId = object["properties"]["speechId"]
           checkHave4SData
 				else
-					if object["properties"]["speechId"].empty?#warnig this is not usual maybe a device got banned
-            puts "[Warning - SiriProxy] This is not usual maybe a device got banned"
-						get_speechId
-						if speechId_avail
-							puts "[Info - SiriProxy] using saved speechID:  #{self.speechId}"
-              object["properties"]["speechId"] = self.speechId #maybe not use saved speechid for not identifying as original 4s
-            else
-              puts "[Info - SiriProxy] no speechId available :("
-         
-            end
+					if object["properties"]["speechId"].empty?#warning this is not usual maybe a device got banned
+            puts "[Warning - SiriProxy] This is not usual maybe a device got banned"				
+						self.speechId_avail=false
           else
             puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["speechId"]}"
           end
@@ -478,14 +471,7 @@ class SiriProxy::Connection < EventMachine::Connection
         else
           if object["properties"]["assistantId"].empty?
             puts "[Warning - SiriProxy] This is not usual maybe a device got banned"
-            get_assistantId
-            if assistantId_avail #maybe not use saved assistant for not identifying as original 4s
-              puts "[Info - SiriProxy] using saved assistantID - #{self.assistantId}"
-              object["properties"]["assistantId"] = self.assistantId
-            else
-              puts "[Info - SiriProxy] no assistantId available :("
-             
-            end
+            self.assistantId_avail=false
           else
             puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["assistantId"]}"
           end
@@ -503,15 +489,26 @@ class SiriProxy::Connection < EventMachine::Connection
     
     #keeping this for filters
     new_obj = received_object(object)
-    puts self.name
+    #puts self.name
     if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false
       puts "[Protection - Siriproxy ]Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
       if object["class"]=="FinishSpeech" 
-         
+        
       end
       pp object if $LOG_LEVEL > 3
       return nil
     end
+    
+    if self.validationData_avail==true and self.name=='iPhone' and self.is_4S==false and (self.speechId_avail==false or self.assistantId_avail==false)  
+      puts "[Protection - Siriproxy ]Dropping Object from #{self.name}] #{object["class"]} due to Backlisted Device!" if $LOG_LEVEL >= 1      
+      if object["class"]=="FinishSpeech" 
+        
+      end
+      pp object if $LOG_LEVEL > 3
+      return nil
+    end
+    
+    
     if new_obj == nil 
       puts "[Info - Dropping Object from #{self.name}] #{object["class"]}" if $LOG_LEVEL > 1
       pp object if $LOG_LEVEL > 3
