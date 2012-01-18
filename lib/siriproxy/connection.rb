@@ -150,10 +150,13 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Key - SiriProxy] - No Key Iniialized"
         else 
           puts "[Info - SiriProxy] - GSM iPhone 4 connected. Using saved keys"
+          puts "[Info - Headers are] " + line
 				end				
 				self.is_4S = false				
-				line["iPhone3,1"] = "iPhone4,1"
-				puts "[Info - changed header to iphone4s] " + line
+        
+        #Disabling header change until bug is resolved
+				#line["iPhone3,1"] = "iPhone4,1"
+				#puts "[Info - changed header to iphone4s] " + line
 			elsif  line.match(/iPhone3,3;/)
 				#if its iphone4,etc					
         @@publickey=PublicKey.instance
@@ -456,7 +459,7 @@ class SiriProxy::Connection < EventMachine::Connection
           checkHave4SData
 				else
 					if object["properties"]["speechId"].empty?#warnig this is not usual maybe a device got banned
-            puts "[Warning - SiriProxy] This is not usual"
+            puts "[Warning - SiriProxy] This is not usual maybe a device got banned"
 						get_speechId
 						if speechId_avail
 							puts "[Info - SiriProxy] using saved speechID:  #{self.speechId}"
@@ -476,7 +479,7 @@ class SiriProxy::Connection < EventMachine::Connection
 					checkHave4SData
         else
           if object["properties"]["assistantId"].empty?
-            puts "[Warning - SiriProxy] This is not usual"
+            puts "[Warning - SiriProxy] This is not usual maybe a device got banned"
             get_assistantId
             if assistantId_avail
               puts "[Info - SiriProxy] using saved assistantID - #{self.assistantId}"
