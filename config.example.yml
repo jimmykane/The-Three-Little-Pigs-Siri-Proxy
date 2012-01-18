@@ -13,8 +13,8 @@ ca_name: 'SiriProxyCA'
 server1: 'guzzoni.apple.com'
 server2: 'your.siri.proxy.server.com'
 
-#For your email configuration. Edit to your email address and set send_email to on
-send_email: 'ON'
+#For your email configuration. Edit to your email address and set send_email to on. 
+send_email: 'OFF' 
 email_from: 'thethreelittlepigs@siriproxy.org'
 email_to: 'youremail'
 email_subject: 'A 4S Key Expired' 
