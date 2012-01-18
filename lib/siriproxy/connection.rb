@@ -465,7 +465,7 @@ class SiriProxy::Connection < EventMachine::Connection
               puts "[Info - SiriProxy] no speechId available :("
             end
           else
-            puts "[Info - SiriProxy] using speechID sent by iPhone: #{object["properties"]["speechId"]}"
+            puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["speechId"]}"
           end
         end
 			end
@@ -485,7 +485,7 @@ class SiriProxy::Connection < EventMachine::Connection
               puts "[Info - SiriProxy] no assistantId available :("
             end
           else
-            puts "[Info - SiriProxy] using assistantID sent by iPhone: #{object["properties"]["assistantId"]}"
+            puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["assistantId"]}"
           end
 				end
 			end    

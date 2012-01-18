@@ -12,23 +12,23 @@ class SiriProxy::PluginManager < Cora
     @plugins = []
     if $APP_CONFIG.plugins
       $APP_CONFIG.plugins.each do |pluginConfig|
-          if pluginConfig.is_a? String
-            className = pluginConfig
-            requireName = "siriproxy-#{className.downcase}"
-          else
-            className = pluginConfig['name']
-            requireName = pluginConfig['require'] || "siriproxy-#{className.downcase}"
-          end
-          require requireName
-          plugin = SiriProxy::Plugin.const_get(className).new(pluginConfig)
-          plugin.manager = self
-          @plugins << plugin
+        if pluginConfig.is_a? String
+          className = pluginConfig
+          requireName = "siriproxy-#{className.downcase}"
+        else
+          className = pluginConfig['name']
+          requireName = pluginConfig['require'] || "siriproxy-#{className.downcase}"
+        end
+        require requireName
+        plugin = SiriProxy::Plugin.const_get(className).new(pluginConfig)
+        plugin.manager = self
+        @plugins << plugin
       end
     end
     log "Plugins laoded: #{@plugins}"
   end
 
-  def process_filters(object, direction)
+  def process_filters(object, direction)   
     object_class = object.class #This way, if we change the object class we won't need to modify this code.
     plugins.each do |plugin|
       #log "Processing filters on #{plugin} for '#{object["class"]}'"
@@ -36,6 +36,12 @@ class SiriProxy::PluginManager < Cora
       object = new_obj if(new_obj == false || new_obj.class == object_class) #prevent accidental poorly formed returns
       return nil if object == false #if any filter returns "false," then the object should be dropped
     end
+    #Often this indicates a bug in OUR code. So let's not send it to Apple. :-)
+		if((object["class"] == "CommandIgnored")&&(direction==:from_iphone))
+			puts "Maybe a Bug"
+      pp object      
+			return nil
+		end
     
     return object
   end
