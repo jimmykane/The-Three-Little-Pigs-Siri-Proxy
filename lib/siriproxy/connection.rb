@@ -1,5 +1,6 @@
 require 'cfpropertylist'
 require 'siriproxy/interpret_siri'
+require 'pony'
 
 
 
@@ -394,6 +395,15 @@ class SiriProxy::Connection < EventMachine::Connection
         puts "[Warning - SiriProxy] The session Validation Expired"          
         $keyDao.validation_expired(@@publickey)          
         puts "[Warning - SiriProxy] The key [#{@@publickey.id}] Marked as Expired"       
+        #Lets also send an email comming soon
+        if $APP_CONFIG.send_email='ON'
+          begin                     
+            #puts "[Email - SiriProxy] Expired key email sent to [#{$APP_CONFIG.email_to}]"
+          rescue 
+            #puts "[Email - SiriProxy] Warning Cannot send mail. Check your ~/.siriproxy/config.yml"
+          end
+        end        
+        #Done with email
         available_keys=$keyDao.listkeys().count          
         if available_keys >= 1          
           @@publickey=$keyDao.next_available()            

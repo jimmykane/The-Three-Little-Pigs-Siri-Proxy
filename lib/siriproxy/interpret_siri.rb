@@ -18,7 +18,8 @@ class SiriProxy::Interpret
     def unknown_intent(object, connection, processor) 
       return false if object == nil
       return false if (!(object["properties"]["views"][0]["properties"]["dialogIdentifier"] == "Common#unknownIntent") rescue true)
-      
+      #Fix for bug https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy/issues/15
+      return false if (object["properties"]["views"][1]["properties"]["commands"][0]["properties"]["commands"][0]["properties"]["utterance"] rescue true)	
       searchUtterance =  object["properties"]["views"][1]["properties"]["commands"][0]["properties"]["commands"][0]["properties"]["utterance"]
       searchText = searchUtterance.split("^")[3]
       return processor.call(object, connection, searchText)
