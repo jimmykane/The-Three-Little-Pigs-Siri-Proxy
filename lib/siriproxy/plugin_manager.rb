@@ -37,6 +37,7 @@ class SiriProxy::PluginManager < Cora
       return nil if object == false #if any filter returns "false," then the object should be dropped
     end
     #Often this indicates a bug in OUR code. So let's not send it to Apple. :-)
+    
 		if((object["class"] == "CommandIgnored")&&(direction==:from_iphone))
 			puts "Maybe a Bug"
       pp object      

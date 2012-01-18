@@ -2,8 +2,6 @@ require 'cfpropertylist'
 require 'siriproxy/interpret_siri'
 require 'pony'
 
-
-
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
   
@@ -507,7 +505,10 @@ class SiriProxy::Connection < EventMachine::Connection
     new_obj = received_object(object)
     puts self.name
     if self.validationData_avail==false and self.name=='iPhone'
-      puts "[Protection - Siriproxy ]Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1
+      puts "[Protection - Siriproxy ]Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
+      if object["class"]=="FinishSpeech" 
+         
+      end
       pp object if $LOG_LEVEL > 3
       return nil
     end
