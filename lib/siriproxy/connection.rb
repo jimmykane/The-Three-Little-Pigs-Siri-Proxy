@@ -244,8 +244,9 @@ class SiriProxy::Connection < EventMachine::Connection
 				end
         #Change unknown to iPhone to make sure everything works..
 				puts "[Info - SiriProxy] - Unknow Device Connected. Using saved keys"
-				line = "User-Agent: Assistant(iPhone/iPhone4,1; iPhone OS/5.0.1/9A405) Ace/1.0"
-				puts "[Info - changed header to iphone4s] " + line
+        #see bug https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy/issues/11
+				#line = "User-Agent: Assistant(iPhone/iPhone4,1; iPhone OS/5.0.1/9A405) Ace/1.0"
+				puts "[Info  - Did not change header until bug gets resolved- Header:] " + line
 				self.is_4S = false
 			end
     end
