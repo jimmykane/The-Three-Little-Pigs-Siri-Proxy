@@ -74,9 +74,9 @@ class SiriProxy::Connection < EventMachine::Connection
       if available_keys > 0
         self.speechId=@@publickey.speechid		
         self.speechId_avail = true
-        puts "[Keys - SiriProy] Key [#{@publickey.id}] Loaded from Database for SpeechId "
+        puts "[Keys - SiriProy] Key [#{@@publickey.id}] Loaded from Database for SpeechId "
       else
-        self.speechId_avail = true
+        self.speechId_avail = false #Fixed Bug https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy/issues/16#issuecomment-3547831
       end
     rescue SystemCallError,NoMethodError
       puts "[ERROR - SiriProy] Error opening the speechId file. Connect an iPhone4S first or create them manually!"
