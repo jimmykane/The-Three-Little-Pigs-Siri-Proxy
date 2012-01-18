@@ -152,8 +152,8 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] - GSM iPhone 4 connected. Using saved keys"         
 				end				
 				self.is_4S = false	
-				line["iPhone3,1"] = "iPhone4,1"
-				puts "[Info - changed header to iphone4s] " + line
+				#line["iPhone3,1"] = "iPhone4,1"
+				#puts "[Info - changed header to iphone4s] " + line
 			elsif  line.match(/iPhone3,3;/)
 				#if its iphone4,etc					
         @@publickey=PublicKey.instance
@@ -175,8 +175,8 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] - CDMA iPhone 4 connected. Using saved keys"
 				end				
 				self.is_4S = false				
-				line["iPhone3,3"] = "iPhone4,1"
-				puts "[Info - changed header to iphone4s] " + line
+				#line["iPhone3,3"] = "iPhone4,1"
+				#puts "[Info - changed header to iphone4s] " + line
 			elsif line.match(/iPad1,1;/)				
 				#older Devices Supported				
         @@publickey=PublicKey.instance
@@ -198,8 +198,8 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] - iPad 1  generation connected. Using saved keys"						
 				end				
 				self.is_4S = false				
-				line["iPad/iPad1,1"] = "iPhone/iPhone4,1"
-				puts "[Info - changed header to iphone4s] " + line
+				#line["iPad/iPad1,1"] = "iPhone/iPhone4,1"
+				#puts "[Info - changed header to iphone4s] " + line
       elsif line.match(/iPod4,1;/)				
 				#older Devices Supported				
         @@publickey=PublicKey.instance
@@ -221,8 +221,8 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] - iPod touch 4th generation connected. Using saved keys"						
 				end				
 				self.is_4S = false				
-				line["iPod touch/iPod4,1"] = "iPhone/iPhone4,1"
-				puts "[Info - changed header to iphone4s] " + line
+				#line["iPod touch/iPod4,1"] = "iPhone/iPhone4,1"
+				#puts "[Info - changed header to iphone4s] " + line
 			else
         #Everithing else like android devices, computer apps etc
         @@publickey=PublicKey.instance
@@ -246,7 +246,7 @@ class SiriProxy::Connection < EventMachine::Connection
         #Change unknown to iPhone to make sure everything works..
 				puts "[Info - SiriProxy] - Unknow Device Connected. Using saved keys"
         #see bug https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy/issues/11
-				line = "User-Agent: Assistant(iPhone/iPhone4,1; iPhone OS/5.0.1/9A405) Ace/1.0"
+				#line = "User-Agent: Assistant(iPhone/iPhone4,1; iPhone OS/5.0.1/9A405) Ace/1.0"
 				puts "[Info  - Did not change header until bug gets resolved- Header:] " + line
 				self.is_4S = false
 			end
