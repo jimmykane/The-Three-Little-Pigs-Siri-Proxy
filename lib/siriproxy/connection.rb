@@ -460,6 +460,7 @@ class SiriProxy::Connection < EventMachine::Connection
 						self.speechId_avail=false
           else
             puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["speechId"]}"
+            self.speechId_avail=true
           end
         end
 			end
@@ -474,6 +475,7 @@ class SiriProxy::Connection < EventMachine::Connection
             self.assistantId_avail=false
           else
             puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["assistantId"]}"
+             self.assistantId_avail=true
           end
 				end
 			end    
