@@ -504,7 +504,7 @@ class SiriProxy::Connection < EventMachine::Connection
     #keeping this for filters
     new_obj = received_object(object)
     puts self.name
-    if self.validationData_avail==false and self.name=='iPhone'
+    if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false
       puts "[Protection - Siriproxy ]Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
       if object["class"]=="FinishSpeech" 
          
