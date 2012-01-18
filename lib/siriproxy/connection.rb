@@ -431,6 +431,7 @@ class SiriProxy::Connection < EventMachine::Connection
             object["properties"]["validationData"] = plist_blob(self.sessionValidationData)
           else
             puts "[Info - SiriProxy] no validationData available :("
+            
           end
 				end
 			end
@@ -446,6 +447,7 @@ class SiriProxy::Connection < EventMachine::Connection
             object["properties"]["sessionValidationData"] = plist_blob(self.sessionValidationData)
           else
             puts "[Info - SiriProxy] no validationData available :("
+           
           end
         end
 			end
@@ -463,6 +465,7 @@ class SiriProxy::Connection < EventMachine::Connection
               object["properties"]["speechId"] = self.speechId #maybe not use saved speechid for not identifying as original 4s
             else
               puts "[Info - SiriProxy] no speechId available :("
+         
             end
           else
             puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["speechId"]}"
@@ -483,6 +486,7 @@ class SiriProxy::Connection < EventMachine::Connection
               object["properties"]["assistantId"] = self.assistantId
             else
               puts "[Info - SiriProxy] no assistantId available :("
+             
             end
           else
             puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["assistantId"]}"
@@ -501,6 +505,12 @@ class SiriProxy::Connection < EventMachine::Connection
     
     #keeping this for filters
     new_obj = received_object(object)
+    puts self.name
+    if self.validationData_avail==false and self.name=='iPhone'
+      puts "[Protection - Siriproxy ]Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1
+      pp object if $LOG_LEVEL > 3
+      return nil
+    end
     if new_obj == nil 
       puts "[Info - Dropping Object from #{self.name}] #{object["class"]}" if $LOG_LEVEL > 1
       pp object if $LOG_LEVEL > 3

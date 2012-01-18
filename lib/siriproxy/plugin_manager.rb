@@ -28,7 +28,7 @@ class SiriProxy::PluginManager < Cora
     log "Plugins laoded: #{@plugins}"
   end
 
-  def process_filters(object, direction)   
+  def process_filters(object, direction)
     object_class = object.class #This way, if we change the object class we won't need to modify this code.
     plugins.each do |plugin|
       #log "Processing filters on #{plugin} for '#{object["class"]}'"
