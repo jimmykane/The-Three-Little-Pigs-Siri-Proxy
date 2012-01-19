@@ -5,7 +5,7 @@ require 'pony'
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
   
-  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail,:key
+  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :is_GetSessionCertificate
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
     self.other_connection.last_ref_id = ref_id if other_connection.last_ref_id != ref_id
@@ -22,6 +22,7 @@ class SiriProxy::Connection < EventMachine::Connection
     self.zip_stream = Zlib::Deflate.new
     self.consumed_ace = false	
     self.is_4S = false 			#bool if its iPhone 4S
+    self.is_GetSessionCertificate = false #bool if phone is setup
     self.sessionValidationData = nil	#validationData
     self.speechId = nil			#speechID
     self.assistantId = nil			#assistantID
@@ -399,6 +400,11 @@ class SiriProxy::Connection < EventMachine::Connection
       return nil
     end
     #Injected 
+
+    if object["class"]=="GetSessionCertificate"
+      puts "[Warning - SiriProxy] Seems phone is not setup yet..."
+      self.is_GetSessionCertificate = true
+    end
     if object["class"]=="SessionValidationFailed"
       puts "expired"
       get_validationData	      
@@ -505,7 +511,7 @@ class SiriProxy::Connection < EventMachine::Connection
     #keeping this for filters
     new_obj = received_object(object)
     #puts self.name
-    if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false
+    if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false and self.is_GetSessionCertificate = false
       puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
       if object["class"]=="FinishSpeech" 
         
@@ -514,7 +520,7 @@ class SiriProxy::Connection < EventMachine::Connection
       return nil
     end
     
-    if self.validationData_avail==true and self.name=='iPhone' and self.is_4S==false and (self.speechId_avail==false or self.assistantId_avail==false)  
+    if self.validationData_avail==true and self.name=='iPhone' and self.is_4S==false and (self.speechId_avail==false or self.assistantId_avail==false) and self.is_GetSessionCertificate = false
       puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to Backlisted Device!" if $LOG_LEVEL >= 1      
       if object["class"]=="FinishSpeech" 
         
