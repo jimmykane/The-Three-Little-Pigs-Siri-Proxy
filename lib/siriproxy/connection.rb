@@ -401,7 +401,7 @@ class SiriProxy::Connection < EventMachine::Connection
     end
     #Injected 
 
-    if object["class"]=="GetSessionCertificate"
+    if object["class"]=="GetSessionCertificate" or object["class"]=="CreateSessionInfoRequest"
       puts "[Warning - SiriProxy] Seems phone is not setup yet..."
       self.is_GetSessionCertificate = true
     end
@@ -511,7 +511,7 @@ class SiriProxy::Connection < EventMachine::Connection
     #keeping this for filters
     new_obj = received_object(object)
     #puts self.name
-    if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false and self.is_GetSessionCertificate = false
+    if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false and self.is_GetSessionCertificate==false
       puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
       if object["class"]=="FinishSpeech" 
         
@@ -520,7 +520,7 @@ class SiriProxy::Connection < EventMachine::Connection
       return nil
     end
     
-    if self.validationData_avail==true and self.name=='iPhone' and self.is_4S==false and (self.speechId_avail==false or self.assistantId_avail==false) and self.is_GetSessionCertificate = false
+    if self.validationData_avail==true and self.name=='iPhone' and self.is_4S==false and (self.speechId_avail==false or self.assistantId_avail==false) and self.is_GetSessionCertificate==false
       puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to Backlisted Device!" if $LOG_LEVEL >= 1      
       if object["class"]=="FinishSpeech" 
         
@@ -544,6 +544,7 @@ class SiriProxy::Connection < EventMachine::Connection
       return nil
     end
     
+    self.is_GetSessionCertificate = false  #Resets it because it is done.
     
     #object = new_obj if ((new_obj = SiriProxy::Interpret.unknown_intent(object, self, plugin_manager.method(:unknown_command))) != false)    
     #object = new_obj if ((new_obj = SiriProxy::Interpret.speech_recognized(object, self, plugin_manager.method(:speech_recognized))) != false)
