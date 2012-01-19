@@ -52,6 +52,14 @@ Set-up Instructions
 -------------------
 
 
+**Tutorial for Ubuntu is now here**
+
+Thanks to am3yrus we have a tutotial for ubuntu lovers: [(http://am3yrus.over-blog.com/)]
+
+If you go for the above tutotial then there is no need to follow any instructions below. 
+
+
+
 **Set up DNS**
 
 Before you can use SiriProxy, you must set up a DNS server on your network to forward requests for guzzoni.apple.com to the computer running the proxy (make sure that computer is not using your DNS server!). I recommend dnsmasq for this purpose. It's easy to get running and can easily handle this sort of behavior. ([http://www.youtube.com/watch?v=a9gO4L0U59s](http://www.youtube.com/watch?v=a9gO4L0U59s))
