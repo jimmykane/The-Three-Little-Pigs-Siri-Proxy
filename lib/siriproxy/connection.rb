@@ -127,8 +127,6 @@ class SiriProxy::Connection < EventMachine::Connection
 		elsif line.match(/^Host:/)
 		    line = "Host: guzzoni.apple.com"  #Keeps Apple from instantly knowing that
 		                                      #this is a Proxy Server.
-		end
-		
 		elsif line.match(/^User-Agent:/)   
       #if its and iphone4s
 			if line.match(/iPhone4,1;/)
