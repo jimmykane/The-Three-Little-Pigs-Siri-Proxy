@@ -21,14 +21,14 @@ class SiriProxy::Connection < EventMachine::Connection
     self.unzip_stream = Zlib::Inflate.new
     self.zip_stream = Zlib::Deflate.new
     self.consumed_ace = false	
-		self.is_4S = false 			#bool if its iPhone 4S
-		self.sessionValidationData = nil	#validationData
-		self.speechId = nil			#speechID
-		self.assistantId = nil			#assistantID
-		self.speechId_avail = false		#speechID available
-		self.assistantId_avail = false		#assistantId available
-		self.validationData_avail = false	#validationData available		
-		puts "[Info - SiriProxy] Created a connection!" 		
+    self.is_4S = false 			#bool if its iPhone 4S
+    self.sessionValidationData = nil	#validationData
+    self.speechId = nil			#speechID
+    self.assistantId = nil			#assistantID
+    self.speechId_avail = false		#speechID available
+    self.assistantId_avail = false		#assistantId available
+    self.validationData_avail = false	#validationData available		
+    puts "[Info - SiriProxy] Created a connection!" 		
   end
   
   #Changes
@@ -124,6 +124,11 @@ class SiriProxy::Connection < EventMachine::Connection
       #A Device has connected!!!
       #Check for User Agent and replace correctly
       
+		elsif line.match(/^Host:/)
+		    line = "Host: guzzoni.apple.com"  #Keeps Apple from instantly knowing that
+		                                      #this is a Proxy Server.
+		end
+		
 		elsif line.match(/^User-Agent:/)   
       #if its and iphone4s
 			if line.match(/iPhone4,1;/)
@@ -145,13 +150,15 @@ class SiriProxy::Connection < EventMachine::Connection
         end
      
 				if @@publickey==nil
-          puts "[Key - SiriProxy] - No Key Iniialized"
+          puts "[Key - SiriProxy] No Key Iniialized"
         else 
-          puts "[Info - SiriProxy] - GSM iPhone 4 connected. Using saved keys"         
+          puts "[Info - SiriProxy] GSM iPhone 4 connected. Using saved keys"         
 				end				
 				self.is_4S = false	
-				#line["iPhone3,1"] = "iPhone4,1"
-				#puts "[Info - changed header to iphone4s] " + line
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+				line["iPhone3,1"] = "iPhone4,1"
+				puts "[Info - SiriProxy] Changed header to iphone4s] "
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 			elsif  line.match(/iPhone3,3;/)
 				#if its iphone4,etc					
         @@publickey=PublicKey.instance
@@ -168,13 +175,15 @@ class SiriProxy::Connection < EventMachine::Connection
         end
      
 				if @@publickey==nil
-          puts "[Key - SiriProxy] - No Key Iniialized"
+          puts "[Key - SiriProxy] No Key Iniialized"
         else 
-          puts "[Info - SiriProxy] - CDMA iPhone 4 connected. Using saved keys"
+          puts "[Info - SiriProxy] CDMA iPhone 4 connected. Using saved keys"
 				end				
 				self.is_4S = false				
-				#line["iPhone3,3"] = "iPhone4,1"
-				#puts "[Info - changed header to iphone4s] " + line
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+				line["iPhone3,3"] = "iPhone4,1"
+				puts "[Info - SiriProxy] Changed header to iphone4s] "
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 			elsif line.match(/iPad1,1;/)				
 				#older Devices Supported				
         @@publickey=PublicKey.instance
@@ -191,12 +200,15 @@ class SiriProxy::Connection < EventMachine::Connection
         end
      
 				if @@publickey==nil
-					puts "[Key - SiriProxy] - No Key Available right now ;("
+					puts "[Key - SiriProxy] No Key Available right now ;("
         else 
-          puts "[Info - SiriProxy] - iPad 1  generation connected. Using saved keys"						
+          puts "[Info - SiriProxy] iPad 1st generation connected. Using saved keys"						
 				end				
 				self.is_4S = false				
-				#line["iPad/iPad1,1"] = "iPhone/iPhone4,1"
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+				line["iPad/iPad1,1"] = "iPhone/iPhone4,1"
+				puts "[Info - SiriProxy] Changed header to iphone4s] "
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				#puts "[Info - changed header to iphone4s] " + line
       elsif line.match(/iPod4,1;/)				
 				#older Devices Supported				
@@ -216,11 +228,13 @@ class SiriProxy::Connection < EventMachine::Connection
 				if @@publickey==nil
 					puts "[Key - SiriProxy] - No Key Available right now ;("
         else 
-          puts "[Info - SiriProxy] - iPod touch 4th generation connected. Using saved keys"						
+          puts "[Info - SiriProxy] iPod touch 4th generation connected. Using saved keys"						
 				end				
 				self.is_4S = false				
-				#line["iPod touch/iPod4,1"] = "iPhone/iPhone4,1"
-				#puts "[Info - changed header to iphone4s] " + line
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+				line["iPod touch/iPod4,1"] = "iPhone/iPhone4,1"
+				puts "[Info - SiriProxy] Changed header to iphone4s] "
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 			else
         #Everithing else like android devices, computer apps etc
         @@publickey=PublicKey.instance
@@ -237,16 +251,17 @@ class SiriProxy::Connection < EventMachine::Connection
         end
      
 				if @@publickey==nil
-					puts "[Key - SiriProxy] - No Key Available right now ;("
+					puts "[Key - SiriProxy] No Key Available right now ;("
         else 
-          puts "[Info - SiriProxy] - Unknow Device Connected. Using saved keys"				
+          puts "[Info - SiriProxy] Unknow Device Connected. Using saved keys"				
 				end
         #Change unknown to iPhone to make sure everything works..
-				puts "[Info - SiriProxy] - Unknow Device Connected. Using saved keys"
-        #see bug https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy/issues/11
-				#line = "User-Agent: Assistant(iPhone/iPhone4,1; iPhone OS/5.0.1/9A405) Ace/1.0"
-				puts "[Info  - Did not change header until bug gets resolved- Header:] " + line
 				self.is_4S = false
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+				line = "User-Agent: Assistant(iPhone/iPhone4,1; iPhone OS/5.0.1/9A405) Ace/1.0"
+				puts "[Info - SiriProxy] Changed header to iphone4s] "
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+				#puts "[Info - SiriProxy] Did not change header until bug gets resolved- Header:] " + line
 			end
     end
     
@@ -408,10 +423,10 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Key - SiriProxy] Changed Key to key {#{[@@publickey.id]}" 
         elsif available_keys <1          
           puts "[Keys - SiriProxy] Available Keys in Database: [#{available_keys}]"
-          puts "[Key - No keys found in Database Available :(] " 									
+          puts "[Keys - SiriProxy] No keys found in Database Available :( " 									
         end        
       else 
-        puts "[Key - No Validation Data AND No Key Available :(] " 									
+        puts "[Keys - SiriProxy]  No Validation Data AND No Key Available :( " 									
       end 
     end
     
@@ -493,7 +508,7 @@ class SiriProxy::Connection < EventMachine::Connection
     new_obj = received_object(object)
     #puts self.name
     if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false
-      puts "[Protection - Siriproxy ]Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
+      puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
       if object["class"]=="FinishSpeech" 
         
       end
@@ -502,7 +517,7 @@ class SiriProxy::Connection < EventMachine::Connection
     end
     
     if self.validationData_avail==true and self.name=='iPhone' and self.is_4S==false and (self.speechId_avail==false or self.assistantId_avail==false)  
-      puts "[Protection - Siriproxy ]Dropping Object from #{self.name}] #{object["class"]} due to Backlisted Device!" if $LOG_LEVEL >= 1      
+      puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to Backlisted Device!" if $LOG_LEVEL >= 1      
       if object["class"]=="FinishSpeech" 
         
       end
