@@ -15,7 +15,7 @@ class SiriProxy
     # @todo shouldnt need this, make centralize logging instead
     $LOG_LEVEL = $APP_CONFIG.log_level.to_i
     #
-    puts "Initializing Proxy..."
+    puts "Initializing Proxy... Experimental version"
     
     #Initialization of event machine variables overider +epoll mode on by default    		
 		EM.epoll
