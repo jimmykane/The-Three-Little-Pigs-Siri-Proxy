@@ -33,6 +33,14 @@ class SiriProxy
     #end of config
     EM.threadpool_size=$conf.max_threads
     
+    
+    #Print email config
+    if $APP_CONFIG.send_email='ON' 
+      puts '[Info - SiriProxy] Email notifications are [ON]!'
+    else
+      puts '[Info - SiriProxy] Email notifications are [OFF]!'
+    end
+    
     #initialize key controller
     @@key=Key.new
     @@key.keyload=0
