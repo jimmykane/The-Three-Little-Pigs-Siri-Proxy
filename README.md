@@ -4,9 +4,7 @@ The Three Little Pigs - Siri Proxy by Jimmy Kane :-)
 About
 -----
 
-Author: Dimitrios Kanellopoulos
-
-Email: jimmykane9@gmail.com
+Author: Dimitrios Kanellopoulos - thpryrchn - Wouter DS
 
 Twitter: http://twitter.com/JimmyKane9
 
