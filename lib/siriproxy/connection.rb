@@ -494,7 +494,7 @@ class SiriProxy::Connection < EventMachine::Connection
             puts "[Warning - SiriProxy] This is not usual maybe a device got banned"
             self.assistantId_avail=false
           else
-            puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["assistantId"]}"
+            puts "[Info - SiriProxy] using/created assistantId: #{object["properties"]["assistantId"]}"
              self.assistantId_avail=true
           end
 				end
