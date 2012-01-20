@@ -527,7 +527,8 @@ class SiriProxy::Connection < EventMachine::Connection
       return nil
     end
     
-    ## --If the speechId and assistantId are nil, the phone is not setup, not banned..
+    ## --If the speechId and assistantId are nil, the phone is not setup, not banned.. 
+    #Jimmy Kane: But what if the current validation data cannot support more devices?
     #if self.validationData_avail==true and self.name=='iPhone' and self.is_4S==false and (self.speechId_avail==false or self.assistantId_avail==false)
     #  puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to Backlisted Device!" if $LOG_LEVEL >= 1      
     #  if object["class"]=="FinishSpeech" 
