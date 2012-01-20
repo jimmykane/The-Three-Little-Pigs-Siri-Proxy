@@ -21,7 +21,18 @@ Version 0.8
 
 Fixed several bugs, added email notifications, key protection and much more
 
-If you are updating dont forget to copy the new config.yml with the email setup!
+
+**Updating from v.0.7**
+
+There is no need to do anything more (create db etc) than these steps
+
+1. Run `siriproxy update`
+
+2. Copy the new `cp config.example.yml ~/.siriproxy/config.yml` with the email setup and edit it!
+
+3. Start the server `siriproxy server`
+
+
 
 Features
 --------
