@@ -30,6 +30,10 @@ There is no need to do anything more (create db etc) than these steps
 
 3. Start the server `siriproxy server`
 
+4. (Optional) Update to the new webinterface. Just copy all files from `webInterface/` to your html/docs and dont forget to edit the database connection info in `inc/connection.inc.php`
+
+    
+
 
 
 Features
