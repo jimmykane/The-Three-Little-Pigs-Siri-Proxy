@@ -43,6 +43,7 @@ $pMgr = new PageManager("pages", "page");
                         <ul>
                             <li><a href="https://twitter.com/WouterDS" class="twitter-follow-button" data-show-count="true" style="width: 250px;">Follow @WouterDS</a></li>
                             <li><a href="https://twitter.com/JimmyKane9" class="twitter-follow-button" data-show-count="true" style="width: 250px;">Follow @JimmyKane9</a></li>
+                            <li> <a href="https://twitter.com/thpryrchn" class="twitter-follow-button" data-show-count="true" style="width: 250px;">Follow @thpryrchn </a></li>
                         </ul>
                     </div>
                     <div class="right">
@@ -60,10 +61,7 @@ $pMgr = new PageManager("pages", "page");
                         <ul>
                             <li>T: <a href="http://twitter.com/jimmykane9">@JimmyKane9</a></li>
                             <li>G+: <a href="http://gplus.to/jimmykane">http://gplus.to/jimmykane</a></li>
-                        </ul>
-                        <ul>
-                            <li>T: <a href="https://twitter.com/#!/thpryrchn">@thpryrchn</a></li>                            
-                        </ul>
+                        </ul>         
                     </div>
                 </div>
                 <div class="clear"></div>
