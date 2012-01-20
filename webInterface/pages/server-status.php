@@ -2,6 +2,7 @@
 	$keys = getkeys();
 	$config = getconfig();
 	$count = 0;      
+        $server_running= checkServer();
 ?>
 <h1>Server Status and Statistics</h1>
 <h2>Legend</h2>
@@ -17,7 +18,11 @@
 <table>
 	<tr>
     	<th>Server status</th>
-        <td>ON</td>
+        <td>
+            <?php
+            if ($server_running==true) echo 'ON'; else echo 'OFF';
+            ?>
+        </td>        
    	</tr>
     <tr>
         <th>Available keys</th>

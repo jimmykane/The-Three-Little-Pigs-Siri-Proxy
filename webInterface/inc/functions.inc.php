@@ -8,7 +8,7 @@ function getkeys() {
     if ($available_keys_count > 0) {
 
         $keys = $db->GetResultAsArray($result);
-        $keys[0]['availablekeys']=$available_keys_count;
+        $keys[0]['availablekeys'] = $available_keys_count;
         return $keys;
     }
     return false;
@@ -20,6 +20,15 @@ function getconfig() {
     $result = $db->MakeQuery($query);
     $config = $db->GetRecord($result);
     return $config;
+}
+
+function checkServer() {
+    $cmd = "ps -C siriproxy";
+    exec($cmd, $output, $result);
+    if (count($output) >= 2) {
+        return true;
+    }
+    return false;
 }
 
 ?>
