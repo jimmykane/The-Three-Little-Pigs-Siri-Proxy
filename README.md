@@ -256,6 +256,8 @@ Acknowledgements
 
 **Credits, greetings and big thanks to all the following.. RESPECT**
 
+Mr. Nirodimos for helping with the iphon4s 
+
   @plamoni ([http://twitter.com/plamoni])
 
   @kmsbueromoebel ([http://ketchup-mayo-senf.de/blog/])
