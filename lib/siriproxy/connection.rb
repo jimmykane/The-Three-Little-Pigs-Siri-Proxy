@@ -414,7 +414,7 @@ class SiriProxy::Connection < EventMachine::Connection
         $keyDao.validation_expired(@@publickey)          
         puts "[Warning - SiriProxy] The key [#{@@publickey.id}] Marked as Expired"       
         #Lets also send an email comming soon
-        if $APP_CONFIG.send_email='ON'
+        if $APP_CONFIG.send_email=='ON' or $APP_CONFIG.send_email=='no'
           begin
             Pony.mail(
               :to => $APP_CONFIG.email_to, 
