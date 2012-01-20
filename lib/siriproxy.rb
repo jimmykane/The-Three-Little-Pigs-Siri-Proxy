@@ -67,11 +67,12 @@ class SiriProxy
           $conf.active_connections = EM.connection_count          
           $confDao.update($conf)
           puts "[Info - SiriProxy] Active connections [#{$conf.active_connections}] Max connections [#{$conf.max_connections}]"
-          if $conf.active_connections>=$conf.max_connections 
-            EventMachine.stop
-            puts "[Warning - Exit - SiriProxy] Max Connections reached! Sever exiting...."
-            exit (0)#Fix for issue-bug https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy/issues/14
-          end
+          # No Longer needed. Now rejects connections from iphone when max connections happen.
+          #if $conf.active_connections>=$conf.max_connections 
+          #  EventMachine.stop
+          #  puts "[Warning - Exit - SiriProxy] Max Connections reached! Sever exiting...."
+          #  exit (0)#Fix for issue-bug https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy/issues/14
+          #end
         }
         EventMachine::PeriodicTimer.new($conf.keyload_dropdown_interval){
           @@overloaded_keys_count=$keyDao.findoverloaded().count

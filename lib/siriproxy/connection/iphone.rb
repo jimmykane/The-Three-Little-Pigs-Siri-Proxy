@@ -1,18 +1,29 @@
+
 #####
   # This is the connection to the iPhone
 #####
 class SiriProxy::Connection::Iphone < SiriProxy::Connection
   def initialize
+    $conf.active_connections = EM.connection_count          
     puts "Create server for iPhone connection"
     super
     self.name = "iPhone"
   end
 
   def post_init
-    super
-    start_tls(:cert_chain_file  => File.expand_path("~/.siriproxy/server.passless.crt"),
-              :private_key_file => File.expand_path("~/.siriproxy/server.passless.key"),
-              :verify_peer      => false)
+    puts "[Info - iPhone] Curent connection [#{$conf.active_connections}]"
+    
+    if $conf.active_connections>=$conf.max_connections 
+      puts "[Warning - iPhone] Max Connections reached! Connection dropping...."
+      super
+      self.close_connection
+      start_tls(:verify_peer      => false)
+      else        
+      super
+      start_tls(:cert_chain_file  => File.expand_path("~/.siriproxy/server.passless.crt"),
+                :private_key_file => File.expand_path("~/.siriproxy/server.passless.key"),
+                :verify_peer      => false)
+    end
   end
 
   def ssl_handshake_completed
