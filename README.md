@@ -16,10 +16,19 @@ Google+: http://gplus.to/jimmykane
 The Three Little Pigs siri proxy server is an intelligent server with key throttling and database connection.
 
 
+Version 0.8
+-----------
+
+Fixed several bugs, added email notifications, key protection and much more
+
+If you are updating dont forget to copy the new config.yml with the email setup!
+
 Features
---------------------
+--------
 
 -Plugins api and config capable (NEW)
+
+-Email Notifications when the key expires (NEW) - Dont forget to setup your email on the config.yml
 
 -MySql Database connection support: Supports MySQL database connection for storing configuration,keys and runtime statistics. Now you can edit and build that (NEW)
 
@@ -54,9 +63,9 @@ Set-up Instructions
 
 **Tutorial for Ubuntu is now here**
 
-Thanks to am3yrus we have a tutotial for ubuntu lovers: [(http://am3yrus.over-blog.com/)]
+Thanks to am3yrus we have a tutorial for ubuntu lovers: [(http://am3yrus.over-blog.com/)]
 
-If you go for the above tutotial then there is no need to follow any instructions below. 
+If you go for the above tutorial then there is no need to follow any instructions below. 
 
 
 

@@ -13,9 +13,10 @@ ca_name: 'SiriProxyCA'
 server1: 'guzzoni.apple.com'
 server2: 'your.siri.proxy.server.com'
 
-#For your email configuration. Edit to your email address and set send_email to on. 
+#For your email configuration. Edit to your email address and set send_email to 'ON'. 
 #Also plase notice that you have to configure sendmail for you pc if its required
 #It is possible that this email will be delivered to your spam/junk folder.
+#html formated message is default
 send_email: 'OFF' 
 email_from: 'The Three Little Pigs'
 email_to: 'youremail'
