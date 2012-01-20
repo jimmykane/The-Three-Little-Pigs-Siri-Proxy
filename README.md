@@ -28,7 +28,7 @@ There is no need to do anything more (create db etc) than these steps
 
 1. Run `siriproxy update`
 
-2. Edit ` ~/.siriproxy/config.yml` with the new email setup lines from `cp config.example.yml` !
+2. Edit ` ~/.siriproxy/config.yml` with the new email setup lines from `config.example.yml` !
 
 3. Start the server `siriproxy server`
 
