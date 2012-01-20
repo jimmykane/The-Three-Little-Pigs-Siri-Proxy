@@ -35,7 +35,7 @@ class SiriProxy
     
     
     #Print email config
-    if $APP_CONFIG.send_email='ON' 
+    if $APP_CONFIG.send_email=='ON' or $APP_CONFIG.send_email=='on'
       puts '[Info - SiriProxy] Email notifications are [ON]!'
     else
       puts '[Info - SiriProxy] Email notifications are [OFF]!'
