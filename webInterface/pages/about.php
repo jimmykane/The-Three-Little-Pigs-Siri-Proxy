@@ -68,3 +68,14 @@ Although it's stored on the database its not used. Each older device that connec
         </form>
     </div>
 </div>
+<script type="text/javascript"><!--
+google_ad_client = "ca-pub-6472702431228368";
+/* The Three Little Pigs */
+google_ad_slot = "4196627207";
+google_ad_width = 728;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
