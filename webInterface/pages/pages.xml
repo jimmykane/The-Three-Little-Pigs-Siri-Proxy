@@ -16,15 +16,7 @@
 		<name>Server Status</name>
 		<file>server-status</file>
 		<extension>php</extension>
-	</page>	
-	
-	<page>
-		<name>Unban Your Device</name>
-		<file>unban-your-device</file>
-		<extension>html</extension>
-	</page>
-	
-	
+	</page>		
 	
 	
 </pages>

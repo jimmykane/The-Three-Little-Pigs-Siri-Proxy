@@ -14,6 +14,16 @@ server1: 'guzzoni.apple.com'
 server2: 'your.siri.proxy.server.com'
 
 #For your email configuration. Edit to your email address and set send_email to on. 
+#Also plase notice that you have to configure sendmail for you pc if its required
+#It is possible that this email will be delivered to your spam/junk folder.
+send_email: 'OFF' 
+email_from: 'The Three Little Pigs'
+email_to: 'youremail'
+email_subject: 'A 4S Key Expired' 
+email_message: '<p>Hello, </br> this is an automated message from The Three Little Pigs SiriProxy.
+</br> A 4S key on the database has expired!</p><p>Please do not reply to this message</p>'
+
+#For your email configuration. Edit to your email address and set send_email to on. 
 send_email: 'OFF' 
 email_from: 'thethreelittlepigs@siriproxy.org'
 email_to: 'youremail'

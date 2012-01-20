@@ -3,11 +3,10 @@ while true;
 do 
 echo "Starting Server"
     if siriproxy server; then
-
-       echo "Server is Running"
+       echo "Max connections reached!" 
    exit 1
    else
       echo "Crashed! Restarting!"
 fi
-sleep 2
+sleep 30
 done
