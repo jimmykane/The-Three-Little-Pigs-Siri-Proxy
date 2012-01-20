@@ -8,5 +8,5 @@ echo "Starting Server"
    else
       echo "Crashed! Restarting!"
 fi
-sleep 30
+sleep 60
 done

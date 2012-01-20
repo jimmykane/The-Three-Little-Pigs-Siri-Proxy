@@ -30,5 +30,4 @@ function checkServer() {
     }
     return false;
 }
-
 ?>

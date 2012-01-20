@@ -20,13 +20,22 @@
     	<th>Server status</th>
         <td>
             <?php
-            if ($server_running==true) echo 'ON'; else echo 'OFF';
+            if ($server_running==true)
+                echo '<p class="notification green">ON</p>'; 
+            else 
+                echo '<p class="notification red">OFF</p>';
             ?>
         </td>        
    	</tr>
     <tr>
         <th>Available keys</th>
-        <td><?php echo $keys[0]['availablekeys'] ?></td>
+        <td><?php         
+            if (count($keys)<=0)
+                echo '<p class="notification red">0</p>' ;
+            else 
+                echo '<p class="notification green">'.$keys[0]['availablekeys'].'</p>' ;                  
+             ?>
+        </td>
    	</tr>
     <tr>
         <th>Maximum connections</th>
