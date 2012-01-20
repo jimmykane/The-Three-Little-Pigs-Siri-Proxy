@@ -4,6 +4,7 @@
 <p>&nbsp;</p>
 <ul>    
 <li><b>Plugins api and config capable (NEW)</b> Now Enjoy Your new plugins!</li>
+<li><b>Email Notifications when the key expires (NEW)</b> Dont forget to setup your email!</li>
 <li><b>MySql Database connection support:</b> Supports MySQL database connection for storing configuration,keys and runtime statistics. Now you can edit and build that (NEW)</li>
 <li><b>Multiple key support:</b> You can connect more than 1 iPhone4S and store even more keys. The more the keys, the more the clients!</li>
 <li><b>Key Throttling:</b> Each client uses a different key, if more than one Keys are available. The throttler makes sure that each Key is throttled thus enabling several client registration and assistant object creation.</li>

@@ -74,7 +74,7 @@ Set-up Instructions
 
 **Tutorial for Ubuntu is now here**
 
-Thanks to am3yrus we have a tutorial for ubuntu lovers: [(http://am3yrus.over-blog.com/)]
+Thanks to am3yrus we have a tutorial for ubuntu lovers: [http://am3yrus.over-blog.com/]
 
 If you go for the above tutorial then there is no need to follow any instructions below. 
 
