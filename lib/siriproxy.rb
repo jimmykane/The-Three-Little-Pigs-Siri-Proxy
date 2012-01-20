@@ -62,7 +62,7 @@ class SiriProxy
           if $conf.active_connections>=$conf.max_connections 
             EventMachine.stop
             puts "[Warning - Exit - SiriProxy] Max Connections reached! Sever exiting...."
-            exit (1)#Fix for issue-bug https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy/issues/14
+            exit (0)#Fix for issue-bug https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy/issues/14
           end
         }
         EventMachine::PeriodicTimer.new($conf.keyload_dropdown_interval){
