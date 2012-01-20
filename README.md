@@ -256,7 +256,7 @@ Acknowledgements
 
 **Credits, greetings and big thanks to all the following.. RESPECT**
 
-Mr. Nirodimos for helping with the iphon4s 
+Mr. Nirodimos for helping with the iphone4s 
 
   @plamoni ([http://twitter.com/plamoni])
 
