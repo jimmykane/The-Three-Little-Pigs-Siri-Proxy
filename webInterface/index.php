@@ -61,6 +61,9 @@ $pMgr = new PageManager("pages", "page");
                             <li>T: <a href="http://twitter.com/jimmykane9">@JimmyKane9</a></li>
                             <li>G+: <a href="http://gplus.to/jimmykane">http://gplus.to/jimmykane</a></li>
                         </ul>
+                        <ul>
+                            <li>T: <a href="https://twitter.com/#!/thpryrchn">@thpryrchn</a></li>                            
+                        </ul>
                     </div>
                 </div>
                 <div class="clear"></div>
