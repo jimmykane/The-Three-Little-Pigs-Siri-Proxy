@@ -2,7 +2,7 @@
 	$keys = getkeys();
 	$config = getconfig();
 	$count = 0;      
-        $server_running= checkServer();
+        $server_running= checkServer();        
 ?>
 <h1>Server Status and Statistics</h1>
 <h2>Legend</h2>
@@ -29,8 +29,9 @@
    	</tr>
     <tr>
         <th>Available keys</th>
-        <td><?php         
-            if (count($keys)<=0)
+        <td><?php   
+      
+            if ($keys==false)
                 echo '<p class="notification red">0</p>' ;
             else 
                 echo '<p class="notification green">'.$keys[0]['availablekeys'].'</p>' ;                  
