@@ -36,6 +36,23 @@ class SiriProxy::Connection < EventMachine::Connection
       self.validationData_avail = false
     end     
   end
+  def sendemail()
+     #Lets also send an email comming soon
+        if $APP_CONFIG.send_email=='ON' or $APP_CONFIG.send_email=='no'
+          begin
+            Pony.mail(
+              :to => $APP_CONFIG.email_to, 
+              :from => $APP_CONFIG.email_from,
+              :subject => $APP_CONFIG.email_subject,
+              :html_body => $APP_CONFIG.email_message
+            )
+            puts "[Email - SiriProxy] Expired key email sent to [#{$APP_CONFIG.email_to}]"
+          rescue 
+            puts "[Email - SiriProxy] Warning Cannot send mail. Check your ~/.siriproxy/config.yml"            
+          end
+        end        
+        #Done with email
+  end
   
   #Changes
   def checkHave4SData
@@ -72,8 +89,7 @@ class SiriProxy::Connection < EventMachine::Connection
 	end  
   #these should never be used!!!
   def get_speechId
-    begin
-      #File.open("../keys/shared/speechId", "r") {|file| self.speechId = file.read}				
+    begin			
       available_keys=$keyDao.listkeys().count     
       if available_keys > 0
         self.speechId=@@publickey.speechid		
@@ -88,9 +104,7 @@ class SiriProxy::Connection < EventMachine::Connection
 	end
 
 	def get_assistantId
-    begin
-      #File.open("../keys/shared/assistantId", "r") {|file| self.assistantId = file.read}
-      #puts self.keylist[0].assistantid
+    begin      
       available_keys=$keyDao.listkeys().count     
       if available_keys > 0
         self.assistantId=@@publickey.assistantid				
@@ -416,21 +430,7 @@ class SiriProxy::Connection < EventMachine::Connection
         puts "[Warning - SiriProxy] The session Validation Expired"          
         $keyDao.validation_expired(@@publickey)          
         puts "[Warning - SiriProxy] The key [#{@@publickey.id}] Marked as Expired"       
-        #Lets also send an email comming soon
-        if $APP_CONFIG.send_email=='ON' or $APP_CONFIG.send_email=='no'
-          begin
-            Pony.mail(
-              :to => $APP_CONFIG.email_to, 
-              :from => $APP_CONFIG.email_from,
-              :subject => $APP_CONFIG.email_subject,
-              :html_body => $APP_CONFIG.email_message
-            )
-            puts "[Email - SiriProxy] Expired key email sent to [#{$APP_CONFIG.email_to}]"
-          rescue 
-            puts "[Email - SiriProxy] Warning Cannot send mail. Check your ~/.siriproxy/config.yml"
-          end
-        end        
-        #Done with email
+        sendemail
         available_keys=$keyDao.listkeys().count          
         if available_keys >= 1          
           @@publickey=$keyDao.next_available()            
