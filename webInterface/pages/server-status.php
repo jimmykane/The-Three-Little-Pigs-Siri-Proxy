@@ -1,8 +1,8 @@
 <?php
-	$keys = getkeys();
-	$config = getconfig();
-	$count = 0;      
-        $server_running= checkServer();        
+$keys = getkeys();
+$config = getconfig();
+$count = 0;
+$server_running = checkServer();
 ?>
 <h1>Server Status and Statistics</h1>
 <h2>Legend</h2>
@@ -16,56 +16,54 @@
 </ul></p>
 <br />
 <table>
-	<tr>
-    	<th>Server status</th>
+    <tr>
+        <th>Server status</th>
         <td>
             <?php
-            if ($server_running==true)
-                echo '<p class="notification green">ON</p>'; 
-            else 
+            if ($server_running == true)
+                echo '<p class="notification green">ON</p>';
+            else
                 echo '<p class="notification red">OFF</p>';
             ?>
         </td>        
-   	</tr>
+    </tr>
     <tr>
         <th>Available keys</th>
-        <td><?php   
-      
-            if ($keys==false)
-                echo '<p class="notification red">0</p>' ;
-            else 
-                echo '<p class="notification green">'.$keys[0]['availablekeys'].'</p>' ;                  
-             ?>
+        <td><?php
+            if ($keys == false)
+                echo '<p class="notification red">0</p>';
+            else
+                echo '<p class="notification green">' . $keys[0]['availablekeys'] . '</p>';
+            ?>
         </td>
-   	</tr>
+    </tr>
     <tr>
         <th>Maximum connections</th>
         <td><?php echo $config['max_connections'] ?></td>
-   	</tr>
+    </tr>
     <tr>
         <th>Active connections</th>
         <td><?php
-				if($config['active_connections'] >= 2) {
-        			echo $config['active_connections'] - 2; #-2 because 1 for guzzoni and 1 for server
-				}
-				else {
-					echo $config['active_connections'];
-				}
-			?></td>
+            if ($config['active_connections'] >= $config['max_connections'])
+                echo '<p class="notification red">' . $config['active_connections'] . '</p>';
+            else
+                echo '<p class="notification green">' . $config['active_connections'] . '</p>';
+            ?>
+        </td>
 
-   	</tr>
+    </tr>
     <tr>
         <th>Max keyload</th>
         <td><?php echo $config['max_keyload'] ?></td>
-   	</tr>
+    </tr>
     <tr>
         <th>Keyload dropdown</th>
-        <td><?php echo  $config['keyload_dropdown'] ?></td>
-   	</tr>
+        <td><?php echo $config['keyload_dropdown'] ?></td>
+    </tr>
     <tr>
         <th>Keyload check interval (sec)</th>
-        <td><?php echo  $config['keyload_dropdown_interval'] ?></td>
-   	</tr>
+        <td><?php echo $config['keyload_dropdown_interval'] ?></td>
+    </tr>
 </table>
 <br />
 <h1>Available keys</h1>
@@ -80,16 +78,16 @@
 </ul>
 </p>
 <br />
-<?php if ($keys!=false&&$keys[0]['availablekeys'] > 0) { ?>
-<table>
-	<tr>
-    	<th>ID</th>
-        <th>Speech ID</th>
-        <th>Assistant ID</th>
-        <th>Validation Data (24h)</th>
-        <th>Keyload</th>
-        <th>Date Added</th>
-   	</tr>
+<?php if ($keys != false && $keys[0]['availablekeys'] > 0) { ?>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Speech ID</th>
+            <th>Assistant ID</th>
+            <th>Validation Data (24h)</th>
+            <th>Keyload</th>
+            <th>Date Added</th>
+        </tr>
         <?php
         foreach ($keys as $key) {
             $count++;
@@ -100,22 +98,23 @@
                 <td><?php echo $key['assistantid'] ?></td>
                 <td>-------</td>
                 <td>
-					<?php if($key['keyload'] >= $config['max_keyload']) { ?>
+                    <?php if ($key['keyload'] >= $config['max_keyload']) { ?>
                         <p class="notification red">Overloaded</p>
-                    <?php } else {
-						echo $key['keyload'] .' / ' . $config['max_keyload'];
+                        <?php
+                    } else {
+                        echo $key['keyload'] . ' / ' . $config['max_keyload'];
                     }
                     ?>
                 </td>
                 <td>
-        			<?php echo $key['date_added'] ?>
+                    <?php echo $key['date_added'] ?>
                 </td>
             </tr>
-    <?php } ?>
+        <?php } ?>
     </table>
 
 <?php } else { ?>
-<p class="notification red">There are no keys available right now, feed the piggies!</p>
+    <p class="notification red">There are no keys available right now, feed the piggies!</p>
 
 <?php } ?>
 <br />
@@ -123,7 +122,7 @@
 <h2>Contribute for further development.</h2>
 <div style="overflow: hidden;">
     <div style="float: left; width: 600px;">
-    	<p>Contribute for further development<br />Donations are welcome in order to keep me developing this project at these hard times. </p>
+        <p>Contribute for further development<br />Donations are welcome in order to keep me developing this project at these hard times. </p>
     </div>
     <div style="float: right; width: 300px; padding-top: 20px;">
         <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
@@ -135,13 +134,13 @@
     </div>
 </div>
 <script type="text/javascript"><!--
-google_ad_client = "ca-pub-6472702431228368";
-/* The Three Little Pigs */
-google_ad_slot = "4196627207";
-google_ad_width = 728;
-google_ad_height = 90;
-//-->
+    google_ad_client = "ca-pub-6472702431228368";
+    /* The Three Little Pigs */
+    google_ad_slot = "4196627207";
+    google_ad_width = 728;
+    google_ad_height = 90;
+    //-->
 </script>
 <script type="text/javascript"
-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+        src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
