@@ -152,7 +152,7 @@ class SiriProxy::CommandLine
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;")
     puts "Created Table config"
 
-    dbh.query("INSERT INTO `config` VALUES ('1', '20', '50', '7', '500', '50', '900');")
+    dbh.query("INSERT INTO `config` VALUES ('1', '20', '50', '0', '5000', '400', '300');")
     puts "Added Default setting in Table config"
     
   end
