@@ -32,7 +32,7 @@ class SiriProxy::Connection < EventMachine::Connection
     available_keys=$keyDao.listkeys().count
     if available_keys > 0
       self.validationData_avail = true      
-      else 
+    else 
       self.validationData_avail = false
     end     
   end
@@ -131,8 +131,8 @@ class SiriProxy::Connection < EventMachine::Connection
       #Check for User Agent and replace correctly
       
 		elsif line.match(/^Host:/)
-		    line = "Host: guzzoni.apple.com"  #Keeps Apple from instantly knowing that
-		                                      #this is a Proxy Server.
+      line = "Host: guzzoni.apple.com"  #Keeps Apple from instantly knowing that
+      #this is a Proxy Server.
 		elsif line.match(/^User-Agent:/)   
       #if its and iphone4s
 			if line.match(/iPhone4,1;/)
@@ -328,13 +328,16 @@ class SiriProxy::Connection < EventMachine::Connection
     return false if unzipped_input.empty? #empty
     unpacked = unzipped_input[0...5].unpack('H*').first
     return true if(unpacked.match(/^0[34]/)) #Ping or pong
-    
-    if unpacked.match(/^[0-9][15-9]/)
-      puts "ROGUE PACKET!!! WHAT IS IT?! TELL US!!! IN IRC!! COPY THE STUFF FROM BELOW"
-      puts unpacked.to_hex
-    end 
-    objectLength = unpacked.match(/^0200(.{6})/)[1].to_i(16)
-    return ((objectLength + 5) < unzipped_input.length) #determine if the length of the next object (plus its prefix) is less than the input buffer
+    begin
+      if unpacked.match(/^[0-9][15-9]/)
+        puts "ROGUE PACKET!!! WHAT IS IT?! TELL US!!! IN IRC!! COPY THE STUFF FROM BELOW"
+        puts unpacked.to_hex
+      end 
+      objectLength = unpacked.match(/^0200(.{6})/)[1].to_i(16)
+      return ((objectLength + 5) < unzipped_input.length) #determine if the length of the next object (plus its prefix) is less than the input buffer
+    rescue 
+      puts "[Bug - SiriProxy] Please contact me about this"
+    end
   end
 
   def read_next_object_from_unzipped
@@ -443,11 +446,11 @@ class SiriProxy::Connection < EventMachine::Connection
     
     if object["properties"] != nil
 
-			if object["properties"]["validationData"] !=nil #&& !object["properties"]["validationData"].empty?
-				if self.is_4S
+      if object["properties"]["validationData"] !=nil #&& !object["properties"]["validationData"].empty?
+        if self.is_4S
           puts "[Info - SiriProxy] using iPhone 4S validationData and saving it"
-					self.sessionValidationData = object["properties"]["validationData"].unpack('H*').join("")
-					checkHave4SData
+          self.sessionValidationData = object["properties"]["validationData"].unpack('H*').join("")
+          checkHave4SData
         else
           get_validationData
           if self.validationData_avail
@@ -457,10 +460,10 @@ class SiriProxy::Connection < EventMachine::Connection
             puts "[Info - SiriProxy] no validationData available :("
             
           end
-				end
-			end
-			if object["properties"]["sessionValidationData"] !=nil #&& !object["properties"]["sessionValidationData"].empty?
-				if self.is_4S
+        end
+      end
+      if object["properties"]["sessionValidationData"] !=nil #&& !object["properties"]["sessionValidationData"].empty?
+        if self.is_4S
           puts "[Info -  SiriProxy] using iPhone 4S validationData and saving it"
           self.sessionValidationData = object["properties"]["sessionValidationData"].unpack('H*').join("")
           checkHave4SData
@@ -474,39 +477,39 @@ class SiriProxy::Connection < EventMachine::Connection
            
           end
         end
-			end
-			if object["properties"]["speechId"] !=nil #&& !object["properties"]["speechId"].empty?
-				if self.is_4S
-					puts "[Info - SiriProxy] using iPhone 4S speechID and saving it"
+      end
+      if object["properties"]["speechId"] !=nil #&& !object["properties"]["speechId"].empty?
+        if self.is_4S
+          puts "[Info - SiriProxy] using iPhone 4S speechID and saving it"
           self.speechId = object["properties"]["speechId"]
           checkHave4SData
-				else
-					if object["properties"]["speechId"].empty?#warning this is not usual maybe a device got banned
+        else
+          if object["properties"]["speechId"].empty?#warning this is not usual maybe a device got banned
             puts "[Warning - SiriProxy] This is not usual maybe a device got banned"				
-						self.speechId_avail=false
+            self.speechId_avail=false
           else
             puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["speechId"]}"
             self.speechId_avail=true
           end
         end
-			end
-			if object["properties"]["assistantId"] !=nil #&& !object["properties"]["assistantId"].empty?
-				if self.is_4S
-					puts "[Info - SiriProxy] using iPhone 4S  assistantId and saving it"
-					self.assistantId = object["properties"]["assistantId"]
-					checkHave4SData
+      end
+      if object["properties"]["assistantId"] !=nil #&& !object["properties"]["assistantId"].empty?
+        if self.is_4S
+          puts "[Info - SiriProxy] using iPhone 4S  assistantId and saving it"
+          self.assistantId = object["properties"]["assistantId"]
+          checkHave4SData
         else
           if object["properties"]["assistantId"].empty?
             puts "[Warning - SiriProxy] This is not usual maybe a device got banned"
             self.assistantId_avail=false
           else
             puts "[Info - SiriProxy] using/created assistantId: #{object["properties"]["assistantId"]}"
-             self.assistantId_avail=true
+            self.assistantId_avail=true
           end
-				end
-			end    
+        end
+      end    
      
-		end
+    end
     #end of injection
     
     
