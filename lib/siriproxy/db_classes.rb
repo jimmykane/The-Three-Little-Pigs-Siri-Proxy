@@ -193,7 +193,7 @@ class KeyDao
 	end
   
   def findoverloaded()    
-    sql = "SELECT * FROM `keys` WHERE expired!='True' AND keyload >= (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload DESC"
+    sql = "SELECT * FROM `keys` WHERE expired!='True'  ORDER by keyload DESC"
 		st = @my.prepare(sql)
 		st.execute()
 		result = fetchResults(st)
