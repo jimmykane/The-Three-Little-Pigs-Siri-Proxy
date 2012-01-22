@@ -93,9 +93,9 @@ $server_running = checkServer();
             $count++;
             ?>
             <tr> 
-                <td><?php echo $key['id'] ?></td>
-                <td><?php echo $key['speechid'] ?></td>
-                <td><?php echo $key['assistantid'] ?></td>
+                  <td><?php echo $key['id'] ?></td>
+                <td><?php echo  '****'.substr(  $key['speechid'] , -9);  ?></td>
+                <td><?php echo  '****'.substr( $key['assistantid'] , -9);?></td>
                 <td>-------</td>
                 <td>
                     <?php if ($key['keyload'] >= $config['max_keyload']) { ?>
