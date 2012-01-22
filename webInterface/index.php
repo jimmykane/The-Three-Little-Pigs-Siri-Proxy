@@ -2,8 +2,7 @@
 ini_set('display_errors', 'On');
 error_reporting(E_ALL ^ E_NOTICE);
 
-define(HOSTNAME, "put your hostname");
-
+require_once ("inc/config.inc.php");
 include_once("inc/connection.inc.php");
 include_once("inc/functions.inc.php");
 include_once("inc/PageManager.class.php");
@@ -57,7 +56,6 @@ $pMgr = new PageManager("pages", "page");
                     <div>
                         <ul>
                             <li>T: <a href="http://twitter.com/wouterds">@WouterDS</a></li>
-                            <li>G+: <a href="http://gplus.to/wouterds">http://gplus.to/wouterds</a></li>                
                             <li>T: <a href="https://twitter.com/thpryrchn">@thpryrchn</a></li>
                             <li>T: <a href="https://twitter.com/HisyamNasir">@HisyamNasir</a></li>
                              <li>T: <a href="http://twitter.com/jimmykane9">@JimmyKane9</a></li>
