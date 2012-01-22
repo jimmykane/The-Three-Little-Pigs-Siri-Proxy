@@ -55,7 +55,11 @@ $pMgr = new PageManager("pages", "page");
                     <h3>Contact Us</h3>
                     <div>
                         <ul>
+<<<<<<< HEAD
                             <li>T: <a href="http://twitter.com/wouterds">@WouterDS</a></li>
+=======
+                            <li>T: <a href="http://twitter.com/wouterds">@WouterDS</a></li>               
+>>>>>>> eac44041fbcba2846b496374f2d57115a6996e9a
                             <li>T: <a href="https://twitter.com/thpryrchn">@thpryrchn</a></li>
                             <li>T: <a href="https://twitter.com/HisyamNasir">@HisyamNasir</a></li>
                              <li>T: <a href="http://twitter.com/jimmykane9">@JimmyKane9</a></li>

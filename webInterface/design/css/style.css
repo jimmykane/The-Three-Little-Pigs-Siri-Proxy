@@ -4,7 +4,7 @@
  * Author: Wouter De Schuuter
  * Project: The Three Little Pigs
  * Start date: 10/01/2012
- * Last update: 14/01/2012
+ * Last update: 22/01/2012
  *
  * Website: http://wouterds.be/
  * Email: info[at]wouterds[dot]be
@@ -345,12 +345,9 @@ div.centerContainer {
 	width: 330px;
 }
 
-#bottom div.left div.left h3 {
-	margin-bottom: 15px;
-}
-
+#bottom div.left div.left h3,
 #bottom div.left div.right h3 {       
-	margin-bottom: 15px;
+	margin-bottom: 7.5px;
 }
 
 #footerBar {
