@@ -26,7 +26,7 @@ function checkServer() {
     $cmd = "ps -C siriproxy";
     exec($cmd, $output, $result);
     if (count($output) >= 2) {
-        echo '1';
+        
         return true;
     }
     $cmd = "ps -C ruby";
