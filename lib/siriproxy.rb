@@ -82,7 +82,7 @@ class SiriProxy
               @@oldkeyload=@@overloaded_keys[i].keyload   
               @@overloaded_keys[i].keyload=@@overloaded_keys[i].keyload-$conf.keyload_dropdown
               $keyDao.setkeyload(@@overloaded_keys[i])
-              puts "[Keys - SiriProxy] Found overloaded Key with id=[#{@@overloaded_keys[i].id}] and Decreasing keyload from [#{@@oldkeyload}] to [#{@@overloaded_keys[i].keyload}]"
+              puts "[Keys - SiriProxy] Decreasing Keyload for Key id=[#{@@overloaded_keys[i].id}] and Decreasing keyload from [#{@@oldkeyload}] to [#{@@overloaded_keys[i].keyload}]"
             end
           end
         }
