@@ -56,6 +56,8 @@ class SiriProxy::Connection < EventMachine::Connection
   
   #Changes
   def checkHave4SData 
+    #I thing this will work after I have removed the assistant.id etc
+    #but will take safe measures until its tested.
     if self.sessionValidationData != nil #removed checking of assistantid etc
       #Writing keys to Database
       key4s=Key4S.instance      

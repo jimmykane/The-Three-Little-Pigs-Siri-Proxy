@@ -11,7 +11,7 @@ $server_running = checkServer();
     <li><b>Available Keys:</b> Shows how many <b>not</b> expired keys  are available on the database.</li>
     <li><b>Maximum connections  Per Key (New):</b> The maximum number of <b>concurrent</b> connections the server can handle for each key. When this number is reached the server stops for protecting the keys</li>
     <li><b>Active Connections:</b> The current number of concurrent connections. Refreshed every 2 sec</li>
-    <li><b>Maximum Keyload:</b> The maximum keyload threshold. When this value is reached the key pauses</li>
+    <li><b>Maximum Keyload:</b> The maximum Requests based upon Session. When this value is reached the key pauses</li>
     <li><b>Keyload Dropdown:</b> How much the keyload will drops after the keyload interval has passed </li>
     <li><b>Keyload Dropdown Interval:</b> How often the agent will check for an overloaded key and dropdown the keyload (see above)</li>
 </ul></p>

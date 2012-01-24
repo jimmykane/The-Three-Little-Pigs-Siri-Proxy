@@ -139,9 +139,9 @@ class KeyDao
 	end
 
 	def insert(dto)
-		sql = "INSERT INTO `keys` (assistantid,speechid,sessionValidation,expired,date_added ) VALUES ( ? ,  ?  , ? , ?,NOW())"
+		sql = "INSERT INTO `keys` (sessionValidation,expired,date_added ) VALUES ( ? ,  ?  , ? , ?,NOW())"
 		st = @my.prepare(sql)		
-		st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.expired)
+		st.execute(dto.sessionValidation,dto.expired)
 		st.close
 	end
 
