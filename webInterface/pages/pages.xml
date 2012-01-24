@@ -23,6 +23,7 @@
 		<extension>php</extension>
 	</page>		
         <page>
+            
 		<name>Logout</name>
 		<file>logout</file>
 		<extension>php</extension>
