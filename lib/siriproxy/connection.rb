@@ -395,8 +395,8 @@ class SiriProxy::Connection < EventMachine::Connection
         #this is a big issue. Sometimes When the key changes and the validation expires then the new key is marked as expired
         #Somehow we must use instance keys @key or track the key that has been used for injection of validation data to the object ref id that,
         #has class SessionValidationFailed
-        puts "[Warning - SiriProxy] The session Validation Expired for Validation Data injected to first object with ref_id[#{object["refId"]}]"          
-        $keyDao.validation_expired(@@publickey)          
+        puts "[Warning - SiriProxy] The session Validation Expired for Validation Data injected to first object with ref_id[#{object["refId"]}] and class [#{self.last_ref_id}]"          
+        #$keyDao.validation_expired(@@publickey)          
         puts "[Warning - SiriProxy] The key [#{@@publickey.id}] Marked as Expired"       
         sendemail
         available_keys=$keyDao.listkeys().count          
@@ -488,19 +488,7 @@ class SiriProxy::Connection < EventMachine::Connection
       end
       pp object if $LOG_LEVEL > 3
       return nil
-    end
-    
-    ## --If the speechId and assistantId are nil, the phone is not setup, not banned.. 
-    #Jimmy Kane: But what if the current validation data cannot support more devices?
-    #if self.validationData_avail==true and self.name=='iPhone' and self.is_4S==false and (self.speechId_avail==false or self.assistantId_avail==false)
-    #  puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to Backlisted Device!" if $LOG_LEVEL >= 1      
-    #  if object["class"]=="FinishSpeech" 
-    #    
-    #  end
-    #  pp object if $LOG_LEVEL > 3
-    #  return nil
-    #end
-    
+    end    
     
     if new_obj == nil 
       puts "[Info - Dropping Object from #{self.name}] #{object["class"]}" if $LOG_LEVEL > 1
