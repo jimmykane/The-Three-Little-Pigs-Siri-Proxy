@@ -324,7 +324,7 @@ class SiriProxy::Connection < EventMachine::Connection
         #has class SessionValidationFailed other_connection.last_ref_id
         puts "[Warning - SiriProxy] The session Validation Expired!"
         puts  "[Warning - SiriProxy] Validation Data injected to first object witch had ace_id[#{object["refId"]}] and my ace is [#{object["aceId"]}]" if $LOG_LEVEL > 2               
-        #$keyDao.validation_expired(self.other_connection.key)          
+        $keyDao.validation_expired(self.other_connection.key)          
         puts "[Warning - SiriProxy] The key [#{self.other_connection.key.id}] and Keyload #{self.other_connection.key.keyload} Marked as Expired"       
         sendemail            
     
