@@ -316,7 +316,7 @@ class SiriProxy::Connection < EventMachine::Connection
     #Check if Validations has Expired
     if object["class"]=="SessionValidationFailed"
       puts "expired"      
-      
+        # I think I fixed it via self.otherconnetction and instance attributes
         #------------@thpryrchn ----------------
         #Please read this and help if you can. 
         #this is a big issue. Sometimes When the key changes and the validation expires then the new key is marked as expired
@@ -407,7 +407,7 @@ class SiriProxy::Connection < EventMachine::Connection
     puts "[Info - #{self.name}] Received Object: #{object["class"]}" if $LOG_LEVEL == 1
     puts "[Info - #{self.name}] Received Object: #{object["class"]} (group: #{object["group"]})" if $LOG_LEVEL == 2
     puts "[Info - #{self.name}] Received Object: #{object["class"]} (group: #{object["group"]}, ref_id: #{object["refId"]},ace_id: #{object["aceId"]})" if $LOG_LEVEL > 2    
-    puts "[Key -  #{self.name}] Recieved Object Using: Key id [#{@key.id}] and Keyload[#{@key.keyload}]  " if @key!=nil && $LOG_LEVEL >1 
+    puts "[Key -  #{self.name}] Recieved Object Using: Key id [#{@key.id}] and Instance Keyload[#{@key.keyload}]  " if @key!=nil && $LOG_LEVEL >1 
     pp object if $LOG_LEVEL > 3
     
     #keeping this for filters
