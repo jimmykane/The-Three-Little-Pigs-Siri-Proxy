@@ -70,7 +70,7 @@ class SiriProxy
           @@max_connections=$conf.max_connections
           @@key.availablekeys=$keyDao.listkeys().count
           if @@key.availablekeys==0
-           @@max_connections=999
+            @@max_connections=999
           elsif @@key.availablekeys>0
             @@max_connections=$conf.max_connections * @@key.availablekeys
           end
@@ -89,8 +89,6 @@ class SiriProxy
             end
           end
         }
-      
-      
       rescue RuntimeError => err
         if err.message == "no acceptor"
           raise "Cannot start the server on port #{$APP_CONFIG.port} - are you root, or have another process on this port already?"

@@ -16,17 +16,13 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
     #if no keys then maximize the connections in order to prevent max connection reach and 4s not be able to connect
     #
     @max_connections=$conf.max_connections
-    @keysavailable=$keyDao.listkeys().count
-    puts @keysavailable
-    @max_connections
-    puts $conf.max_connections
-    puts @keysavailable
+    @keysavailable=$keyDao.listkeys().count   
     if @keysavailable==0
        @max_connections=999
     elsif @keysavailable>0
        @max_connections=$conf.max_connections * @keysavailable
     end
-    puts '[Keys - iPhone] Keys [#{@keysvailable}]'
+    puts '[Keys - iPhone] Keys [#{@keysavailable}]'
     if $conf.active_connections>=@max_connections
       puts "[Warning - iPhone] Max Connections reached! Connection dropping...."
       super
