@@ -3,9 +3,10 @@ ini_set('display_errors', 'On');
 error_reporting(E_ALL ^ E_NOTICE);
 
 require_once ("inc/config.inc.php");
-include_once("inc/connection.inc.php");
-include_once("inc/functions.inc.php");
-include_once("inc/PageManager.class.php");
+require_once("inc/connection.inc.php");
+require_once("inc/functions.inc.php");
+require_once("inc/functions.php");
+require_once("inc/PageManager.class.php");
 
 $pMgr = new PageManager("pages", "page");
 ?>
@@ -23,6 +24,7 @@ $pMgr = new PageManager("pages", "page");
         <div id="top">
             <div class="centerContainer">
                 <?php echo $pMgr->navigation(); ?>
+                
                 <div id="header">
                     <h1>The Three Little Pigs - A Siri Server That Needs To Be Fed</h1>
                 </div>

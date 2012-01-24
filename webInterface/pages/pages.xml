@@ -17,6 +17,14 @@
 		<file>server-status</file>
 		<extension>php</extension>
 	</page>		
-	
-	
+	<page>
+		<name>Login</name>
+		<file>login</file>
+		<extension>php</extension>
+	</page>		
+        <page>
+		<name>Logout</name>
+		<file>logout</file>
+		<extension>php</extension>
+	</page>		
 </pages>

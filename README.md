@@ -4,7 +4,7 @@ The Three Little Pigs - Siri Proxy by Jimmy Kane :-)
 About
 -----
 
-Author: Dimitrios Kanellopoulos - thpryrchn - Wouter DS
+Author: Jimmy Kane - thpryrchn - Wouter DS
 
 Twitter: http://twitter.com/JimmyKane9
 
@@ -207,9 +207,15 @@ Make sure you have apache2,mysql,php,php-mysql in common words LAMP setup up and
 
 A documentation on how to do this on Ubuntu is here. ([https://help.ubuntu.com/community/ApacheMySQLPHP])
 
-1. Edit the `webInterface/inc/connection.inc.php` and enter the database connection info
+1. Edit the `webInterface/inc/config.inc.php` and enter the database connection info and your dns info
 
-2. Copy all files under webInterface to your apache html docs folder
+2. Create the certificate folder `mkdir webInterface/certificates`
+
+3. Copy the certificate from `~/.siriproxy/ca.pem` to `webInterface/certificates/ca.pem`
+
+4. Copy all files under webInterface to your apache html docs folder
+
+
 
     
 

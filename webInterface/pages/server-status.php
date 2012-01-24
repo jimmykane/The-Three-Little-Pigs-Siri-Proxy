@@ -4,14 +4,15 @@ $config = getconfig();
 $count = 0;
 $server_running = checkServer();
 ?>
-<h1>Server Status and Statistics</h1>
+<h1>Server Status and Statistics <?php if (isAdministrativeUser())
+    echo ' - Administrator'; ?></h1>
 <h2>Legend</h2>
 <p><ul>
     <li><b>Available Keys:</b> Shows how many <b>not</b> expired keys  are available on the database.</li>
-    <li><b>Maximum connections:</b> The maximum number of <b>concurrent</b> connections the server can handle. When this number is reached the server stops for protecting the keys</li>
-    <li><b>Active Connections</b> The current number of concurrent connections. Refreshed every 2 sec</li>
-    <li><b>Maximum Keyload</b> The maximum keyload threshold. When this value is reached the key pauses</li>
-    <li><b>Keyload Dropdown</b> How much the keyload will drops after the keyload interval has passed </li>
+    <li><b>Maximum connections  Per Key (New):</b> The maximum number of <b>concurrent</b> connections the server can handle for each key. When this number is reached the server stops for protecting the keys</li>
+    <li><b>Active Connections:</b> The current number of concurrent connections. Refreshed every 2 sec</li>
+    <li><b>Maximum Keyload:</b> The maximum keyload threshold. When this value is reached the key pauses</li>
+    <li><b>Keyload Dropdown:</b> How much the keyload will drops after the keyload interval has passed </li>
     <li><b>Keyload Dropdown Interval:</b> How often the agent will check for an overloaded key and dropdown the keyload (see above)</li>
 </ul></p>
 <br />
@@ -38,10 +39,6 @@ $server_running = checkServer();
         </td>
     </tr>
     <tr>
-        <th>Maximum connections</th>
-        <td><?php echo $config['max_connections'] ?></td>
-    </tr>
-    <tr>
         <th>Active connections</th>
         <td><?php
             if ($config['active_connections'] >= $config['max_connections'])
@@ -53,16 +50,69 @@ $server_running = checkServer();
 
     </tr>
     <tr>
-        <th>Max keyload</th>
-        <td><?php echo $config['max_keyload'] ?></td>
+        <th>Maximum connections Per Key</th>
+        <?php if (isAdministrativeUser()) { ?>
+            <td>
+                <form name="ConfigUpdate" id="ConfigUpdate" method="post" action="inc/config_update_db.php" onsubmit="return ValidateFormMaxConnections(); ">
+                    <input size="6" type="text" name="MaxConnections" id="MaxConnections" maxlength="4" value="<?php echo $config['max_connections'] ?>"/>
+                    <input title="Update Max Connections" type="image" SRC="design/img/refresh.png" HEIGHT="32" WIDTH="32" BORDER="0" ALT="Submit Form"/>
+                </form>
+            </td>
+        <?php } else {
+            ?>
+            <td><?php echo $config['max_connections'] ?></td>
+            <?php
+        }
+        ?>
+    </tr>
+
+    <tr>
+        <th>Max KeyLoad</th>
+        <?php if (isAdministrativeUser()) { ?>        
+            <td>
+                <form name="ConfigUpdate" id="ConfigUpdate" method="post" action="inc/config_update_db.php" onsubmit="return ValidateFormMaxKeyload(); ">
+                    <input size="6" type="text" name="MaxKeyload" id="MaxKeyload" maxlength="4" value="<?php echo $config['max_keyload'] ?>"/>
+                    <input title="Update Max Keyload" type="image" SRC="design/img/refresh.png" HEIGHT="32" WIDTH="32" BORDER="0" ALT="Submit Form"/>
+                </form>
+            </td>
+        <?php } else { ?>
+            <td><?php echo $config['max_keyload'] ?></td>
+            <?php
+        }
+        ?>
+
     </tr>
     <tr>
-        <th>Keyload dropdown</th>
-        <td><?php echo $config['keyload_dropdown'] ?></td>
+        <th>Keyload Dropdown</th>
+        <?php if (isAdministrativeUser()) { ?>
+            <td>
+                <form name="ConfigUpdate" id="ConfigUpdate" method="post" action="inc/config_update_db.php" onsubmit="return ValidateFormKeyloadDropdown(); ">
+                    <input size="6" type="text" name="KeyloadDropdown" id="KeyloadDropdown" maxlength="4" value="<?php echo $config['keyload_dropdown'] ?>"/>
+                    <input title="Update Keyload Dropdown" type="image" SRC="design/img/refresh.png" HEIGHT="32" WIDTH="32" BORDER="0" ALT="Submit Form"/>
+                </form>
+            </td>
+        <?php } else {
+            ?>
+            <td><?php echo $config['keyload_dropdown'] ?></td>
+            <?php
+        }
+        ?>
+
     </tr>
     <tr>
-        <th>Keyload check interval (sec)</th>
-        <td><?php echo $config['keyload_dropdown_interval'] ?></td>
+        <th>Keyload Check Interval (sec)</th>
+        <?php if (isAdministrativeUser()) { ?>
+            <td>
+                <form name="ConfigUpdate" id="ConfigUpdate" method="post" action="inc/config_update_db.php" onsubmit="return ValidateFormKeyloadCheckInterval(); ">
+                    <input size="6" type="text" name="KeyloadCheckInterval" id="KeyloadCheckInterval" maxlength="4" value="<?php echo $config['keyload_dropdown_interval'] ?>"/>
+                    <input title="Update Check Interval" type="image" SRC="design/img/refresh.png" HEIGHT="32" WIDTH="32" BORDER="0" ALT="Submit Form"/>
+                </form>
+            </td>
+        <?php } else { ?>
+            <td><?php echo $config['keyload_dropdown_interval'] ?></td>
+            <?php
+        }
+        ?>       
     </tr>
 </table>
 <br />
@@ -87,15 +137,54 @@ $server_running = checkServer();
             <th>Validation Data (24h)</th>
             <th>Keyload</th>
             <th>Date Added</th>
+            <?php 
+            if (isAdministrativeUser()){
+                echo '<th>Update</th>';
+            }
+            ?>
         </tr>
         <?php
         foreach ($keys as $key) {
             $count++;
+            if (isAdministrativeUser()){ ?>
+         
+                <tr>
+                    <form name="KeyUpdate" id="KeyUpdate" method="post" action="inc/key_update_db.php" onsubmit="return ValidateFormKeyUpdate(); ">
+                        <td>
+                            <?php echo $key['id'] ?>
+                            <input size="20" type="hidden" name="KeyId" id="KeyId"  value="<?php echo $key['id'] ?>"/> 
+                        </td>
+                    <td>
+                       <input size="20" type="text" name="SpeechId" id="SpeechId"  value="<?php echo $key['speechid'] ?>"/> 
+                    </td>
+                    <td>
+                       <input size="20" type="text" name="AssistantId" id="AssistantId"  value="<?php echo $key['assistantid'] ?>"/> 
+                    </td>
+                    <td>
+                       <input size="20" type="text" name="ValidationData" id="ValidationData"  value="<?php echo $key['sessionValidation'] ?>"/> 
+                    </td>
+                    <td>
+                       <input size="8" type="text" name="KeyLoad" id="KeyLoad"  maxlength="4" value="<?php echo $key['keyload'] ?>"/> /  <?php echo $config['max_keyload'] ?>
+                    </td>
+                    <td>
+                     <?php echo $key['date_added'] ?>
+                    </td>
+                    <td>
+                          <input title="Update Key Data" type="image" SRC="design/img/refresh.png" HEIGHT="32" WIDTH="32" BORDER="0" ALT="Submit Form"/>
+                    </td>
+                    </form>
+                </tr>
+         
+                
+                
+            <?php    
+            }else{
+               
             ?>
             <tr> 
-                  <td><?php echo $key['id'] ?></td>
-                <td><?php echo  '****'.substr(  $key['speechid'] , -9);  ?></td>
-                <td><?php echo  '****'.substr( $key['assistantid'] , -9);?></td>
+                <td><?php echo $key['id'] ?></td>
+                <td><?php echo '****' . substr($key['speechid'], -9); ?></td>
+                <td><?php echo '****' . substr($key['assistantid'], -9); ?></td>
                 <td>-------</td>
                 <td>
                     <?php if ($key['keyload'] >= $config['max_keyload']) { ?>
@@ -110,7 +199,11 @@ $server_running = checkServer();
                     <?php echo $key['date_added'] ?>
                 </td>
             </tr>
-        <?php } ?>
+            
+        <?php 
+            }
+        } 
+        ?>
     </table>
 
 <?php } else { ?>
@@ -133,6 +226,52 @@ $server_running = checkServer();
         </form>
     </div>
 </div>
+
+<script type="text/javascript" language="javascript">
+    function ValidateFormMaxConnections(){    
+        if ((document.getElementById('MaxConnections').value=="")) {
+            alert("Warning\n You havent filled the Maximum Connection");
+            return false;
+        }
+        else
+            return true;
+    }
+    function ValidateFormMaxKeyload(){
+        if ((document.getElementById('MaxKeyload').value=="")) {
+            alert("Warning\n You havent filled the Maximum Keyload");
+            return false;
+        }
+        else
+            return true;
+    }
+    function ValidateFormKeyloadDropdown(){
+        if ((document.getElementById('KeyloadDropdown').value=="")) {
+            alert("Warning\n You havent filled the Keyload Dropdown");
+            return false;
+        }
+        else
+            return true;
+    }
+    function ValidateFormKeyloadCheckInterval(){
+        if ((document.getElementById('KeyloadCheckInterval').value=="")) {
+            alert("Warning\n You havent filled the Keyload Check Interval");
+            return false;
+        }
+        else
+            return true;
+    }
+    
+    function ValidateFormKeyUpdate(){
+        if ((document.getElementById('UserNameLogin').value=="")
+            || (document.getElementById('LoginPasswordLogin').value =="")) {
+            alert("Warning\n You havent filled all the required fields");
+            return false;
+        }
+        else
+            return true;
+    }
+</script>
+
 <script type="text/javascript"><!--
     google_ad_client = "ca-pub-6472702431228368";
     /* The Three Little Pigs */
