@@ -24,7 +24,7 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
     if @keysavailable==0
        @max_connections=999
     elsif @keysavailable>0
-       @max_connections=$conf.max_connections * $keyDao.listkeys().count
+       @max_connections=$conf.max_connections * @keysavailable
     end
     puts '[Keys - iPhone] Keys [#{@keysvailable}]'
     if $conf.active_connections>=@max_connections

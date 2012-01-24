@@ -67,7 +67,7 @@ class SiriProxy
           $conf.active_connections = EM.connection_count          
           $confDao.update($conf)
           ### Per Key based connections
-         
+          @@max_connections=$conf.max_connections
           @@key.availablekeys=$keyDao.listkeys().count
           if @@key.availablekeys==0
            @@max_connections=999
