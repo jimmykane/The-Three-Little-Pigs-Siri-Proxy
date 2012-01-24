@@ -240,8 +240,71 @@ class KeyDao
 		return rows
 	end
 
- #New Assistant Class to use for tracking
+  #New Assistant Class to use for tracking
+  class Assistant
+    attr_accessor :id, :key_id,:assistantid,:speechid,:date_created
+    def id=(value)  # The setter method for @id
+      @id =  value
+    end
+    def key_id=(value)  # The setter method for @key_id
+      @key_id =  value
+    end
+    def assistantid=(value)  # The setter method for @assistantid
+      @assistantid =  value
+    end
+    def speechid=(value)  # The setter method for @speechid
+      @speechid =  value
+    end
+    def date_created=(value)  # The setter method for @date_created
+      @date_created =  value
+    end
+  end
 
+  class AssistantDao
+    include Singleton
+	
+    def initialize()		
+    end
+    def connect_to_db(my)
+      @my = my;
+    end
+    def getkeyassistants(dto)
+      sql = "SELECT * FROM `assistants` WHERE key_id=?"
+      st = @my.prepare(sql);
+      st.execute(dto.id);
+      result = fetchResults(st)
+      st.close    
+      return result[0]
+    end
+    def check_duplicate(dto)
+      sql = "SELECT * FROM `assistants` WHERE assistantid=?"
+      st = @my.prepare(sql)
+      st.execute(dto.assistantid)
+      result = fetchResults(st)
+      st.close
+      return result[0]		
+    end
+    def createassistant(dto)
+      sql = "INSERT INTO `assistants` (key_id,assistantid,speechid,date_added) VALUES ( ? , ? , ? , NOW()))"
+      st = @my.prepare(sql);
+      st.execute(dto.key_id,dto.assistantid,dto.speechid);      
+      st.close    
+    end
+    def fetchResults(stmt)
+      rows = []
+      while row = stmt.fetch do
+        dto = Assistant.new
+        dto.id = row[0]
+        dto.key_id= row[1]
+        dto.assistantid=row[2]
+        dto.speechid=row[3]		
+        dto.date_added=row[4]	      
+        rows << dto
+      end
+      return rows
+    end
+
+  end
  
   
   
