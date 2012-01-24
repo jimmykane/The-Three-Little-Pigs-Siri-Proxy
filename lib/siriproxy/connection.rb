@@ -390,7 +390,7 @@ class SiriProxy::Connection < EventMachine::Connection
       puts "expired"
       get_validationData	      
       if self.validationData_avail
-        #------------@thpryrchn ---------------
+        #------------@thpryrchn ----------------
         #Please read this and help if you can. 
         #this is a big issue. Sometimes When the key changes and the validation expires then the new key is marked as expired
         #Somehow we must use instance keys @key or track the key that has been used for injection of validation data to the object ref id that,
