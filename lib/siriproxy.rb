@@ -41,19 +41,9 @@ class SiriProxy
       puts '[Info - SiriProxy] Email notifications are [OFF]!'
     end
     
-    #initialize key controller
-    @@key=Key.new
-    @@key.keyload=0
+    #initialize key controller    
 		$keyDao=KeyDao.instance#instansize Dao object controller
-		$keyDao.connect_to_db($my_db)		
-    
-    if ($keyDao.listkeys().count)>0      
-      @@key.availablekeys=$keyDao.listkeys().count      
-      puts "[Keys - SiriProxy] Available Keys in Database: [#{@@key.availablekeys}]"
-    else
-      puts "[Keys - SiriProxy] Initialized Please connect a 4S. No keys available"
-      @@key.availablekeys=0
-    end
+		$keyDao.connect_to_db($my_db)       
     EventMachine.run do
       begin
         puts "Starting SiriProxy on port #{$APP_CONFIG.port}.."
@@ -67,25 +57,25 @@ class SiriProxy
           $conf.active_connections = EM.connection_count          
           $confDao.update($conf)
           ### Per Key based connections
-          @@max_connections=$conf.max_connections
-          @@key.availablekeys=$keyDao.listkeys().count
-          if @@key.availablekeys==0
-            @@max_connections=999
-          elsif @@key.availablekeys>0
-            @@max_connections=$conf.max_connections * @@key.availablekeys
+          @max_connections=$conf.max_connections
+          @availablekeys=$keyDao.listkeys().count
+          if @availablekeys==0
+            @max_connections=999
+          elsif @availablekeys>0
+            @max_connections=$conf.max_connections * @availablekeys
           end
-          puts "[Info - SiriProxy] Active connections [#{$conf.active_connections}] Max connections [#{@@max_connections}]"
+          puts "[Info - SiriProxy] Active connections [#{$conf.active_connections}] Max connections [#{@max_connections}]"
           
         }
         EventMachine::PeriodicTimer.new($conf.keyload_dropdown_interval){
-          @@overloaded_keys_count=$keyDao.findoverloaded().count
-          if (@@overloaded_keys_count>0)
-            @@overloaded_keys=$keyDao.findoverloaded()     
-            for i in 0..(@@overloaded_keys_count-1)            
-              @@oldkeyload=@@overloaded_keys[i].keyload   
-              @@overloaded_keys[i].keyload=@@overloaded_keys[i].keyload-$conf.keyload_dropdown
-              $keyDao.setkeyload(@@overloaded_keys[i])
-              puts "[Keys - SiriProxy] Decreasing Keyload for Key id=[#{@@overloaded_keys[i].id}] and Decreasing keyload from [#{@@oldkeyload}] to [#{@@overloaded_keys[i].keyload}]"
+          @overloaded_keys_count=$keyDao.findoverloaded().count
+          if (@overloaded_keys_count>0)
+            @overloaded_keys=$keyDao.findoverloaded()     
+            for i in 0..(@overloaded_keys_count-1)            
+              @oldkeyload=@overloaded_keys[i].keyload   
+              @overloaded_keys[i].keyload=@overloaded_keys[i].keyload-$conf.keyload_dropdown
+              $keyDao.setkeyload(@overloaded_keys[i])
+              puts "[Keys - SiriProxy] Decreasing Keyload for Key id=[#{@overloaded_keys[i].id}] and Decreasing keyload from [#{@oldkeyload}] to [#{@overloaded_keys[i].keyload}]"
             end
           end
         }
