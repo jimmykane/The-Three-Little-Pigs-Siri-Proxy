@@ -130,7 +130,9 @@ class SiriProxy::Connection < EventMachine::Connection
 		elsif line.match(/^User-Agent:/)   
       #if its and iphone4s
 			if line.match(/iPhone4,1;/)
+        puts "[RollEyes - Siri*-*Proxy]" 
 				puts "[Info - SiriProxy] iPhone 4S connected"        
+        puts "[RollEyes - Siri*-*Proxy]" 
 				self.is_4S = true
 			elsif  line.match(/iPhone3,1;/)
 				#if its iphone4,etc	
