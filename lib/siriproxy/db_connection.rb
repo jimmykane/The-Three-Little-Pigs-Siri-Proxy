@@ -9,7 +9,7 @@ DB_DATABASE=$APP_CONFIG.db_database
 def db_connect() 
 		begin
 			db_connection=Mysql.real_connect(DB_HOST, DB_USER, DB_PASS, DB_DATABASE)
-			db_connection.autocommit(false);
+			#db_connection.autocommit(false);
 			puts "Mysql Server version: " + db_connection.get_server_info+ "\nConnection and dataset ok"
 			return db_connection
 		rescue Mysql::Error => e 

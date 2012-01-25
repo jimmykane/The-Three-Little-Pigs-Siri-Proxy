@@ -114,7 +114,7 @@ class SiriProxy::Connection < EventMachine::Connection
     puts "[Info - #{self.name}] SSL completed for #{self.name}" if $LOG_LEVEL > 1
   end
   
-  def receive_line(line) #Process header
+  def receive_line(line) #Process header    
     puts "[Header - #{self.name}] #{line}" if $LOG_LEVEL > 2
     if(line == "") #empty line indicates end of headers
       puts "[Debug - #{self.name}] Found end of headers" if $LOG_LEVEL > 3
@@ -413,6 +413,7 @@ class SiriProxy::Connection < EventMachine::Connection
     puts "[Info - #{self.name}] Received Object: #{object["class"]} (group: #{object["group"]}, ref_id: #{object["refId"]},ace_id: #{object["aceId"]})" if $LOG_LEVEL > 2    
     puts "[Key -  #{self.name}] Recieved Object Using: Key id [#{@key.id}] and Instance Keyload[#{@key.keyload}]  " if @key!=nil &&self.validationData_avail!=false && $LOG_LEVEL >1 
     pp object if $LOG_LEVEL > 3
+   
     
     #keeping this for filters
     new_obj = received_object(object)
