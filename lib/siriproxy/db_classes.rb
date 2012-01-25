@@ -239,9 +239,9 @@ class KeyDao
 
 		return rows
 	end
+end
 
-  #New Assistant Class to use for tracking
-  class Assistant
+class Assistant
     attr_accessor :id, :key_id,:assistantid,:speechid,:date_created
     def id=(value)  # The setter method for @id
       @id =  value
@@ -261,13 +261,17 @@ class KeyDao
   end
 
   class AssistantDao
+
     include Singleton
 	
-    def initialize()		
+    def initialize()	
+      
     end
+    
     def connect_to_db(my)
       @my = my;
     end
+    
     def getkeyassistants(dto)
       sql = "SELECT * FROM `assistants` WHERE key_id=?"
       st = @my.prepare(sql);
@@ -276,6 +280,7 @@ class KeyDao
       st.close    
       return result[0]
     end
+    
     def check_duplicate(dto)
       sql = "SELECT * FROM `assistants` WHERE assistantid=?"
       st = @my.prepare(sql)
@@ -284,12 +289,14 @@ class KeyDao
       st.close
       return result[0]		
     end
+    
     def createassistant(dto)
       sql = "INSERT INTO `assistants` (key_id,assistantid,speechid,date_added) VALUES ( ? , ? , ? , NOW()))"
       st = @my.prepare(sql);
       st.execute(dto.key_id,dto.assistantid,dto.speechid);      
       st.close    
     end
+    
     def fetchResults(stmt)
       rows = []
       while row = stmt.fetch do
@@ -305,7 +312,3 @@ class KeyDao
     end
 
   end
- 
-  
-  
-end

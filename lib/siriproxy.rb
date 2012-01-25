@@ -31,6 +31,15 @@ class SiriProxy
     $conf.active_connections=0 
     $confDao.update($conf)
     #end of config
+    
+    #initialize key controller    
+		$keyDao=KeyDao.instance#instansize Dao object controller
+		$keyDao.connect_to_db($my_db)       
+    
+    #Initialize The Assistant Controller
+    $assistantDao=AssistantDao.instance
+    $assistantDao.connect_to_db($my_db)
+    
     EM.threadpool_size=$conf.max_threads
     
     
@@ -41,9 +50,8 @@ class SiriProxy
       puts '[Info - SiriProxy] Email notifications are [OFF]!'
     end
     
-    #initialize key controller    
-		$keyDao=KeyDao.instance#instansize Dao object controller
-		$keyDao.connect_to_db($my_db)       
+    
+    
     EventMachine.run do
       begin
         puts "Starting SiriProxy on port #{$APP_CONFIG.port}.."

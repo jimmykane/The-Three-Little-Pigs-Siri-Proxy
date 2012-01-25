@@ -87,7 +87,7 @@ class SiriProxy::Connection < EventMachine::Connection
         $keyDao.setkeyload(@key) 
         puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
         self.sessionValidationData= @key.sessionValidation	
-        self.validationData_avail = true
+        self.validationData_avail = true       
         #hmmmmm
       else 
         puts "[Key - SiriProxy] No keys available in database"
@@ -375,10 +375,15 @@ class SiriProxy::Connection < EventMachine::Connection
           self.speechId_avail=false      
           self.assistantId_avail=false
         else
-          puts "[Info - SiriProxy] using/created assistantId: #{object["properties"]["assistantId"]}"
-          puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["speechId"]}"
           self.speechId_avail=true
           self.assistantId_avail=true
+          puts "[Info - SiriProxy] using/created assistantId: #{object["properties"]["assistantId"]}"
+          puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["speechId"]}"
+          #Lets record the assistants. 
+          
+          
+          
+          
         end
         
       end      
