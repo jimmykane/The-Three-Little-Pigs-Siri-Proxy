@@ -1,5 +1,7 @@
 port: 443
-log_level: 1
+
+#Log level 2 to see whats going on
+log_level: 2
 
 #This is your Database config:
 db_host: 'localhost'
