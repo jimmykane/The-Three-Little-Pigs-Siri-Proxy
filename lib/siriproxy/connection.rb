@@ -426,7 +426,7 @@ class SiriProxy::Connection < EventMachine::Connection
     if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false 
       puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
       if object["class"]=="FinishSpeech" 
-        
+             #return object     
       end
       pp object if $LOG_LEVEL > 3
       return nil
