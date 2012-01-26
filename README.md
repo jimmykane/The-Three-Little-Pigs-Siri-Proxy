@@ -259,9 +259,17 @@ Yes. If you have Grabbed the keys
 
 **How do I set up a DNS server to forward Guzzoni.apple.com traffic to my computer?**
 
-Check out my video on this: 
+Check out  this: 
 
 [http://www.youtube.com/watch?v=a9gO4L0U59s](http://www.youtube.com/watch?v=a9gO4L0U59s)
+
+**Problems with DNS and Iphone4S not connecting? (Not showing in command line)**
+
+If you are using ubuntu please consider that many Ubuntu installations run the named DNS server. To use the DNSMASQ server do the dollowing at each reboot:
+
+        sudo /etc/init.d/dnsmasq stop -> To stop DNS Server
+        sudo killall named -> to stopped stupid named service (another dns server)
+        sudo /et/init,d/dnsmasq start -> to restart dnsserver
 
 
 **How do I remove the certificate from my iPhone when I'm done?**
