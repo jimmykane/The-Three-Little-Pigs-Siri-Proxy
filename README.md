@@ -19,9 +19,17 @@ Version 0.9a
 -----------
 
 -Added premature admin login and settings change via web. See webInterface/inc/config.inc.php
+
+-Removed Capturing of assistantid's and speechid's due to the fact that they are no longer needed!
+
 -Added max connections per key!
+
 -Changed method about the keyload increases. Now its based upon session utilization!
+
 -Fixed a bug where when a key expired and a client established a connection the wrong key was marked expired
+
+-Fixed a bug where when a 4s would connect and its not setup the server did not recognize it
+
 -Bug fixes
 
 
@@ -270,6 +278,17 @@ If you are using ubuntu please consider that many Ubuntu installations run the n
         sudo /etc/init.d/dnsmasq stop -> To stop DNS Server
         sudo killall named -> to stopped stupid named service (another dns server)
         sudo /et/init,d/dnsmasq start -> to restart dnsserver
+
+
+
+**Gem is not installing?**
+
+0. Type rvm requirements and install all packages that RVM proposes!
+
+1. Review the error output and run the manual install as suggested.
+
+2. Notice the missing libraries. My usual missing ones are mysql-devel,zlib,zlib-devel,libxml2.
+
 
 
 **How do I remove the certificate from my iPhone when I'm done?**
