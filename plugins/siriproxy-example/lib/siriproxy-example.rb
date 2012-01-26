@@ -30,10 +30,8 @@ class SiriProxy::Plugin::Example < SiriProxy::Plugin
   #Essential for server status
   listen_for /how many keys/i do
     @keysavailable=$keyDao.listkeys().count
-    if @keysavailable>0
-    @overloaded_keys=$keyDao.findoverloaded().count
-    @overloaded_keys=0 if @overloaded_keys<=0
-    say "There are #{@keysavailable} keys available and #{@overloaded_keys} overloaded  " #say something to the user!    
+    if @keysavailable>0    
+    say "There are #{@keysavailable} keys available" #say something to the user!    
     request_completed #always complete your request! Otherwise the phone will "spin" at the user!
     else
       say "All keys are overloaded!" #say something to the user!    
