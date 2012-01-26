@@ -35,6 +35,15 @@ Version 0.9a
 -Bug fixes
 
 
+**Recomended default values**
+
+-Max Connections per key: default=15
+
+-Max Keyload: default=500
+
+-Keyload Dropdown: default=100~125
+
+-Keyload Dropdown Interval: default=1200~1800
 
 
 
