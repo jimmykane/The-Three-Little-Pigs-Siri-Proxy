@@ -52,7 +52,7 @@ class SiriProxy::Plugin::Example < SiriProxy::Plugin
       request_completed #always complete your request! Otherwise the phone will "spin" at the user!
     end
   end
-  
+#end of server status monitor  
   
   listen_for /test siri proxy/i do
     say "Siri Proxy is up and running!" #say something to the user!
