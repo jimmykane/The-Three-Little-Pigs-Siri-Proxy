@@ -2,6 +2,7 @@ require 'cora'
 require 'siri_objects'
 require 'pp'
 
+
 #######
 # This is a "hello world" style plugin. It simply intercepts the phrase "test siri proxy" and responds
 # with a message about the proxy being up and running (along with a couple other core features). This 
@@ -25,6 +26,33 @@ class SiriProxy::Plugin::Example < SiriProxy::Plugin
     # - Return nil (or anything not a Hash or false) to have the object forwarded (along with any 
     #    modifications made to it)
   end 
+  
+  #Essential for server status
+  listen_for /how many keys/i do
+    @keysavailable=$keyDao.listkeys().count
+    if @keysavailable>0
+    @overloaded_keys=$keyDao.findoverloaded().count
+    @overloaded_keys=0 if @overloaded_keys<=0
+    say "There are #{@keysavailable} keys available and #{@overloaded_keys} overloaded  " #say something to the user!    
+    request_completed #always complete your request! Otherwise the phone will "spin" at the user!
+    else
+      say "All keys are overloaded!" #say something to the user!    
+      request_completed #always complete your request! Otherwise the phone will "spin" at the user!
+    end
+  end
+  
+  listen_for /how many active connections/i do
+    $conf.active_connections = EM.connection_count 
+    @activeconnections=$conf.active_connections
+    if @activeconnections>0
+    say "There are #{@activeconnections} active connections" #say something to the user!    
+    request_completed #always complete your request! Otherwise the phone will "spin" at the user!
+    else
+      say "Something went wrong!" #say something to the user!    
+      request_completed #always complete your request! Otherwise the phone will "spin" at the user!
+    end
+  end
+  
   
   listen_for /test siri proxy/i do
     say "Siri Proxy is up and running!" #say something to the user!
