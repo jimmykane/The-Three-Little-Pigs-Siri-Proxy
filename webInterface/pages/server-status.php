@@ -41,11 +41,14 @@ $server_running = checkServer();
     <tr>
         <th>Active connections</th>
         <td><?php
-            if ($config['active_connections'] >= $config['max_connections'])
+          if ($keys != false){
+            if ($config['active_connections'] > $config['max_connections'] * $keys[0]['availablekeys'] )
                 echo '<p class="notification red">' . $config['active_connections'] . '</p>';
             else
                 echo '<p class="notification green">' . $config['active_connections'] . '</p>';
-            ?>
+          }else {
+                echo '<p class="notification green">' . 999 . '</p>';
+            }?>
         </td>
 
     </tr>
