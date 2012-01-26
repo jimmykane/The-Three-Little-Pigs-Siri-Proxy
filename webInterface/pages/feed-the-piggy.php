@@ -1,37 +1,29 @@
-<h1>Say hello to "The Three Little Pigs" server!</h1>
-<p>&nbsp;</p>
+<?php
+$ip = gethostbyname(HOSTNAME);
+?>
+<h1>Feed The Three Little Pigs</h1>
+<h2>This procedure is only for an iPhone 4S</h2>
+<p>Below is a guide how to feed the Piggy a 4S key.
+<ol>		
+    <li>Install this certificate on the iPhone 4S <a href="certificates/ca.crt">cal.crt</a></li>
+    <li>If the above certificate doesnt install then download it to your PC/Mac/Linux, and mail it to yourself. </li>
+    <li>Go to Settings > Wifi, press the blue arrow and change the dns to <?= $ip ?></li>
+    <li>Use Siri</li>
+    <li>Done! <b>If Siri replied back to you then you just fed the Piggy another key.</b> Now check the <a href="?page=server-status">server status</a> to see that a key has been added!</li>
+    <li>In order to rollback to your old dns just put the old dns or renew lease</li>
+</ol>
 
-<h1>Features:</h1>  
-<p>&nbsp;</p>
-<ul>    
-<li><b>Admin Login WebInterface  (NEW)</b> A little premature but will be updated soon</li>
-<li><b>Connections depend on how many keys are available  (NEW)</b> This way you can set connections caps right</li>
-<li><b>Plugins api and config capable</b> Now Enjoy Your new plugins!</li>
-<li><b>Email Notifications when the key expires</b> Dont forget to setup your email!</li>
-<li><b>MySql Database connection support:</b> Supports MySQL database connection for storing configuration,keys and runtime statistics. Now you can edit and build that (NEW)</li>
-<li><b>Multiple key support:</b> You can connect more than 1 iPhone4S and store even more keys. The more the keys, the more the clients!</li>
-<li><b>Key Throttling:</b> Each client uses a different key, if more than one Keys are available. The throttler makes sure that each Key is throttled thus enabling several client registration and assistant object creation.</li>
-<li><b>KeyLoad Safeguard:</b> Never worry about how many people use your iPhone4S key. Each Key has a maximum keyload. Even when the key is still valid, if the keyload limit is exceeded, the safeguard disables the key and protects the iPhone4S from getting banned.</li>
-<li><b>KeyLoad Aware:</b> Checks what key is not "Hot" anymore and periodically decreases the load, thus re-enabling Safeguarded Keys</li>
-<li><b>Web interface and monitoring:</b> Always know what is happening without a CLI! With a web interface you can check statistics such as active connections, valid keys, server load, keyload etc</li>
-<li><b>One certificate for all devices:</b> Both Siri Capable devices (currently only iPhone4s) and older devices are using the same certificate and the same port (443 default for SSL)</li>
-<li><b>One instance of the server:</b> Due to one certificate you can run only one instance of the server.</li>
-<li><b>Bug Free (I hope...):-)</b> Never worry if the server has crashed. Most of the bugs that were causing the server to crash are fixed now.</li>
-</ul>
-<br />
-<p><strong>What does this server do? Why is it different than any other Siri Proxy server?</strong><br />
-This server is based on the <a href="ketchup-mayo-senf.de/blog/">@kmsbueromoebel</a> proxy and <a href="https://github.com/plamoni/SiriProxy">Plamoni's</a> proxy.<br />
-I personally thank <a href="https://twitter.com/thpryrchn">@thpryrchn</a> for guiding me in rake and gems and helping me implementing the code to Plamoni's server. </br>
-This server implements a MySQL database connection for storing validation data of Siri capable Devices (4S etc).<br />
-Each Key is throttled through this server enabling several client registrations and assistant object creation.</br>
-This enables more clients to connect. Yes that's correct. <a href="/index.php?page=about"> more</a>
+<p class="notification yellow">Warning! This is an Alpha server and the validation data will be shared with more than one device!<br />
+If you are having problems connecting, that's because you are banned.I take no responsibility, you agree that you do this on your own risk. </br>
+      
+</p>
 
 <br />
 
-<h2>Contribute for further development.</h2>
+<h2>Contribute to help us to keep the server up and for further development.</h2>
 <div style="overflow: hidden;">
     <div style="float: left; width: 600px;">
-    	<p>Contribute for further development<br />Donations are welcome in order to keep me developing this project at these hard times. </p>
+    	<p>If you like this server, please help us paying for the server costs.<br />Donations are welcome in order to keep me developing this project at these hard times. </p>
     </div>
     <div style="float: right; width: 300px; padding-top: 20px;">
         <form action="https://www.paypal.com/cgi-bin/webscr" method="post">

@@ -150,9 +150,10 @@ class SiriProxy::CommandLine
   `keyload_dropdown_interval` int(5) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;")
+    
     puts "Created Table config"
 
-    dbh.query("INSERT INTO `config` VALUES ('1', '20', '50', '0', '5000', '400', '300');")
+    dbh.query("INSERT INTO `config` VALUES ('1', '20', '15', '0', '500', '100', '1600');")
     puts "Added Default setting in Table config"
     
   end

@@ -11,9 +11,19 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
   end
 
   def post_init
-    puts "[Info - iPhone] Curent connection [#{$conf.active_connections}]"
-    
-    if $conf.active_connections>=$conf.max_connections 
+    puts "[Info - iPhone] Curent connections [#{$conf.active_connections}]"
+    #Some code in order connections to depend on the evailable keys
+    #if no keys then maximize the connections in order to prevent max connection reach and 4s not be able to connect
+    #
+    @max_connections=$conf.max_connections
+    @keysavailable=$keyDao.listkeys().count   
+    if @keysavailable==0
+       @max_connections=999
+    elsif @keysavailable>0
+       @max_connections=$conf.max_connections * @keysavailable
+    end
+    puts '[Keys - iPhone] Keys [#{@keysavailable}]'
+    if $conf.active_connections>=@max_connections
       puts "[Warning - iPhone] Max Connections reached! Connection dropping...."
       super
       self.close_connection
@@ -34,9 +44,8 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
     other_connection.plugin_manager = plugin_manager
   end
   
-  def received_object(object)
+  def received_object(object)   
     return plugin_manager.process_filters(object, :from_iphone)
-
     #plugin_manager.object_from_client(object, self)
   end
 end

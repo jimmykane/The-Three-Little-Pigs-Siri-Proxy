@@ -55,69 +55,49 @@ class SiriProxy::Connection < EventMachine::Connection
   end
   
   #Changes
-  def checkHave4SData
-    if self.speechId != nil and self.assistantId != nil and self.sessionValidationData != nil
+  def checkHave4SData 
+    #I thing this will work after I have removed the assistant.id etc
+    #but will take safe measures until its tested.
+    if self.sessionValidationData != nil #removed checking of assistantid etc
       #Writing keys to Database
-      key4s=Key4S.instance
-      key4s.assistantid=self.assistantId
-      key4s.speechid=self.speechId
+      key4s=Key4S.instance      
       key4s.sessionValidation=self.sessionValidationData
       key4s.expired='False'
       if $keyDao.check_duplicate(key4s)
         puts "[Info - SiriProxy] Duplicate Validation Data. Key NOT saved"
       else
         $keyDao.insert(key4s)
-        puts "[Info - SiriProxy] Keys written to Database"
-        
+        puts "[Info - SiriProxy] Keys written to Database"        
       end
     end
-  end
-  
-  def get_validationData
+  end  
+  #this method validation data now is the one that defines the keyload. 
+  #This way KeyLoad gets the meaning of request. Its updated via request of assistantload/create
+  def get_validationData(object)  
     begin      
-      available_keys=$keyDao.listkeys().count           
-      if available_keys > 0
-        self.sessionValidationData= @@publickey.sessionValidation	
-        self.validationData_avail = true      
-        puts "[Keys - SiriProy] Key [#{@@publickey.id}] Loaded from Database for Validation Data"
+      @key=Key.new
+      @available_keys=$keyDao.listkeys().count      
+      if (@available_keys) > 0
+        puts "[Key - SiriProxy] Keys available [#{@available_keys}]"
+        @key=$keyDao.next_available() 
+        puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data" 
+        puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
+        @oldkeyload=@key.keyload          
+        @key.keyload=@key.keyload+10  
+        $keyDao.setkeyload(@key) 
+        puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
+        self.sessionValidationData= @key.sessionValidation	
+        self.validationData_avail = true       
+        #hmmmmm
       else 
+        puts "[Key - SiriProxy] No keys available in database"
         self.validationData_avail = false
       end     
     rescue SystemCallError,NoMethodError
       puts "[ERROR - SiriProxy] Error opening the sessionValidationData  file. Connect an iPhone4S first or create them manually!"
     end
 	end  
-  #these should never be used!!!
-  def get_speechId
-    begin			
-      available_keys=$keyDao.listkeys().count     
-      if available_keys > 0
-        self.speechId=@@publickey.speechid		
-        self.speechId_avail = true
-        puts "[Keys - SiriProy] Key [#{@@publickey.id}] Loaded from Database for SpeechId "
-      else
-        self.speechId_avail = false #Fixed Bug https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy/issues/16#issuecomment-3547831
-      end
-    rescue SystemCallError,NoMethodError
-      puts "[ERROR - SiriProy] Error opening the speechId file. Connect an iPhone4S first or create them manually!"
-    end
-	end
-
-	def get_assistantId
-    begin      
-      available_keys=$keyDao.listkeys().count     
-      if available_keys > 0
-        self.assistantId=@@publickey.assistantid				
-        self.assistantId_avail = true
-        puts "[Keys - SiriProy] Key [#{@@publickey.id}] Loaded from Database for AssistantId "
-      else
-        self.assistantId_avail = false
-      end
-    rescue SystemCallError,NoMethodError
-      puts "[ERROR - SiriProxy] Error opening the assistantId file. Connect an iPhone4S first or create them manually!"
-    end
-	end
-  
+  #Revomed the getassistant and speechid 
   def plist_blob(string)
     string = [string].pack('H*')
     #string = [string]
@@ -134,7 +114,7 @@ class SiriProxy::Connection < EventMachine::Connection
     puts "[Info - #{self.name}] SSL completed for #{self.name}" if $LOG_LEVEL > 1
   end
   
-  def receive_line(line) #Process header
+  def receive_line(line) #Process header    
     puts "[Header - #{self.name}] #{line}" if $LOG_LEVEL > 2
     if(line == "") #empty line indicates end of headers
       puts "[Debug - #{self.name}] Found end of headers" if $LOG_LEVEL > 3
@@ -150,79 +130,31 @@ class SiriProxy::Connection < EventMachine::Connection
 		elsif line.match(/^User-Agent:/)   
       #if its and iphone4s
 			if line.match(/iPhone4,1;/)
+        puts "[RollEyes - Siri*-*Proxy]" 
 				puts "[Info - SiriProxy] iPhone 4S connected"        
+        puts "[RollEyes - Siri*-*Proxy]" 
 				self.is_4S = true
 			elsif  line.match(/iPhone3,1;/)
-				#if its iphone4,etc					
-        @@publickey=PublicKey.instance
-        available_keys=$keyDao.listkeys().count      
-        if (available_keys)>0     
-          @@publickey=$keyDao.next_available()        
-          @oldkeyload=@@publickey.keyload          
-          @@publickey.keyload=@@publickey.keyload+10  
-          $keyDao.setkeyload(@@publickey)         
-          puts "[Key - SiriProxy] Next Key with id=[#{@@publickey.id}] and increasing keyload from [#{@oldkeyload}] to [#{@@publickey.keyload}]"
-          puts "[Key - SiriProxy] Keys available [#{available_keys}]"
-        else
-          puts "[Key - SiriProxy] No keys available in database"
-        end
-     
-				if @@publickey==nil
-          puts "[Key - SiriProxy] No Key Iniialized"
-        else 
-          puts "[Info - SiriProxy] GSM iPhone 4 connected. Using saved keys"         
-				end				
+				#if its iphone4,etc	
+        #making self instace keys via tracking of connections					
 				self.is_4S = false	
+        puts "[Info - SiriProxy] GSM iPhone 4 connected"
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPhone3,1"] = "iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 			elsif  line.match(/iPhone3,3;/)
-				#if its iphone4,etc					
-        @@publickey=PublicKey.instance
-        available_keys=$keyDao.listkeys().count      
-        if (available_keys)>0     
-          @@publickey=$keyDao.next_available()        
-          @oldkeyload=@@publickey.keyload          
-          @@publickey.keyload=@@publickey.keyload+10  
-          $keyDao.setkeyload(@@publickey)         
-          puts "[Key - SiriProxy] Next Key with id=[#{@@publickey.id}] and increasing keyload from [#{@oldkeyload}] to [#{@@publickey.keyload}]"
-          puts "[Key - SiriProxy] Keys available [#{available_keys}]"
-        else
-          puts "[Key - SiriProxy] No keys available in database"
-        end
-     
-				if @@publickey==nil
-          puts "[Key - SiriProxy] No Key Iniialized"
-        else 
-          puts "[Info - SiriProxy] CDMA iPhone 4 connected. Using saved keys"
-				end				
+				#if its iphone4,etc		
 				self.is_4S = false				
+        puts "[Info - SiriProxy] CDMA iPhone 4 connected"
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPhone3,3"] = "iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 			elsif line.match(/iPad1,1;/)				
 				#older Devices Supported				
-        @@publickey=PublicKey.instance
-        available_keys=$keyDao.listkeys().count      
-        if (available_keys)>0     
-          @@publickey=$keyDao.next_available()        
-          @oldkeyload=@@publickey.keyload          
-          @@publickey.keyload=@@publickey.keyload+10  
-          $keyDao.setkeyload(@@publickey)         
-          puts "[Key - SiriProxy] Next Key with id=[#{@@publickey.id}] and increasing keyload from [#{@oldkeyload}] to [#{@@publickey.keyload}]"
-          puts "[Key - SiriProxy] Keys available [#{available_keys}]"
-        else
-          puts "[Key - SiriProxy] No keys available in database"
-        end
-     
-				if @@publickey==nil
-					puts "[Key - SiriProxy] No Key Available right now ;("
-        else 
-          puts "[Info - SiriProxy] iPad 1st generation connected. Using saved keys"						
-				end				
 				self.is_4S = false				
+        puts "[Info - SiriProxy] iPad 1st generation connected"						
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPad/iPad1,1"] = "iPhone/iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
@@ -230,61 +162,24 @@ class SiriProxy::Connection < EventMachine::Connection
 				#puts "[Info - changed header to iphone4s] " + line
       elsif line.match(/iPod4,1;/)				
 				#older Devices Supported				
-        @@publickey=PublicKey.instance
-        available_keys=$keyDao.listkeys().count      
-        if (available_keys)>0     
-          @@publickey=$keyDao.next_available()        
-          @oldkeyload=@@publickey.keyload          
-          @@publickey.keyload=@@publickey.keyload+10  
-          $keyDao.setkeyload(@@publickey)         
-          puts "[Key - SiriProxy] Next Key with id=[#{@@publickey.id}] and increasing keyload from [#{@oldkeyload}] to [#{@@publickey.keyload}]"
-          puts "[Key - SiriProxy] Keys available [#{available_keys}]"
-        else
-          puts "[Key - SiriProxy] No keys available in database"
-        end
-     
-				if @@publickey==nil
-					puts "[Key - SiriProxy] - No Key Available right now ;("
-        else 
-          puts "[Info - SiriProxy] iPod touch 4th generation connected. Using saved keys"						
-				end				
-				self.is_4S = false				
+				self.is_4S = false	
+        puts "[Info - SiriProxy] iPod touch 4th generation connected"					
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPod touch/iPod4,1"] = "iPhone/iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 			else
         #Everithing else like android devices, computer apps etc
-        @@publickey=PublicKey.instance
-        available_keys=$keyDao.listkeys().count      
-        if (available_keys)>0     
-          @@publickey=$keyDao.next_available()        
-          @oldkeyload=@@publickey.keyload          
-          @@publickey.keyload=@@publickey.keyload+10  
-          $keyDao.setkeyload(@@publickey)         
-          puts "[Key - SiriProxy] Next Key with id=[#{@@publickey.id}] and increasing keyload from [#{@oldkeyload}] to [#{@@publickey.keyload}]"
-          puts "[Key - SiriProxy] Keys available [#{available_keys}]"
-        else
-          puts "[Key - SiriProxy] No keys available in database"
-        end
-     
-				if @@publickey==nil
-					puts "[Key - SiriProxy] No Key Available right now ;("
-        else 
-          puts "[Info - SiriProxy] Unknow Device Connected. Using saved keys"				
-				end
+        
         #Change unknown to iPhone to make sure everything works..
+        puts "[Info - SiriProxy] Unknow Device Connected"	
 				self.is_4S = false
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line = "User-Agent: Assistant(iPhone/iPhone4,1; iPhone OS/5.0.1/9A405) Ace/1.0"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
-				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
-				#puts "[Info - SiriProxy] Did not change header until bug gets resolved- Header:] " + line
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
 			end
-    end
-    
-    
-    
+    end    
     
     self.output_buffer << (line + "\x0d\x0a") #Restore the CR-LF to the end of the line
     
@@ -386,7 +281,7 @@ class SiriProxy::Connection < EventMachine::Connection
     object
   end
   
-  def inject_object_to_output_stream(object)
+  def inject_object_to_output_stream(object)    
     if object["refId"] != nil && !object["refId"].empty?
       @block_rest_of_session = false if @block_rest_of_session && self.last_ref_id != object["refId"] #new session
       self.last_ref_id = object["refId"] 
@@ -421,29 +316,24 @@ class SiriProxy::Connection < EventMachine::Connection
       pp object if $LOG_LEVEL > 3
       return nil
     end
-    #Injected 
-
-    if object["class"]=="SessionValidationFailed"
-      puts "expired"
-      get_validationData	      
-      if self.validationData_avail
-        puts "[Warning - SiriProxy] The session Validation Expired"          
-        $keyDao.validation_expired(@@publickey)          
-        puts "[Warning - SiriProxy] The key [#{@@publickey.id}] Marked as Expired"       
-        sendemail
-        available_keys=$keyDao.listkeys().count          
-        if available_keys >= 1          
-          @@publickey=$keyDao.next_available()            
-          puts "[Key - SiriProxy] Changed Key to key {#{[@@publickey.id]}" 
-        elsif available_keys <1          
-          puts "[Keys - SiriProxy] Available Keys in Database: [#{available_keys}]"
-          puts "[Keys - SiriProxy] No keys found in Database Available :( " 									
-        end        
-      else 
-        puts "[Keys - SiriProxy]  No Validation Data AND No Key Available :( " 									
-      end 
-    end
     
+    #Check if Validations has Expired
+    if object["class"]=="SessionValidationFailed"
+      puts "expired"      
+        # I think I fixed it via self.otherconnetction and instance attributes
+        #------------@thpryrchn ----------------
+        #Please read this and help if you can. 
+        #this is a big issue. Sometimes When the key changes and the validation expires then the new key is marked as expired
+        #Somehow we must use instance keys @key or track the key that has been used for injection of validation data to the object ref id that,
+        #has class SessionValidationFailed other_connection.last_ref_id
+        puts "[Warning - SiriProxy] The session Validation Expired!"
+        puts  "[Warning - SiriProxy] Validation Data injected to first object witch had ace_id[#{object["refId"]}] and my ace is [#{object["aceId"]}]" if $LOG_LEVEL > 2               
+        $keyDao.validation_expired(self.other_connection.key)          
+        puts "[Warning - SiriProxy] The key [#{self.other_connection.key.id}] and Keyload #{self.other_connection.key.keyload} Marked as Expired"       
+        sendemail            
+    
+    end
+    #inject Validation
     if object["properties"] != nil
 
       if object["properties"]["validationData"] !=nil #&& !object["properties"]["validationData"].empty?
@@ -452,9 +342,9 @@ class SiriProxy::Connection < EventMachine::Connection
           self.sessionValidationData = object["properties"]["validationData"].unpack('H*').join("")
           checkHave4SData
         else
-          get_validationData
+          get_validationData(object)
           if self.validationData_avail
-            puts "[Info - SiriProxy] using saved validationData"
+            puts "[Info - SiriProxy] using saved validationData"            
             object["properties"]["validationData"] = plist_blob(self.sessionValidationData)
           else
             puts "[Info - SiriProxy] no validationData available :("
@@ -462,28 +352,44 @@ class SiriProxy::Connection < EventMachine::Connection
           end
         end
       end
-      if object["properties"]["sessionValidationData"] !=nil #&& !object["properties"]["sessionValidationData"].empty?
+      if object["properties"]["sessionValidationData"] !=nil #&& !object["properties"]["sessionValidationData"].empty? I was wrong both are needed
         if self.is_4S
           puts "[Info -  SiriProxy] using iPhone 4S validationData and saving it"
           self.sessionValidationData = object["properties"]["sessionValidationData"].unpack('H*').join("")
           checkHave4SData
         else
-          get_validationData
+          get_validationData(object)
           if  self.validationData_avail
-            puts "[Info - SiriProxy] using saved validationData"
-            object["properties"]["sessionValidationData"] = plist_blob(self.sessionValidationData)
+            puts "[Info - SiriProxy] using saved sessionvalidationData"
+            object["properties"]["sessionValidationData"] = plist_blob(self.sessionValidationData)  
           else
             puts "[Info - SiriProxy] no validationData available :("
            
           end
         end
       end
-      if object["properties"]["speechId"] !=nil #&& !object["properties"]["speechId"].empty?
-        if self.is_4S
-          puts "[Info - SiriProxy] using iPhone 4S speechID and saving it"
-          self.speechId = object["properties"]["speechId"]
-          checkHave4SData
+      if object["properties"]["speechId"] !=nil&&object["properties"]["assistantId"] !=nil
+        #revomed saving speechid 
+        if object["properties"]["speechId"].empty? || object["properties"]["assistantId"].empty? #warning this is not usual maybe a device got banned
+          puts "[Warning - SiriProxy] This is not usual maybe a device got banned"				
+          self.speechId_avail=false      
+          self.assistantId_avail=false
         else
+          self.speechId_avail=true
+          self.assistantId_avail=true
+          puts "[Info - SiriProxy] using/created assistantId: #{object["properties"]["assistantId"]}"
+          puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["speechId"]}"
+          #Lets record the assistants. 
+          
+          
+          
+          
+        end
+        
+      end      
+=begin OLD CODE Unmerged - Please comment. 
+      if object["properties"]["speechId"] !=nil #&& !object["properties"]["speechId"].empty?
+       #revomed saving speechid 
           if object["properties"]["speechId"].empty?#warning this is not usual maybe a device got banned
             puts "[Warning - SiriProxy] This is not usual maybe a device got banned"				
             self.speechId_avail=false
@@ -491,14 +397,10 @@ class SiriProxy::Connection < EventMachine::Connection
             puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["speechId"]}"
             self.speechId_avail=true
           end
-        end
+        
       end
       if object["properties"]["assistantId"] !=nil #&& !object["properties"]["assistantId"].empty?
-        if self.is_4S
-          puts "[Info - SiriProxy] using iPhone 4S  assistantId and saving it"
-          self.assistantId = object["properties"]["assistantId"]
-          checkHave4SData
-        else
+        #same here removed
           if object["properties"]["assistantId"].empty?
             puts "[Warning - SiriProxy] This is not usual maybe a device got banned"
             self.assistantId_avail=false
@@ -506,17 +408,17 @@ class SiriProxy::Connection < EventMachine::Connection
             puts "[Info - SiriProxy] using/created assistantId: #{object["properties"]["assistantId"]}"
             self.assistantId_avail=true
           end
-        end
+        
       end    
-     
+=end
     end
-    #end of injection
-    
-    
+    #end of injection        
     puts "[Info - #{self.name}] Received Object: #{object["class"]}" if $LOG_LEVEL == 1
     puts "[Info - #{self.name}] Received Object: #{object["class"]} (group: #{object["group"]})" if $LOG_LEVEL == 2
-    puts "[Info - #{self.name}] Received Object: #{object["class"]} (group: #{object["group"]}, ref_id: #{object["refId"]}, ace_id: #{object["aceId"]})" if $LOG_LEVEL > 2
+    puts "[Info - #{self.name}] Received Object: #{object["class"]} (group: #{object["group"]}, ref_id: #{object["refId"]},ace_id: #{object["aceId"]})" if $LOG_LEVEL > 2    
+    puts "[Key -  #{self.name}] Recieved Object Using: Key id [#{@key.id}] and Instance Keyload[#{@key.keyload}]  " if @key!=nil &&self.validationData_avail!=false && $LOG_LEVEL >1 
     pp object if $LOG_LEVEL > 3
+   
     
     #keeping this for filters
     new_obj = received_object(object)
@@ -528,19 +430,7 @@ class SiriProxy::Connection < EventMachine::Connection
       end
       pp object if $LOG_LEVEL > 3
       return nil
-    end
-    
-    ## --If the speechId and assistantId are nil, the phone is not setup, not banned.. 
-    #Jimmy Kane: But what if the current validation data cannot support more devices?
-    #if self.validationData_avail==true and self.name=='iPhone' and self.is_4S==false and (self.speechId_avail==false or self.assistantId_avail==false)
-    #  puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to Backlisted Device!" if $LOG_LEVEL >= 1      
-    #  if object["class"]=="FinishSpeech" 
-    #    
-    #  end
-    #  pp object if $LOG_LEVEL > 3
-    #  return nil
-    #end
-    
+    end    
     
     if new_obj == nil 
       puts "[Info - Dropping Object from #{self.name}] #{object["class"]}" if $LOG_LEVEL > 1

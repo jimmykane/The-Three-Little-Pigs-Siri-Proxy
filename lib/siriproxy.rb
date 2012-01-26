@@ -15,7 +15,7 @@ class SiriProxy
     # @todo shouldnt need this, make centralize logging instead
     $LOG_LEVEL = $APP_CONFIG.log_level.to_i
     #
-    puts "Initializing Proxy... v.0.8b"
+    puts "Initializing Proxy... v.0.9a"
     
     #Initialization of event machine variables overider +epoll mode on by default    		
 		EM.epoll
@@ -31,6 +31,15 @@ class SiriProxy
     $conf.active_connections=0 
     $confDao.update($conf)
     #end of config
+    
+    #initialize key controller    
+		$keyDao=KeyDao.instance#instansize Dao object controller
+		$keyDao.connect_to_db($my_db)       
+    
+    #Initialize The Assistant Controller
+    $assistantDao=AssistantDao.instance
+    $assistantDao.connect_to_db($my_db)
+    
     EM.threadpool_size=$conf.max_threads
     
     
@@ -41,19 +50,8 @@ class SiriProxy
       puts '[Info - SiriProxy] Email notifications are [OFF]!'
     end
     
-    #initialize key controller
-    @@key=Key.new
-    @@key.keyload=0
-		$keyDao=KeyDao.instance#instansize Dao object controller
-		$keyDao.connect_to_db($my_db)		
     
-    if ($keyDao.listkeys().count)>0      
-      @@key.availablekeys=$keyDao.listkeys().count      
-      puts "[Keys - SiriProxy] Available Keys in Database: [#{@@key.availablekeys}]"
-    else
-      puts "[Keys - SiriProxy] Initialized Please connect a 4S. No keys available"
-      @@key.availablekeys=0
-    end
+    
     EventMachine.run do
       begin
         puts "Starting SiriProxy on port #{$APP_CONFIG.port}.."
@@ -66,28 +64,29 @@ class SiriProxy
         EventMachine::PeriodicTimer.new(10){
           $conf.active_connections = EM.connection_count          
           $confDao.update($conf)
-          puts "[Info - SiriProxy] Active connections [#{$conf.active_connections}] Max connections [#{$conf.max_connections}]"
-          # No Longer needed. Now rejects connections from iphone when max connections happen.
-          #if $conf.active_connections>=$conf.max_connections 
-          #  EventMachine.stop
-          #  puts "[Warning - Exit - SiriProxy] Max Connections reached! Sever exiting...."
-          #  exit (0)#Fix for issue-bug https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy/issues/14
-          #end
+          ### Per Key based connections
+          @max_connections=$conf.max_connections
+          @availablekeys=$keyDao.listkeys().count
+          if @availablekeys==0
+            @max_connections=999
+          elsif @availablekeys>0
+            @max_connections=$conf.max_connections * @availablekeys
+          end
+          puts "[Info - SiriProxy] Active connections [#{$conf.active_connections}] Max connections [#{@max_connections}]"
+          
         }
         EventMachine::PeriodicTimer.new($conf.keyload_dropdown_interval){
-          @@overloaded_keys_count=$keyDao.findoverloaded().count
-          if (@@overloaded_keys_count>0)
-            @@overloaded_keys=$keyDao.findoverloaded()     
-            for i in 0..(@@overloaded_keys_count-1)            
-              @@oldkeyload=@@overloaded_keys[i].keyload   
-              @@overloaded_keys[i].keyload=@@overloaded_keys[i].keyload-$conf.keyload_dropdown
-              $keyDao.setkeyload(@@overloaded_keys[i])
-              puts "[Keys - SiriProxy] Decreasing Keyload for Key id=[#{@@overloaded_keys[i].id}] and Decreasing keyload from [#{@@oldkeyload}] to [#{@@overloaded_keys[i].keyload}]"
+          @overloaded_keys_count=$keyDao.findoverloaded().count
+          if (@overloaded_keys_count>0)
+            @overloaded_keys=$keyDao.findoverloaded()     
+            for i in 0..(@overloaded_keys_count-1)            
+              @oldkeyload=@overloaded_keys[i].keyload   
+              @overloaded_keys[i].keyload=@overloaded_keys[i].keyload-$conf.keyload_dropdown
+              $keyDao.setkeyload(@overloaded_keys[i])
+              puts "[Keys - SiriProxy] Decreasing Keyload for Key id=[#{@overloaded_keys[i].id}] and Decreasing keyload from [#{@oldkeyload}] to [#{@overloaded_keys[i].keyload}]"
             end
           end
         }
-      
-      
       rescue RuntimeError => err
         if err.message == "no acceptor"
           raise "Cannot start the server on port #{$APP_CONFIG.port} - are you root, or have another process on this port already?"
