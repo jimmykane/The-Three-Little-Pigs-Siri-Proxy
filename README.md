@@ -15,8 +15,14 @@ The Three Little Pigs siri proxy server is an intelligent server with key thrott
 
 
 
-Version 0.9a
+Version 0.9am
 -----------
+
+-Added in example plugin custom commands to display server stats. Be sure to have it enabled in your `~/.siriproxy/config.yml` 
+
+    Say: 'How many keys' and Siri replies with the available keys
+
+    Say: 'How many active connections' and Siri replies with the current active connections
 
 -Added recommended values in gentables functions. Please regenerate your Tables. Keep in mind that this will destroy all data in db!
 
