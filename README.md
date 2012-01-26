@@ -18,6 +18,8 @@ The Three Little Pigs siri proxy server is an intelligent server with key thrott
 Version 0.9a
 -----------
 
+-Added recommended values in gentables functions. Please regenerate your Tables. Keep in mind that this will destroy all data in db!
+
 -Added premature admin login and settings change via web. See webInterface/inc/config.inc.php
 
 -Removed Capturing of assistantid's and speechid's due to the fact that they are no longer needed!
