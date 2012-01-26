@@ -1,3 +1,3 @@
 class SiriProxy
-  VERSION = "0.9expr"
+  VERSION = "0.9am"
 end
