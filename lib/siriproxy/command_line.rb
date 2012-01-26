@@ -153,7 +153,7 @@ class SiriProxy::CommandLine
     
     puts "Created Table config"
 
-    dbh.query("INSERT INTO `config` VALUES ('1', '20', '15', '0', '500', '100', '1600');")
+    dbh.query("INSERT INTO `config` VALUES ('1', '20', '15', '0', '500', '100', '1200');")
     puts "Added Default setting in Table config"
     
   end
