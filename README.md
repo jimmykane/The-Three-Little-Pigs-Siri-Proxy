@@ -13,6 +13,20 @@ Google+: http://gplus.to/jimmykane
 
 The Three Little Pigs siri proxy server is an intelligent server with key throttling and database connection.
 
+**A little info upon public/semipublic servers**
+
+So you got a server and you are afraid if apple will ban your device? Lets get things straight then
+
+1. The Three Little Pigs DO NOT send any XACE-HOST, assistantid,speechid to Apple servers. They also get right of the host header. 
+
+2. Apple doesnt ban by UUID (as far as now!)
+
+3. Apple bans by IP! So use proxychains/Tor/tsocks/torsocks/torify etc to fake the ip and DNS
+
+To the pont: You got a 4S, you get commandFailed and/or cannot create assistantid? 
+Solution: Change IP/Network
+
+
 
 
 Version 0.9am
