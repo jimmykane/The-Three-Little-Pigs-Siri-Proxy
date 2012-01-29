@@ -291,7 +291,7 @@ class Assistant
     end
     
     def createassistant(dto)
-      sql = "INSERT INTO `assistants` (key_id,assistantid,speechid,date_added) VALUES ( ? , ? , ? , NOW()))"
+      sql = "INSERT INTO `assistants` (key_id,assistantid,speechid,date_created) VALUES ( ? , ? , ? , NOW())"
       st = @my.prepare(sql)
       st.execute(dto.key_id,dto.assistantid,dto.speechid)   
       st.close    

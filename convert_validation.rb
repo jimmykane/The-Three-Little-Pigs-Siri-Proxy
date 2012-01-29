@@ -1,0 +1,1 @@
+puts "paste your data here".unpack('H*').join("")

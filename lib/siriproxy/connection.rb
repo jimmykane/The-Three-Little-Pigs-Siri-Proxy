@@ -66,7 +66,7 @@ class SiriProxy::Connection < EventMachine::Connection
       key4s.sessionValidation=@sessionValidationData      
       #checking for 4s assistant and speechid      
       if object["properties"]["assistantId"] !=nil and object["properties"]["speechId"].empty?
-      key4s.assistantid=object["properties"]["assistantId"] 
+        key4s.assistantid=object["properties"]["assistantId"] 
       else
         key4s.assistantid="no assistant"
       end      
@@ -390,9 +390,24 @@ class SiriProxy::Connection < EventMachine::Connection
         else
           self.speechId_avail=true #useless
           self.assistantId_avail=true #useless
-          puts "[Info - SiriProxy] using/created assistantId: #{object["properties"]["assistantId"]}"
-          puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["speechId"]}"
+          if object["class"]=="LoadAssistant"
+            puts "[Info - SiriProxy] Device has assistantId: #{object["properties"]["assistantId"]}"
+            puts "[Info - SiriProxy] Device has speechID: #{object["properties"]["speechId"]}" 
+          end                    
           #Lets record the assistants. 
+          if  object["class"]=="AssistantCreated"            
+            @assistant=Assistant.new
+            @assistant.assistantid=object["properties"]["assistantId"]
+            @assistant.speechid=object["properties"]["speechId"]
+            @assistant.key_id=self.other_connection.key.id
+            if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
+              puts "[Info - SiriProxy] Duplicate Assistand ID. Assistant NOT saved"
+            else
+              $assistantDao.createassistant(@assistant)
+              puts "[Info - SiriProxy] Created Assistantid #{object["properties"]["assistantId"]} using key [#{self.other_connection.key.id}]"              
+            end
+          end
+          
         end
       end      
 
