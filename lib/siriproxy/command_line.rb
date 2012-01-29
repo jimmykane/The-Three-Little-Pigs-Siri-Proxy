@@ -41,6 +41,7 @@ class SiriProxy::CommandLine
     case command
     when 'server'           then run_server(subcommand)
     when 'gencerts'         then gen_certs
+    when 'gennewtables'     then gen_newtables  
     when 'gentables'        then gen_tables  
     when 'bundle'           then run_bundle(subcommand)
     when 'console'          then run_console
@@ -155,10 +156,38 @@ class SiriProxy::CommandLine
 
     dbh.query("INSERT INTO `config` VALUES ('1', '20', '15', '0', '500', '100', '1200');")
     puts "Added Default setting in Table config"
-    
+    dbh.query("DROP TABLE IF EXISTS `assistants`;")
+    puts "Table Assistants Droped"   
+    dbh.query("CREATE TABLE `assistants` (
+  `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
+  `key_id` int(255) unsigned NOT NULL,
+  `assistantid` longtext NOT NULL,
+  `speechid` longtext NOT NULL,
+  `date_created` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
+    puts "Created Table Assistants"
   end
     
-    
+  def gen_newtables
+    require 'siriproxy/db_connection'
+    if dbh=db_connect()
+      puts "DATABASE FOUND"
+    else 
+      puts "Could not connect to database"
+    end
+    dbh.query("DROP TABLE IF EXISTS `assistants`;")
+    puts "Table Assistants Droped"   
+    dbh.query("CREATE TABLE `assistants` (
+  `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
+  `key_id` int(255) unsigned NOT NULL,
+  `assistantid` longtext NOT NULL,
+  `speechid` longtext NOT NULL,
+  `date_created` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
+    puts "Created Table Assistants"
+  end  
     
   def update(directory=nil)
     if(directory)
