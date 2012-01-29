@@ -4,7 +4,10 @@ The Three Little Pigs - Siri Proxy by Jimmy Kane :-)
 About
 -----
 
-Author: Jimmy Kane - thpryrchn - Wouter DS
+Author: Jimmy Kane - Thpryrchn 
+Design/WebInterface: Wouter DS
+
+Blog: quartzcoding.blogspot.com
 
 Twitter: http://twitter.com/JimmyKane9
 
@@ -23,11 +26,37 @@ So you got a server and you are afraid if apple will ban your device? Lets get t
 
 3. Apple bans by IP! So use proxychains/Tor/tsocks/torsocks/torify etc to fake the ip and DNS
 
+4. Also keep in mind that there is a limit on how many assistants you can create per key per day. I am not sure but 30 is an average. Please correct me if I am mistaken. There will be a new release soon where there will be a limit on that and hopefully this issue will be resolved.
+
 To the pont: You got a 4S, you get commandFailed and/or cannot create assistantid? 
-Solution: Change IP/Network
+
+Solution 1: Change IP/Network
+
+Solution 2: Use other iPhone4s DATA
 
 
 
+Version 0.9b
+-----------
+
+-Re-added Capturing of assistantid's and speechid's just for reference although they are not used
+
+-Added function in web-Interface to manually create a key, and show old expired keys. Coming soon new and improved web Interface
+
+-Improved grabber. Now if the 4S is not setup the keys are saved! 
+
+-Detection of iPad2
+
+-Several bug fixes
+
+
+**Coming soon**
+
+-Assistantid monitor per key and assistant limits!
+
+-Improved web Interface by @Wouter DS
+
+-Tutorial 100% ok for OSX SL, and OSX L!!!  via @Thpryrchn
 
 Version 0.9am
 -----------
@@ -41,8 +70,6 @@ Version 0.9am
 -Added recommended values in gentables functions. Please regenerate your Tables. Keep in mind that this will destroy all data in db!
 
 -Added premature admin login and settings change via web. See webInterface/inc/config.inc.php
-
--Removed Capturing of assistantid's and speechid's due to the fact that they are no longer needed!
 
 -Added max connections per key!
 

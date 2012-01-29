@@ -55,13 +55,27 @@ class SiriProxy::Connection < EventMachine::Connection
   end
   
   #Changes
-  def checkHave4SData 
-    #I thing this will work after I have removed the assistant.id etc
-    #but will take safe measures until its tested.
-    if self.sessionValidationData != nil #removed checking of assistantid etc
-      #Writing keys to Database
-      key4s=Key4S.instance      
-      key4s.sessionValidation=self.sessionValidationData
+  def checkHave4SData(object) 
+    #changed the way 4s validation are saved. Now the get the values via the object etc.    
+    @sessionValidationData = object["properties"]["validationData"].unpack('H*').join("") if object["properties"]["validationData"] !=nil
+    @sessionValidationData = object["properties"]["sessionValidationData"].unpack('H*').join("") if object["properties"]["sessionValidationData"] !=nil
+      
+    if @sessionValidationData != nil #removed checking of assistantid etc
+      #Writing keys to Database     
+      key4s=Key4S.instance       
+      key4s.sessionValidation=@sessionValidationData      
+      #checking for 4s assistant and speechid      
+      if object["properties"]["assistantId"] !=nil and object["properties"]["speechId"].empty?
+      key4s.assistantid=object["properties"]["assistantId"] 
+      else
+        key4s.assistantid="no assistant"
+      end      
+      if object["properties"]["speechId"] !=nil and object["properties"]["speechId"].empty?      
+        key4s.speechid = object["properties"]["speechId"] 
+      else
+        key4s.speechid="no speech"      
+      end    
+      
       key4s.expired='False'
       if $keyDao.check_duplicate(key4s)
         puts "[Info - SiriProxy] Duplicate Validation Data. Key NOT saved"
@@ -69,7 +83,10 @@ class SiriProxy::Connection < EventMachine::Connection
         $keyDao.insert(key4s)
         puts "[Info - SiriProxy] Keys written to Database"        
       end
+    else
+      puts "[Info - SiriProxy] Something went wrong. Please file this bug. Key NOT saved!"
     end
+    
   end  
   #this method validation data now is the one that defines the keyload. 
   #This way KeyLoad gets the meaning of request. Its updated via request of assistantload/create
@@ -135,8 +152,7 @@ class SiriProxy::Connection < EventMachine::Connection
         puts "[RollEyes - Siri*-*Proxy]" 
 				self.is_4S = true
 			elsif  line.match(/iPhone3,1;/)
-				#if its iphone4,etc	
-        #making self instace keys via tracking of connections					
+				#if its iphone4,etc	 			
 				self.is_4S = false	
         puts "[Info - SiriProxy] GSM iPhone 4 connected"
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
@@ -144,24 +160,27 @@ class SiriProxy::Connection < EventMachine::Connection
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 			elsif  line.match(/iPhone3,3;/)
-				#if its iphone4,etc		
 				self.is_4S = false				
         puts "[Info - SiriProxy] CDMA iPhone 4 connected"
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPhone3,3"] = "iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
-			elsif line.match(/iPad1,1;/)				
-				#older Devices Supported				
+      elsif line.match(/iPad2,2;/)	
+				self.is_4S = false				
+        puts "[Info - SiriProxy] iPad 2nd generation connected"						
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+				line["iPad/iPad2,2"] = "iPhone/iPhone4,1"
+				puts "[Info - SiriProxy] Changed header to iphone4s] "
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
+			elsif line.match(/iPad1,1;/)		
 				self.is_4S = false				
         puts "[Info - SiriProxy] iPad 1st generation connected"						
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPad/iPad1,1"] = "iPhone/iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
-				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
-				#puts "[Info - changed header to iphone4s] " + line
-      elsif line.match(/iPod4,1;/)				
-				#older Devices Supported				
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
+      elsif line.match(/iPod4,1;/)		
 				self.is_4S = false	
         puts "[Info - SiriProxy] iPod touch 4th generation connected"					
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
@@ -169,8 +188,7 @@ class SiriProxy::Connection < EventMachine::Connection
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 			else
-        #Everithing else like android devices, computer apps etc
-        
+        #Everithing else like android devices, computer apps etc        
         #Change unknown to iPhone to make sure everything works..
         puts "[Info - SiriProxy] Unknow Device Connected"	
 				self.is_4S = false
@@ -320,97 +338,64 @@ class SiriProxy::Connection < EventMachine::Connection
     #Check if Validations has Expired
     if object["class"]=="SessionValidationFailed"
       puts "expired"      
-        # I think I fixed it via self.otherconnetction and instance attributes
-        #------------@thpryrchn ----------------
-        #Please read this and help if you can. 
-        #this is a big issue. Sometimes When the key changes and the validation expires then the new key is marked as expired
-        #Somehow we must use instance keys @key or track the key that has been used for injection of validation data to the object ref id that,
-        #has class SessionValidationFailed other_connection.last_ref_id
-        puts "[Warning - SiriProxy] The session Validation Expired!"
-        puts  "[Warning - SiriProxy] Validation Data injected to first object witch had ace_id[#{object["refId"]}] and my ace is [#{object["aceId"]}]" if $LOG_LEVEL > 2               
-        $keyDao.validation_expired(self.other_connection.key)          
-        puts "[Warning - SiriProxy] The key [#{self.other_connection.key.id}] and Keyload #{self.other_connection.key.keyload} Marked as Expired"       
-        sendemail            
+      # I think I fixed it via self.otherconnetction and instance attributes
+      #------------@thpryrchn ----------------
+      #Please read this and help if you can. 
+      #this is a big issue. Sometimes When the key changes and the validation expires then the new key is marked as expired
+      #Somehow we must use instance keys @key or track the key that has been used for injection of validation data to the object ref id that,
+      #has class SessionValidationFailed other_connection.last_ref_id
+      puts "[Warning - SiriProxy] The session Validation Expired!"
+      puts  "[Warning - SiriProxy] Validation Data injected to first object witch had ace_id[#{object["refId"]}] and my ace is [#{object["aceId"]}]" if $LOG_LEVEL > 2               
+      $keyDao.validation_expired(self.other_connection.key)          
+      puts "[Warning - SiriProxy] The key [#{self.other_connection.key.id}] and Keyload #{self.other_connection.key.keyload} Marked as Expired"       
+      sendemail            
     
     end
-    #inject Validation
-    if object["properties"] != nil
-
+    #inject Validation- Grab Validation
+    if object["properties"] != nil 
       if object["properties"]["validationData"] !=nil #&& !object["properties"]["validationData"].empty?
         if self.is_4S
-          puts "[Info - SiriProxy] using iPhone 4S validationData and saving it"
-          self.sessionValidationData = object["properties"]["validationData"].unpack('H*').join("")
-          checkHave4SData
+          puts "[Info - SiriProxy] Saving iPhone 4S validation Data"          
+          checkHave4SData(object)
         else
           get_validationData(object)
           if self.validationData_avail
             puts "[Info - SiriProxy] using saved validationData"            
             object["properties"]["validationData"] = plist_blob(self.sessionValidationData)
           else
-            puts "[Info - SiriProxy] no validationData available :("
-            
+            puts "[Info - SiriProxy] no validationData available :("            
           end
         end
       end
       if object["properties"]["sessionValidationData"] !=nil #&& !object["properties"]["sessionValidationData"].empty? I was wrong both are needed
         if self.is_4S
-          puts "[Info -  SiriProxy] using iPhone 4S validationData and saving it"
-          self.sessionValidationData = object["properties"]["sessionValidationData"].unpack('H*').join("")
-          checkHave4SData
+          puts "[Info -  SiriProxy] using iPhone 4S validationData and saving it"         
+          checkHave4SData(object)
         else
           get_validationData(object)
           if  self.validationData_avail
             puts "[Info - SiriProxy] using saved sessionvalidationData"
             object["properties"]["sessionValidationData"] = plist_blob(self.sessionValidationData)  
           else
-            puts "[Info - SiriProxy] no validationData available :("
-           
+            puts "[Info - SiriProxy] no validationData available :("           
           end
         end
       end
       if object["properties"]["speechId"] !=nil&&object["properties"]["assistantId"] !=nil
         #revomed saving speechid 
         if object["properties"]["speechId"].empty? || object["properties"]["assistantId"].empty? #warning this is not usual maybe a device got banned
-          puts "[Warning - SiriProxy] This is not usual maybe a device got banned"				
-          self.speechId_avail=false      
-          self.assistantId_avail=false
+          puts "[Warning - SiriProxy] This device is Not setup!"				
+          self.speechId_avail=false #useless     
+          self.assistantId_avail=false #useless
         else
-          self.speechId_avail=true
-          self.assistantId_avail=true
+          self.speechId_avail=true #useless
+          self.assistantId_avail=true #useless
           puts "[Info - SiriProxy] using/created assistantId: #{object["properties"]["assistantId"]}"
           puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["speechId"]}"
           #Lets record the assistants. 
-          
-          
-          
-          
         end
-        
       end      
-=begin OLD CODE Unmerged - Please comment. 
-      if object["properties"]["speechId"] !=nil #&& !object["properties"]["speechId"].empty?
-       #revomed saving speechid 
-          if object["properties"]["speechId"].empty?#warning this is not usual maybe a device got banned
-            puts "[Warning - SiriProxy] This is not usual maybe a device got banned"				
-            self.speechId_avail=false
-          else
-            puts "[Info - SiriProxy] using/created speechID: #{object["properties"]["speechId"]}"
-            self.speechId_avail=true
-          end
-        
-      end
-      if object["properties"]["assistantId"] !=nil #&& !object["properties"]["assistantId"].empty?
-        #same here removed
-          if object["properties"]["assistantId"].empty?
-            puts "[Warning - SiriProxy] This is not usual maybe a device got banned"
-            self.assistantId_avail=false
-          else
-            puts "[Info - SiriProxy] using/created assistantId: #{object["properties"]["assistantId"]}"
-            self.assistantId_avail=true
-          end
-        
-      end    
-=end
+
     end
     #end of injection        
     puts "[Info - #{self.name}] Received Object: #{object["class"]}" if $LOG_LEVEL == 1
@@ -426,7 +411,7 @@ class SiriProxy::Connection < EventMachine::Connection
     if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false 
       puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
       if object["class"]=="FinishSpeech" 
-             #return object     
+        #return object     
       end
       pp object if $LOG_LEVEL > 3
       return nil

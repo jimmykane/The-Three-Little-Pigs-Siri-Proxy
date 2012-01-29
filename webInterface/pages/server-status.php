@@ -1,5 +1,6 @@
 <?php
 $keys = getkeys();
+$expired_keys = getexpiredkeys();
 $config = getconfig();
 $count = 0;
 $server_running = checkServer();
@@ -41,14 +42,15 @@ $server_running = checkServer();
     <tr>
         <th>Active connections</th>
         <td><?php
-          if ($keys != false){
-            if ($config['active_connections'] > $config['max_connections'] * $keys[0]['availablekeys'] )
-                echo '<p class="notification red">' . $config['active_connections'] . '</p>';
-            else
-                echo '<p class="notification green">' . $config['active_connections'] . '</p>';
-          }else {
+            if ($keys != false) {
+                if ($config['active_connections'] > $config['max_connections'] * $keys[0]['availablekeys'])
+                    echo '<p class="notification red">' . $config['active_connections'] . '</p>';
+                else
+                    echo '<p class="notification green">' . $config['active_connections'] . '</p>';
+            }else {
                 echo '<p class="notification green">' . 999 . '</p>';
-            }?>
+            }
+            ?>
         </td>
 
     </tr>
@@ -61,8 +63,7 @@ $server_running = checkServer();
                     <input title="Update Max Connections" type="image" SRC="design/img/refresh.png" HEIGHT="32" WIDTH="32" BORDER="0" ALT="Submit Form"/>
                 </form>
             </td>
-        <?php } else {
-            ?>
+        <?php } else { ?>
             <td><?php echo $config['max_connections'] ?></td>
             <?php
         }
@@ -122,26 +123,25 @@ $server_running = checkServer();
 <h1>Available keys</h1>
 <h2>Legend</h2>
 <p>
-<ul>
-    <li><b>Speechid</b> The speech identifier send from the iphone4s</li>
-    <li><b>Assistantid</b> The assistant identifier from the iphone4s</li>
-    <li><b>Validation Data</b> The validation data from the iphone4s</li>
+<ul>    
+    <li><b>Validation Data</b> The validation data from the iPhone4S which is the only thing needed</li>
     <li><b>Keyload</b> The current load on each key. When the limit is reached the key gets "HOT", and therefore pauses for a short of time (throttles)</li>
     <li><b>Date Added</b> The date and time that the key was added!</li>        
 </ul>
 </p>
-<br />
+<br/>
+
 <?php if ($keys != false && $keys[0]['availablekeys'] > 0) { ?>
     <table>
         <tr>
-            <th>ID</th>
+            <th>ID</th>           
             <th>Speech ID</th>
             <th>Assistant ID</th>
             <th>Validation Data (24h)</th>
             <th>Keyload</th>
             <th>Date Added</th>
-            <?php 
-            if (isAdministrativeUser()){
+            <?php
+            if (isAdministrativeUser()) {
                 echo '<th>Update</th>';
             }
             ?>
@@ -149,43 +149,40 @@ $server_running = checkServer();
         <?php
         foreach ($keys as $key) {
             $count++;
-            if (isAdministrativeUser()){ ?>
-         
+            if (isAdministrativeUser()) {
+                ?>         
                 <tr>
-                    <form name="KeyUpdate" id="KeyUpdate" method="post" action="inc/key_update_db.php" onsubmit="return ValidateFormKeyUpdate(); ">
-                        <td>
-                            <?php echo $key['id'] ?>
-                            <input size="20" type="hidden" name="KeyId" id="KeyId"  value="<?php echo $key['id'] ?>"/> 
-                        </td>
+                <form name="KeyUpdate" id="KeyUpdate" method="post" action="inc/key_update_db.php" onsubmit="return ValidateFormKeyUpdate(); ">
                     <td>
-                       <input size="20" type="text" name="SpeechId" id="SpeechId"  value="<?php echo $key['speechid'] ?>"/> 
+                        <?php echo $key['id'] ?>
+                        <input size="20" type="hidden" name="KeyId" id="KeyId"  value="<?php echo $key['id'] ?>"/> 
+                    </td>    
+                    <td>
+                        <input size="20" type="text" name="SpeechId" id="SpeechId"  value="<?php echo $key['speechid'] ?>"/> 
                     </td>
                     <td>
-                       <input size="20" type="text" name="AssistantId" id="AssistantId"  value="<?php echo $key['assistantid'] ?>"/> 
+                        <input size="20" type="text" name="AssistantId" id="AssistantId"  value="<?php echo $key['assistantid'] ?>"/> 
                     </td>
                     <td>
-                       <input size="20" type="text" name="ValidationData" id="ValidationData"  value="<?php echo $key['sessionValidation'] ?>"/> 
+                        <input size="20" type="text" name="ValidationData" id="ValidationData"  value="<?php echo $key['sessionValidation'] ?>"/> 
                     </td>
                     <td>
-                       <input size="8" type="text" name="KeyLoad" id="KeyLoad"  maxlength="4" value="<?php echo $key['keyload'] ?>"/> /  <?php echo $config['max_keyload'] ?>
+                        <input size="8" type="text" name="KeyLoad" id="KeyLoad"  maxlength="4" value="<?php echo $key['keyload'] ?>"/> /  <?php echo $config['max_keyload'] ?>
                     </td>
                     <td>
-                     <?php echo $key['date_added'] ?>
+                        <?php echo $key['date_added'] ?>
                     </td>
                     <td>
-                          <input title="Update Key Data" type="image" SRC="design/img/refresh.png" HEIGHT="32" WIDTH="32" BORDER="0" ALT="Submit Form"/>
+                        <input title="Update Key Data" type="image" SRC="design/img/refresh.png" HEIGHT="32" WIDTH="32" BORDER="0" ALT="Submit Form"/>
                     </td>
-                    </form>
-                </tr>
-         
-                
-                
-            <?php    
-            }else{
-               
+                </form>
+            </tr>          
+
+            <?php
+        } else {
             ?>
             <tr> 
-                <td><?php echo $key['id'] ?></td>
+                <td><?php echo $key['id'] ?></td>        
                 <td><?php echo '****' . substr($key['speechid'], -9); ?></td>
                 <td><?php echo '****' . substr($key['assistantid'], -9); ?></td>
                 <td>-------</td>
@@ -194,7 +191,7 @@ $server_running = checkServer();
                         <p class="notification red">Overloaded</p>
                         <?php
                     } else {
-                        echo $key['keyload'] . ' / ' . $config['max_keyload'];
+                        echo (($key['keyload'] / $config['max_keyload']) * 100) . '%';
                     }
                     ?>
                 </td>
@@ -202,11 +199,11 @@ $server_running = checkServer();
                     <?php echo $key['date_added'] ?>
                 </td>
             </tr>
-            
-        <?php 
-            }
-        } 
-        ?>
+
+            <?php
+        }
+    }
+    ?>
     </table>
 
 <?php } else { ?>
@@ -214,7 +211,82 @@ $server_running = checkServer();
 
 <?php } ?>
 <br />
+<?php if (isAdministrativeUser()) { ?>
+    <div class="notification green" style="max-width:300px;">
+        <div id="addkey">
+            <p><b>Manually add a key</b></p>
+        </div>
+        <div class="key">
+            <form name="KeyInsert" id="KeyInsert" method="post" action="inc/key_insert_db.php" onsubmit="return ValidateFormKeyInsert(); ">
+                <table>
+                    <tr>
+                        <th>
+                            Validation Data
+                        </th>
+                        <th>
+                            Action
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input size="20" type="text" name="ValidationData" id="ValidationData"/>
+                        </td>
+                        <td>
+                            <input type="submit" size="30" name="KeySubmit" id="KeySubmit" value="Submit" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <br/>       
+        </div>
+    </div>
 
+<?php } ?>
+<br />
+<?php
+if ($expired_keys != false && $expired_keys[0]['expiredkeys'] > 0) {
+    ?>
+    <div class="notification yellow">
+        <div id="showexpired">
+            <p><b>Click Here to show expired keys</b></p>
+        </div>
+        <div class="expiredkeys">                      
+            <table>
+                <tr>
+                    <th>ID</th>   
+                    <th>Speech ID</th>
+                    <th>Assistant ID</th>
+                    <th>Validation Data (24h)</th>
+                    <th>Keyload</th>
+                    <th>Date Added</th>
+                </tr>
+                <?php foreach ($expired_keys as $expired_key) { ?>    
+                    <tr> 
+                        <td><p><?php echo $expired_key['id'] ?></p></td>   
+                        <td><?php echo '****' . substr($expired_key['speechid'], -9); ?></td>
+                        <td><?php echo '****' . substr($expired_key['assistantid'], -9); ?></td>
+                        <td>-------</td>
+                        <td>
+                            <?php if ($expired_key['keyload'] >= $config['max_keyload']) { ?>
+                                <p class="notification red">Overloaded</p>
+                                <?php
+                            } else {
+                                echo (($expired_key['keyload'] / $config['max_keyload']) * 100) . '%';
+                            }
+                            ?>
+                        </td>
+                        <td>
+                            <?php echo $expired_key['date_added'] ?>
+                        </td>
+                    </tr>
+                <?php } ?>
+            </table>
+            <br/>
+        </div>
+    </div>
+    </br>
+    </br>
+<?php } ?>
 <h2>Contribute for further development.</h2>
 <div style="overflow: hidden;">
     <div style="float: left; width: 600px;">
@@ -265,8 +337,16 @@ $server_running = checkServer();
     }
     
     function ValidateFormKeyUpdate(){
-        if ((document.getElementById('UserNameLogin').value=="")
-            || (document.getElementById('LoginPasswordLogin').value =="")) {
+        if ((document.getElementById('ValidationData').value=="")
+            || (document.getElementById('KeyLoad').value =="")) {
+            alert("Warning\n You havent filled all the required fields");
+            return false;
+        }
+        else
+            return true;
+    }
+    function ValidateFormKeyInsert(){
+        if (document.getElementById('ValidationData').value==""){
             alert("Warning\n You havent filled all the required fields");
             return false;
         }
@@ -285,4 +365,16 @@ $server_running = checkServer();
 </script>
 <script type="text/javascript"
         src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+<script>
+    $(document).ready(function(){
+        $(".key").hide();	
+        $("#addkey").click(function () {
+            $(".key").slideToggle();       
+        });     
+        $(".expiredkeys").hide();	
+        $("#showexpired").click(function () {
+            $(".expiredkeys").slideToggle();       
+        });        
+    });    
 </script>

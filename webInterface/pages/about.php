@@ -2,10 +2,9 @@
 
 <p>This server uses a very simple but clever and precocious tactic to server a larger number of devices and at the same time protects the key.
 I editing and forked @plamoni's and  @kmsbueromoebel 's server just  because Apple followed a very bad tactic. That was Siri assistant  software restriction to older devices, done only for marketing reason (my humble opinion).</p>
+<p><b>The source code is available on <a href="https://github.com/jimmykane">git-hub</a></p>
 
 <h1>So lets get to the point how does this work?</h1>
-
-<p><b>Step 1:</b></p>
 
 <p>Lets say two Siri Capable Devices (currently only iPhone4s) connect to server. The server saves the keys on the Database. 
 Each key has assistantid,speechid, sessionValidationData,expired,keyload and date_added columns. Lets see what they are about:</p>
@@ -14,19 +13,18 @@ Each key has assistantid,speechid, sessionValidationData,expired,keyload and dat
 <li><b>assistantid</b> - The assistant identifier. Unique for each device. In other words this defines your Siri and how it responds. eg. If I gave you my assistantid then Siri would get confused and sometimes respond to you with my nickname. Ugly.
 Although it's stored on the database its not used. Each older device that connects on the server creates a new assistantid via using the sessionValidationData.</li>
 <li><b>speechid</b> - The speech identifier. Again unique for each device like above.</li>
-<li><b>sessionValidationData</b> - The most importand field and the only thing needed for using siri on older devices. These validation data is a big string that gets generated every 24 hours on Siri Capable Devices via FairPlayed. These validation data allow only a small number of assistant's to be created and are somehow linked to the original Siri Capable Device</li>
+<li><b>sessionValidationData</b> - The most importand field and the <b>only thing needed</b> for using Siri on older devices. These validation data is a big string that gets generated every 24 hours on Siri Capable Devices via FairPlayed. These validation data allow only a small number of assistant's to be created and are somehow linked to the original Siri Capable Device</li>
 <li><b>expired</b> - It changed to true when the sessionValidation Data (mentioned above) expire. Default value="False" as enum</li>
 <li><b>keyload</b> - How much the key has been used. The default values is 0 and the maximum value is 1000. Each time a device connects and makes a session the keyload increases by 10. So each key can serve up to 100 connection sessions until it gets overloaded and pauses up for a period of time</li>
 </ul>
         <p><b>Ok the keys are saved what now?</b></p>
 
-<ul>
-    
+<ul>   
 <li>Each time a older device connects, the server finds the key with the least keyload and uses that to forge the packets with the sessionValidationData in order to be accepted by guzzoni.apple.com (Apple's siri servers)</li>
 <li>Each older device that connects uses the sessionValidationData to create a assistant.</li>
-<li>After the assistant is created it can use siri via the proxy for speech  recognition and views creation.</li>
+<li>After the assistant is created it can use Siri via the proxy for speech  recognition and views creation.</li>
 <li>When one of the keys are overloaded (reaches the keyload max values) the server then does not forge the packets thus stops misusement of  the key.</li>
-<li>After 15 minutes of  the overloaded key drops -100 lets another 10 sessions to be created and so on until the key expires.</li>
+<li>After the Keyload interval the overloaded key drops -100 lets another 10 sessions to be created and so on until the key expires.</li>
 <li>This helps a lot to pretend that its a normal everyday use (with some finetuning to the above values and limits) and spoofing/securing the Siri Capable Devices.</li>
 <li>Also a webgui can help you monitor the active concurrent connections, and all the above in realtime. You can forget ssh'ing to your VPS and using screen to view how the server is doing.</li>
 </ul>    

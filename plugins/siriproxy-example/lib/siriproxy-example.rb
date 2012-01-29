@@ -3,7 +3,6 @@ require 'cora'
 require 'siri_objects'
 require 'pp'
 
-
 #######
 # This is a "hello world" style plugin. It simply intercepts the phrase "test siri proxy" and responds
 # with a message about the proxy being up and running (along with a couple other core features). This 
@@ -12,11 +11,11 @@ require 'pp'
 # Remember to add other plugins to the "config.yml" file if you create them!
 ######
 
-    #Note about returns from filters:
-    # - Return false to stop the object from being forwarded
-    # - Return a Hash to substitute or update the object
-    # - Return nil (or anything not a Hash or false) to have the object forwarded (along with any 
-    #    modifications made to it)
+#Note about returns from filters:
+# - Return false to stop the object from being forwarded
+# - Return a Hash to substitute or update the object
+# - Return nil (or anything not a Hash or false) to have the object forwarded (along with any 
+#    modifications made to it)
 
 class SiriProxy::Plugin::Example < SiriProxy::Plugin
   def initialize(config)
@@ -32,9 +31,12 @@ class SiriProxy::Plugin::Example < SiriProxy::Plugin
   #Essential for server status
   listen_for /how many keys/i do
     @keysavailable=$keyDao.listkeys().count
-    if @keysavailable>0    
-    say "There are #{@keysavailable} keys available" #say something to the user!    
-    request_completed #always complete your request! Otherwise the phone will "spin" at the user!
+    if @keysavailable==1
+      say "There is one key available on the server" #say something to the user!    
+      request_completed #always complete your request! Otherwise the phone will "spin" at the user!
+    elsif @keysavailable>0    
+      say "There are #{@keysavailable} keys available" #say something to the user!    
+      request_completed #always complete your request! Otherwise the phone will "spin" at the user!
     else
       say "All keys are overloaded!" #say something to the user!    
       request_completed #always complete your request! Otherwise the phone will "spin" at the user!
@@ -45,14 +47,14 @@ class SiriProxy::Plugin::Example < SiriProxy::Plugin
     $conf.active_connections = EM.connection_count 
     @activeconnections=$conf.active_connections
     if @activeconnections>0
-    say "There are #{@activeconnections} active connections" #say something to the user!    
-    request_completed #always complete your request! Otherwise the phone will "spin" at the user!
+      say "There are #{@activeconnections} active connections" #say something to the user!    
+      request_completed #always complete your request! Otherwise the phone will "spin" at the user!
     else
       say "Something went wrong!" #say something to the user!    
       request_completed #always complete your request! Otherwise the phone will "spin" at the user!
     end
   end
-#end of server status monitor  
+  #end of server status monitor  
   
   listen_for /test siri proxy/i do
     say "Siri Proxy is up and running!" #say something to the user!

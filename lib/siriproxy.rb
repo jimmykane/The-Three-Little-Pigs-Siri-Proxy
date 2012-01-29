@@ -1,7 +1,8 @@
 require 'eventmachine'
 require 'zlib'
 require 'pp'
-
+require "siriproxy/version"
+       
 
 class String
   def to_hex(seperator=" ")
@@ -14,9 +15,9 @@ class SiriProxy
   def initialize()
     # @todo shouldnt need this, make centralize logging instead
     $LOG_LEVEL = $APP_CONFIG.log_level.to_i
-    #
-    puts "Initializing Proxy... v.0.9am"
-    
+    #Version support added
+    puts "Initializing TLP version [#{SiriProxy::VERSION}]"
+
     #Initialization of event machine variables overider +epoll mode on by default    		
 		EM.epoll
     
@@ -40,17 +41,14 @@ class SiriProxy
     $assistantDao=AssistantDao.instance
     $assistantDao.connect_to_db($my_db)
     
-    EM.threadpool_size=$conf.max_threads
-    
+    EM.threadpool_size=$conf.max_threads    
     
     #Print email config
     if $APP_CONFIG.send_email=='ON' or $APP_CONFIG.send_email=='on'
       puts '[Info - SiriProxy] Email notifications are [ON]!'
     else
       puts '[Info - SiriProxy] Email notifications are [OFF]!'
-    end
-    
-    
+    end    
     
     EventMachine.run do
       begin

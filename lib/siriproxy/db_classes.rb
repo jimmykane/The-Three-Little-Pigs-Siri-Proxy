@@ -40,20 +40,20 @@ class ConfigDao
 	def initialize()		
 	end
 	def connect_to_db(my)
-		@my = my;
+		@my = my
 	end
   def getsettings
     sql = "SELECT * FROM `config` "
-    st = @my.prepare(sql);
-    st.execute();
+    st = @my.prepare(sql)
+    st.execute()
     result = fetchResults(st)
 		st.close    
     return result[0]
   end
 	def update(dto)
-		sql = "UPDATE `config` SET max_threads = ?,max_connections= ? ,active_connections=?, max_keyload=?,keyload_dropdown=?,keyload_dropdown_interval=? WHERE id=1";
-		st = @my.prepare(sql);
-		st.execute(dto.max_threads,dto.max_connections,dto.active_connections,dto.max_keyload,dto.keyload_dropdown,dto.keyload_dropdown_interval);
+		sql = "UPDATE `config` SET max_threads = ?,max_connections= ? ,active_connections=?, max_keyload=?,keyload_dropdown=?,keyload_dropdown_interval=? WHERE id=1"
+		st = @my.prepare(sql)
+		st.execute(dto.max_threads,dto.max_connections,dto.active_connections,dto.max_keyload,dto.keyload_dropdown,dto.keyload_dropdown_interval)
     
 		st.close
    
@@ -135,27 +135,27 @@ class KeyDao
 	end
 
 	def connect_to_db(my)
-		@my = my;
+		@my = my
 	end
 
 	def insert(dto)
-		sql = "INSERT INTO `keys` (sessionValidation,expired,date_added ) VALUES ( ? , ?,NOW())"
+		sql = "INSERT INTO `keys` (assistantid,speechid,sessionValidation,expired,date_added ) VALUES ( ? ,  ?  , ? , ?,NOW())"
 		st = @my.prepare(sql)		
-		st.execute(dto.sessionValidation,dto.expired)
+		st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.expired)
 		st.close
 	end
 
 	def update(dto)
-		sql = "UPDATE `keys` SET assistantid = ?,speechid= ? ,sessionValidation=?,expired=?,keyload=? WHERE id = ?";
-		st = @my.prepare(sql);
-		st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.expired,dto.keyload,dto.id);
+		sql = "UPDATE `keys` SET assistantid = ?,speechid= ? ,sessionValidation=?,expired=?,keyload=? WHERE id = ?"
+		st = @my.prepare(sql)
+		st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.expired,dto.keyload,dto.id)
 		st.close
 	end
   
   def setkeyload(dto)
-		sql = "UPDATE `keys` SET keyload=? WHERE id = ?";
-		st = @my.prepare(sql);
-		st.execute(dto.keyload,dto.id);
+		sql = "UPDATE `keys` SET keyload=? WHERE id = ?"
+		st = @my.prepare(sql)
+		st.execute(dto.keyload,dto.id)
 		st.close
 	end
 
@@ -176,9 +176,9 @@ class KeyDao
 	end
 
 	def validation_expired(dto)				
-		sql = "UPDATE `keys` SET expired='True' WHERE id = ?";
-		st = @my.prepare(sql);
-		st.execute(dto.id);
+		sql = "UPDATE `keys` SET expired='True' WHERE id = ?"
+		st = @my.prepare(sql)
+		st.execute(dto.id)
 		st.close		
 	end
 
@@ -269,13 +269,13 @@ class Assistant
     end
     
     def connect_to_db(my)
-      @my = my;
+      @my = my
     end
     
     def getkeyassistants(dto)
       sql = "SELECT * FROM `assistants` WHERE key_id=?"
-      st = @my.prepare(sql);
-      st.execute(dto.id);
+      st = @my.prepare(sql)
+      st.execute(dto.id)
       result = fetchResults(st)
       st.close    
       return result[0]
@@ -292,8 +292,8 @@ class Assistant
     
     def createassistant(dto)
       sql = "INSERT INTO `assistants` (key_id,assistantid,speechid,date_added) VALUES ( ? , ? , ? , NOW()))"
-      st = @my.prepare(sql);
-      st.execute(dto.key_id,dto.assistantid,dto.speechid);      
+      st = @my.prepare(sql)
+      st.execute(dto.key_id,dto.assistantid,dto.speechid)   
       st.close    
     end
     

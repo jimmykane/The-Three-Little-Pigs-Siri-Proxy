@@ -20,7 +20,7 @@ server2: 'your.siri.proxy.server.com'
 #It is possible that this email will be delivered to your spam/junk folder.
 #html formated message is default
 send_email: 'OFF' 
-email_from: 'The Three Little Pigs'
+email_from: 'TheThreeLittlePigs@pigs.com'
 email_to: 'youremail'
 email_subject: 'A 4S Key Expired' 
 email_message: '<p>Hello, </br> this is an automated message from The Three Little Pigs SiriProxy.

@@ -1,8 +1,7 @@
 <?php
-
 function getkeys() {
     extract($GLOBALS);
-    $query = "SELECT * FROM `keys` WHERE expired='False' ";
+    $query = "SELECT * FROM `keys` WHERE expired='False'";
     $result = $db->MakeQuery($query);
     $available_keys_count = $db->GetRecordCount($result);
     if ($available_keys_count > 0) {
@@ -13,6 +12,21 @@ function getkeys() {
     }
     return false;
 }
+
+function getexpiredkeys() {
+    extract($GLOBALS);
+    $query = "SELECT * FROM `keys` WHERE expired='True'";
+    $result = $db->MakeQuery($query);
+    $available_keys_count = $db->GetRecordCount($result);
+    if ($available_keys_count > 0) {
+
+        $keys = $db->GetResultAsArray($result);
+        $keys[0]['expiredkeys'] = $available_keys_count;
+        return $keys;
+    }
+    return false;
+}
+
 
 function getconfig() {
     extract($GLOBALS);
@@ -35,5 +49,4 @@ function checkServer() {
     }
     return false;
 }
-
 ?>

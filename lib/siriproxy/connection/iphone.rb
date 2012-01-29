@@ -22,9 +22,9 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
     elsif @keysavailable>0
        @max_connections=$conf.max_connections * @keysavailable
     end
-    puts '[Keys - iPhone] Keys [#{@keysavailable}]'
+   
     if $conf.active_connections>=@max_connections
-      puts "[Warning - iPhone] Max Connections reached! Connection dropping...."
+      puts "[Warning - Siriproxy] Max Connections reached! Connection dropping...."
       super
       self.close_connection
       start_tls(:verify_peer      => false)
@@ -38,10 +38,15 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
 
   def ssl_handshake_completed
     super
+    begin
     self.other_connection = EventMachine.connect('guzzoni.apple.com', 443, SiriProxy::Connection::Guzzoni)
     self.plugin_manager.guzzoni_conn = self.other_connection
     other_connection.other_connection = self #hehe
     other_connection.plugin_manager = plugin_manager
+    rescue
+      puts "[Warning - Siriproxy] Could not connect to Guzzoni!!! Server pausing!"
+      exit (0)
+    end
   end
   
   def received_object(object)   

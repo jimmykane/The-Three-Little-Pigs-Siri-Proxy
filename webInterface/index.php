@@ -19,12 +19,13 @@ $pMgr = new PageManager("pages", "page");
         <title>The Three Little Pigs :: Siri Proxy | <?php echo $pMgr->getTitle(); ?></title>
         <link rel="stylesheet" type="text/css" media="screen" href="design/css/style.css" />
         <link rel="shortcut icon" href="design/img/favicon.ico" />
+        <script src="http://code.jquery.com/jquery-latest.js"></script>
     </head>
     <body>
         <div id="top">
             <div class="centerContainer">
                 <?php echo $pMgr->navigation(); ?>
-                
+
                 <div id="header">
                     <h1>The Three Little Pigs - A Siri Server That Needs To Be Fed</h1>
                 </div>
@@ -60,7 +61,7 @@ $pMgr = new PageManager("pages", "page");
                             <li>T: <a href="http://twitter.com/wouterds">@WouterDS</a></li>
                             <li>T: <a href="https://twitter.com/thpryrchn">@thpryrchn</a></li>
                             <li>T: <a href="https://twitter.com/HisyamNasir">@HisyamNasir</a></li>
-                             <li>T: <a href="http://twitter.com/jimmykane9">@JimmyKane9</a></li>
+                            <li>T: <a href="http://twitter.com/jimmykane9">@JimmyKane9</a></li>
                             <li>G+: <a href="http://gplus.to/jimmykane">http://gplus.to/jimmykane</a></li>
                         </ul>         
                     </div>
@@ -97,5 +98,6 @@ $pMgr = new PageManager("pages", "page");
             Cufon.replace('#middle p, #middle ul, #middle ol, #middle label, #middle table, #bottom', { hover: true, fontFamily: 'Tisa' });
             Cufon.replace('#top, h1, h2, h3, h4, h5, h6', { hover: true, fontFamily: 'League Gothic' });
             </script>
+           
     </body>
 </html>
