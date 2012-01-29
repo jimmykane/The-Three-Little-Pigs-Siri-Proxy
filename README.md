@@ -36,8 +36,8 @@ Solution 2: Use other iPhone4s DATA
 
 
 
-Version 0.9b
------------
+Version 0.9ba
+-------------
 
 -Re-added Capturing of assistantid's and speechid's just for reference although they are not used
 
