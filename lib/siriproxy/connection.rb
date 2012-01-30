@@ -166,11 +166,25 @@ class SiriProxy::Connection < EventMachine::Connection
 				line["iPhone3,3"] = "iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
-      elsif line.match(/iPad2,2;/)	
+      elsif line.match(/iPad2,1;/)	
 				self.is_4S = false				
-        puts "[Info - SiriProxy] iPad 2nd generation connected"						
+        puts "[Info - SiriProxy] iPad2 Wifi Only connected"						
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+				line["iPad/iPad2,1"] = "iPhone/iPhone4,1"
+				puts "[Info - SiriProxy] Changed header to iphone4s] "
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
+			elsif line.match(/iPad2,2;/)	
+				self.is_4S = false				
+        puts "[Info - SiriProxy] iPad2 GSM connected"						
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPad/iPad2,2"] = "iPhone/iPhone4,1"
+				puts "[Info - SiriProxy] Changed header to iphone4s] "
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
+			elsif line.match(/iPad2,3;/)	
+				self.is_4S = false				
+        puts "[Info - SiriProxy] iPad2 CDMA connected"						
+				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+				line["iPad/iPad2,3"] = "iPhone/iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
 			elsif line.match(/iPad1,1;/)		
