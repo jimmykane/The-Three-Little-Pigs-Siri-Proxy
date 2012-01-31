@@ -36,17 +36,43 @@ function getconfig() {
     return $config;
 }
 
-function checkServer() {
-    $cmd = "ps -C siriproxy";
-    exec($cmd, $output, $result);
-    if (count($output) >= 2) {
-        return true;
-    }
-    $cmd = "ps -C ruby";
-    exec($cmd, $output2, $result);
-    if (count($output2) >= 2) {
+function ismac() {
+    $cmd = "uname";
+    exec($cmd, $output);
+    if ($output = "darwin") {
         return true;
     }
     return false;
+}
+
+
+function checkServer() {
+    $isrunningmac = ismac();
+
+    if ($isrunningmac = true) {
+        $cmd = "ps aux < /dev/null | grep siriproxy";
+        exec($cmd, $output, $result);
+        if (count($output) >= 3) {
+            return true;
+        }
+        
+        $cmd = "ps aux < /dev/null | grep ruby";
+        exec($cmd, $output2, $result);
+        if (count($output2) >= 3) {
+            return true;
+        }
+        return false;
+    }
+        $cmd = "ps -C siriproxy";
+        exec($cmd, $output, $result);
+        if (count($output) >= 2) {
+            return true;
+        }
+        $cmd = "ps -C ruby";
+        exec($cmd, $output2, $result);
+        if (count($output2) >= 2) {
+            return true;
+        }
+        return false;
 }
 ?>
