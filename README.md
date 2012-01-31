@@ -82,7 +82,7 @@ Version 0.9am
 -Bug fixes
 
 
-**Recomended default values**
+**Recommended default values**
 
 -Max Connections per key: default=15
 
@@ -121,7 +121,7 @@ Features
 
 -Plugins api and config capable (NEW)
 
--Email Notifications when the key expires (NEW) - Dont forget to setup your email on the config.yml
+-Email Notifications when the key expires (NEW) - Don't forget to setup your email on the config.yml
 
 -MySql Database connection support: Supports MySQL database connection for storing configuration,keys and runtime statistics. Now you can edit and build that (NEW)
 
@@ -271,7 +271,7 @@ Clone this repo locally, then navigate into the The-Three-Little-Pigs directory 
 
         You can also start the server by a re-open script that ensures to restart the server if it crashes
 
-        `./reopen.sh`
+        `./siriproxy-restarter`
 
 12. Test that the server is running by saying "Test Siri Proxy" to your phone.
 
@@ -329,9 +329,9 @@ Also if you dont have static ip you can use this dns python server. ([https://gi
 
 
 
-These instructions assume you have installed Xcode, and Macports already.
-
 **Let's make sure everything is up to date**
+
+These instructions assume you have installed Xcode, and Macports already.
 
    * Update makeports `sudo port selfupdate`
 
@@ -426,11 +426,16 @@ Clone this repo locally, then navigate into the The-Three-Little-Pigs directory 
 
 	Answer yes to "Do you wish to trust this .rvmrc file?"
     
+	* _If you miss it, just type in `rvm reload` and you can do it again._
+
+
 3. Install Rake and Bundler:  
 
 	`sudo gem install rake bundler`  
 
-4. Install SiriProxy gem (do this from your SiriProxy directory):  
+4. Install mysql & SiriProxy gem (do this from your SiriProxy directory):  
+
+	`gem install mysql -- --with-mysql-config=/usr/local/mysql/bin/mysql_config`
 
 	`rake install`  
 
