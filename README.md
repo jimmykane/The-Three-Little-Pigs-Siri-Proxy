@@ -39,65 +39,66 @@ Solution 2: Use other iPhone4s DATA
 Version 0.9ba
 -------------
 
--Re-added Capturing of assistantid's and speechid's just for reference although they are not used
+* Re-added Capturing of assistantid's and speechid's just for reference although they are not used
 
--Added function in web-Interface to manually create a key, and show old expired keys. Coming soon new and improved web Interface
+* Added function in web-Interface to manually create a key, and show old expired keys. Coming soon new and improved web Interface
 
--Improved grabber. Now if the 4S is not setup the keys are saved! 
+* Improved grabber. Now if the 4S is not setup the keys are saved! 
 
--Detection of iPad2
+* Detection of iPad2
 
--Several bug fixes
+* Several bug fixes
+
+* Tutorial for OSX Snow Leoparf, and OSX Lion!!!  Thanks to @Thpryrchn
 
 
 **Coming soon**
 
--Assistantid monitor per key and assistant limits!
+* Assistantid monitor per key and assistant limits!
 
--Improved web Interface by @Wouter DS
+* Improved web Interface by @Wouter DS
 
--Tutorial 100% ok for OSX SL, and OSX L!!!  via @Thpryrchn
 
 Version 0.9am
 -----------
 
--Added in example plugin custom commands to display server stats. Be sure to have it enabled in your `~/.siriproxy/config.yml` 
+* Added in example plugin custom commands to display server stats. Be sure to have it enabled in your `~/.siriproxy/config.yml` 
 
     Say: 'How many keys' and Siri replies with the available keys
 
     Say: 'How many active connections' and Siri replies with the current active connections
 
--Added recommended values in gentables functions. Please regenerate your Tables. Keep in mind that this will destroy all data in db!
+* Added recommended values in gentables functions. Please regenerate your Tables. Keep in mind that this will destroy all data in db!
 
--Added premature admin login and settings change via web. See webInterface/inc/config.inc.php
+* Added premature admin login and settings change via web. See webInterface/inc/config.inc.php
 
--Added max connections per key!
+* Added max connections per key!
 
--Changed method about the keyload increases. Now its based upon session utilization!
+* Changed method about the keyload increases. Now its based upon session utilization!
 
--Fixed a bug where when a key expired and a client established a connection the wrong key was marked expired
+* Fixed a bug where when a key expired and a client established a connection the wrong key was marked expired
 
--Fixed a bug where when a 4s would connect and its not setup the server did not recognize it
+* Fixed a bug where when a 4s would connect and its not setup the server did not recognize it
 
--Bug fixes
+* Bug fixes
 
 
 **Recommended default values**
 
--Max Connections per key: default=15
+* Max Connections per key: default=15
 
--Max Keyload: default=500
+* Max Keyload: default=500
 
--Keyload Dropdown: default=100~125
+* Keyload Dropdown: default=100~125
 
--Keyload Dropdown Interval: default=1200~1800
+* Keyload Dropdown Interval: default=1200~1800
 
 
 
 Version 0.8b
 -----------
 
-Fixed several bugs, added email notifications, key protection and much more
+* Fixed several bugs, added email notifications, key protection and much more
 
 
 **Updating from v.0.7**
@@ -119,27 +120,27 @@ There is no need to do anything more (create db etc) than these steps
 Features
 --------
 
--Plugins api and config capable (NEW)
+* Plugins api and config capable (NEW)
 
--Email Notifications when the key expires (NEW) - Don't forget to setup your email on the config.yml
+* Email Notifications when the key expires (NEW) - Don't forget to setup your email on the config.yml
 
--MySql Database connection support: Supports MySQL database connection for storing configuration,keys and runtime statistics. Now you can edit and build that (NEW)
+* MySql Database connection support: Supports MySQL database connection for storing configuration,keys and runtime statistics. Now you can edit and build that (NEW)
 
--Multiple key support: You can connect more than 1 iPhone4S and store even more keys. The more the keys, the more the clients!
+* Multiple key support: You can connect more than 1 iPhone4S and store even more keys. The more the keys, the more the clients!
 
--Key Throttling: Each client uses a different key, if more than one Keys are available. The throttler makes sure that each Key is throttled thus enabling several client registration and assistant object creation.
+* Key Throttling: Each client uses a different key, if more than one Keys are available. The throttler makes sure that each Key is throttled thus enabling several client registration and assistant object creation.
 
--KeyLoad Safeguard: Never worry about how many people use your iPhone4S key. Each Key has a maximum keyload. Even when the key is still valid, if the keyload limit is exceeded, the safeguard disables the key and protects the iPhone4S from getting banned.
+* KeyLoad Safeguard: Never worry about how many people use your iPhone4S key. Each Key has a maximum keyload. Even when the key is still valid, if the keyload limit is exceeded, the safeguard disables the key and protects the iPhone4S from getting banned.
 
--KeyLoad Aware: Checks what key is not "Hot" anymore and periodically decreases the load, thus re-enabling Safeguarded Keys
+* KeyLoad Aware: Checks what key is not "Hot" anymore and periodically decreases the load, thus re-enabling Safeguarded Keys
 
--Web interface and monitoring: Always know what is happening without a CLI! With a web interface you can check statistics such as active connections, valid keys, server load, keyload etc.
+* Web interface and monitoring: Always know what is happening without a CLI! With a web interface you can check statistics such as active connections, valid keys, server load, keyload etc.
 
--One certificate for all devices: Both Siri Capable devices (currently only iPhone4s) and older devices are using the same certificate and the same port (443 default for SSL)
+* One certificate for all devices: Both Siri Capable devices (currently only iPhone4s) and older devices are using the same certificate and the same port (443 default for SSL)
 
--One instance of the server: Due to one certificate you can run only one instance of the server.
+* One instance of the server: Due to one certificate you can run only one instance of the server.
 
--Bug Free (I hope...):-) Never worry if the server has crashed. Most of the bugs that were causing the server to crash are fixed now.
+* Bug Free (I hope...) :-) Never worry if the server has crashed. Most of the bugs that were causing the server to crash are fixed now.
 
 
 Notice About Plugins
@@ -156,13 +157,15 @@ Set-up Instructions
 
 **Tutorial for Ubuntu is now here**
 
-Thanks to am3yrus we have a tutorial for ubuntu lovers: [http://am3yrus.over-blog.com/]
+Thanks to am3yrus we have a tutorial for ubuntu lovers: [http://am3yrus.over-blog.com](http://am3yrus.over-blog.com)
 
 If you go for the above tutorial then there is no need to follow any instructions below. 
 
 
 
 **Set up DNS**
+
+* __Not needed if you Jailbrake an iPhone 4S. Just add repo [http://cydia.myrepospace.com/thpryrchn](http://cydia.myrepospace.com/thpryrchn) and install Spire 4S. Then you can point it to your server just like you do with any other iPhone 4.__
 
 Before you can use SiriProxy, you must set up a DNS server on your network to forward requests for guzzoni.apple.com to the computer running the proxy (make sure that computer is not using your DNS server!). I recommend dnsmasq for this purpose. It's easy to get running and can easily handle this sort of behavior. ([http://www.youtube.com/watch?v=a9gO4L0U59s](http://www.youtube.com/watch?v=a9gO4L0U59s))
 Also if you dont have static ip you can use this dns python server. ([https://github.com/jimmykane/Roque-Dns-Server])
@@ -201,11 +204,11 @@ Install MySQL on your system and create a database called siri or whatever you l
 
 1. Connect to mysql 
     
-        `mysql -h localhost -u root -p `
+	`mysql -h localhost -u root -p `
 
 2. Create the Database
 
-        `CREATE DATABASE siri;`
+	`CREATE DATABASE siri;`
 
 	
 **Set up The Three Little Pigs**
@@ -214,11 +217,11 @@ Clone this repo locally, then navigate into the The-Three-Little-Pigs directory 
 
 1. Clone the repo
 
-        `git clone https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy`
+	`git clone https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy`
 
 2. Change path to it
 
-        `cd The-Three-Little-Pigs-Siri-Proxy`
+	`cd The-Three-Little-Pigs-Siri-Proxy`
     
 3. Install Rake and Bundler:  
 
@@ -243,37 +246,37 @@ Clone this repo locally, then navigate into the The-Three-Little-Pigs directory 
         db_pass: 'yourpassword'
         db_database: 'siri'
 
-6. Edit your `~/.siriproxy/config.yml` and put your server info for certs
+8. Edit your `~/.siriproxy/config.yml` and put your server info for certs
 
         ca_name: 'SiriProxyCA'
         server1: 'guzzoni.apple.com'
         server2: 'your.siri.proxy.server.com'
 
-7. Generate certificates.   
+9. Generate certificates.   
 
 	`siriproxy gencerts`
 
 
 
-8. Install `~/.siriproxy/ca.pem` on all your devices including iphone4s etc. This can easily be done by emailing the file to yourself and clicking on it in the iPhone email app. Follow the prompts.
+10. Install `~/.siriproxy/ca.pem` on all your devices including iphone4s etc. This can easily be done by emailing the file to yourself and clicking on it in the iPhone email app. Follow the prompts.
 
-9. Bundle SiriProxy (this should be done every time you change the config.yml):  
+11. Bundle SiriProxy (this should be done every time you change the config.yml):  
 
 	`siriproxy bundle`
 
-10. Create the tables needed for the database. You will only need to do this once. Keep in mind that this will delete all DATA on the tables such as keys and config data
+12. Create the tables needed for the database. You will only need to do this once. Keep in mind that this will delete all DATA on the tables such as keys and config data
 
-        siriproxy gentables
+	`siriproxy gentables`
 
-11. Start SiriProxy (must start as root because it uses a port < 1024):  
+13. Start SiriProxy (must start as root because it uses a port < 1024):  
 
 	`sudo siriproxy server`
 
-        You can also start the server by a re-open script that ensures to restart the server if it crashes
+	You can also start the server by a re-open script that ensures to restart the server if it crashes
 
-        `./siriproxy-restarter`
+	`./siriproxy-restarter`
 
-12. Test that the server is running by saying "Test Siri Proxy" to your phone.
+14. Test that the server is running by saying "Test Siri Proxy" to your phone.
 
 
 Note: on some machines, rvmsudo changes "`~`" to "`/root/`". This means that you may need to symlink your "`.siriproxy`" directory to "`/root/`" in order to get the application to work:  
@@ -303,11 +306,11 @@ A documentation on how to do this on Ubuntu is here. ([https://help.ubuntu.com/c
 
 Once you're up and running, if you modify the code, or you want to grab the latest code from GitHub, you can do that easily using the "siriproxy update" command. Here's a couple of examples:
 
-	`siriproxy update`  
+`siriproxy update`  
 	
 Installs the latest code from the [master] branch on GitHub.
 	
-	`siriproxy update /path/to/SiriProxy`  
+`siriproxy update /path/to/SiriProxy`  
 
 Installs the code from /path/to/SiriProxy
 	
@@ -322,7 +325,7 @@ Snow Leopard & Lion Set-up Instructions
 
 **Set up DNS**
 
-Since the 4S is now jailbroken, This section isn't really needed now...
+* __Not needed if you Jailbrake an iPhone 4S. Just add repo [http://cydia.myrepospace.com/thpryrchn](http://cydia.myrepospace.com/thpryrchn) and install Spire 4S. Then you can point it to your server just like you do with any other iPhone 4.__
 
 Before you can use SiriProxy, you must set up a DNS server on your network to forward requests for guzzoni.apple.com to the computer running the proxy (make sure that computer is not using your DNS server!). I recommend dnsmasq for this purpose. It's easy to get running and can easily handle this sort of behavior. ([http://www.youtube.com/watch?v=a9gO4L0U59s](http://www.youtube.com/watch?v=a9gO4L0U59s))
 Also if you dont have static ip you can use this dns python server. ([https://github.com/jimmykane/Roque-Dns-Server])
@@ -581,9 +584,9 @@ Check out  this:
 
 If you are using ubuntu please consider that many Ubuntu installations run the named DNS server. To use the DNSMASQ server do the dollowing at each reboot:
 
-        sudo /etc/init.d/dnsmasq stop -> To stop DNS Server
-        sudo killall named -> to stopped stupid named service (another dns server)
-        sudo /et/init,d/dnsmasq start -> to restart dnsserver
+	sudo /etc/init.d/dnsmasq stop -> To stop DNS Server
+	sudo killall named -> to stopped stupid named service (another dns server)
+	sudo /et/init,d/dnsmasq start -> to restart dnsserver
 
 
 
