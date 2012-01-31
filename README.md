@@ -311,9 +311,252 @@ Installs the latest code from the [master] branch on GitHub.
 
 Installs the code from /path/to/SiriProxy
 	
-	`siriproxy update -b gemify` 
+	
+Snow Leopard & Lion Set-up Instructions
+---------------------------------------
 
-Installs the latest code from the [gemify] branch on GitHub
+
+**This has only been tested on Snow Leopard and Lion**
+
+
+
+**Set up DNS**
+
+Since the 4S is now jailbroken, This section isn't really needed now...
+
+Before you can use SiriProxy, you must set up a DNS server on your network to forward requests for guzzoni.apple.com to the computer running the proxy (make sure that computer is not using your DNS server!). I recommend dnsmasq for this purpose. It's easy to get running and can easily handle this sort of behavior. ([http://www.youtube.com/watch?v=a9gO4L0U59s](http://www.youtube.com/watch?v=a9gO4L0U59s))
+Also if you dont have static ip you can use this dns python server. ([https://github.com/jimmykane/Roque-Dns-Server])
+
+
+
+These instructions assume you have installed Xcode, and Macports already.
+
+**Let's make sure everything is up to date**
+
+   * Update makeports `sudo port selfupdate`
+
+   * Update Outdated Ports `sudo port upgrade outdated`
+
+   * Install Required Ports `sudo port install git-core mono libksba`
+
+**Install MySQL**
+
+   * Download DMG from ([mysql.com](http://dev.mysql.com/downloads/mysql/5.1.html#macosx-dmg)) Use 64bit (Unless you have a old intel core due)
+
+   * Install everything in the package in this order: mysql, the startup item, the preference pane.
+
+   * Start MySQL in the preference pane.
+
+   * Secure your MySQL server
+
+	`/usr/local/mysql/bin/mysqladmin -u root password [your password goes here]`
+
+   * Install it in your path (optional, but can make things easier)
+
+		sudo -s
+		echo "/usr/local/mysql/bin" >> /etc/paths
+		exit
+
+   * Make everything compatible with PHP and stuff..
+
+		sudo mkdir /var/mysql
+		sudo ln -s /tmp/mysql.sock /var/mysql/mysql.sock
+
+
+**Set up RVM and Ruby 1.9.3**
+
+If you don't already have Ruby 1.9.3 installed through RVM, please do so in order to make sure you can follow the steps later. Experts can ignore this. If you're unsure, follow these directions carefully:
+
+1. Download and install RVM (if you don't have it already):
+
+	* Download/install RVM:  
+
+		`bash < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer)`  
+
+	* Activate RVM:  
+
+		`source /Users/benjamin/.profile`  
+
+
+
+2. Install Ruby 1.9.3 (if you don't have it already):   
+
+	* **Snow Leopard**
+
+	`rvm install 1.9.3`  
+
+
+	* **Lion** (Or if using xcode 4.2 or higher)
+
+	`rvm install 1.9.3 --with-gcc=clang`  
+
+
+3. Set RVM to use/default to 1.9.3:   
+
+	`rvm use 1.9.3 --default`
+
+
+**Setup MySQL**
+
+Install MySQL on your system and create a database called siri or whatever you like. 
+
+1. Connect to mysql 
+    
+	`/usr/local/mysql/bin/mysql -h localhost -u root -p `
+
+2. Create the Database
+
+	`CREATE DATABASE siri;` then `quit` to exit
+
+3. Setup MySql Gem
+
+	`sudo gem install mysql -- --with-mysql-config=/usr/local/mysql/bin/mysql_config`
+	
+**Set up The Three Little Pigs**
+
+Clone this repo locally, then navigate into the The-Three-Little-Pigs directory (the root of the repo). Then follow these instructions carefully. Note that nothing needs to be (or should be) done as root until you launch the server:
+
+1. Clone the repo
+
+	`git clone https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy`
+
+2. Change path to it
+
+	`cd The-Three-Little-Pigs-Siri-Proxy`
+
+	Answer yes to "Do you wish to trust this .rvmrc file?"
+    
+3. Install Rake and Bundler:  
+
+	`sudo gem install rake bundler`  
+
+4. Install SiriProxy gem (do this from your SiriProxy directory):  
+
+	`rake install`  
+
+5. Make .siriproxy directory:  
+
+	`mkdir ~/.siriproxy`  
+
+6. Move default config file to .siriproxy (if you need to make configuration changes, do that now by editing the config.yml):  
+
+	`cp ./config.example.yml ~/.siriproxy/config.yml`  
+
+7. Edit `~/.siriproxy/config.yml` and put your database info
+
+        db_host: 'localhost'
+        db_user: 'root'
+        db_pass: 'yourpassword'
+        db_database: 'siri'
+
+6. Edit your `~/.siriproxy/config.yml` and put your server info for certs
+
+        ca_name: 'SiriProxyCA'
+        server1: 'guzzoni.apple.com'
+        server2: 'your.siri.proxy.server.com'
+
+7. Generate certificates.   
+
+	`siriproxy gencerts`
+
+
+
+8. Install `~/.siriproxy/ca.pem` on all your devices including iphone4s etc. This can easily be done by emailing the file to yourself and clicking on it in the iPhone email app. Follow the prompts.
+
+9. Bundle SiriProxy (this should be done every time you change the config.yml):  
+
+	`siriproxy bundle`
+
+10. Create the tables needed for the database. You will only need to do this once. Keep in mind that this will delete all DATA on the tables such as keys and config data
+
+        siriproxy gentables
+
+
+** Starting your SiriProxy server **
+
+1. Go to the directory where it was cloned to. Usually this:
+
+	`cd ~/The-Three-Little-Pigs-Siri-Proxy/`
+
+
+	Start SiriProxy 
+
+	* If you are using port less than 1024 (must start as root because it uses a port < 1024):  
+
+		`rvmsudo siriproxy server`
+
+	* 1025 or higher
+
+		`siriproxy server`
+
+
+    You can also start the server by a re-open script that ensures to restart the server if it crashes
+
+     * Port 1024 or less
+
+		`rvmsudo ./siriproxy-restarter`
+
+	* Port 1025 or higher
+
+		`./siriproxy-restarter`
+
+
+2. Test that the server is running by saying "Test Siri Proxy" to your phone.
+
+
+**Installing the Web Interface on Mac**
+
+Make sure you enable Web Sharing in System Preferences.
+
+1. Edit the `webInterface/inc/config.inc.php` and enter the database connection info and your dns info admin pass etc
+
+2. Create the certificate folder `mkdir ~/The-Three-Little-Pigs-Siri-Proxy/webInterface/certificates`
+
+3. Copy the certificate from `~/.siriproxy/ca.pem` to `webInterface/certificates/ca.pem`
+
+	`cp ~/.siriproxy/ca.pem ~/The-Three-Little-Pigs-Siri-Proxy/webInterface/certificates/ca.pem`
+
+4. Copy all files under webInterface to your /Library/WebServer/Documents/ folder
+
+5. (Optional) Open `pages` folder on your htlm folder path and delete whatever page you dont want! Also edit `pages/pages.xml` with the stuff you need!
+
+6. Enable PHP because it isn't by default on a mac
+
+	`sudo nano nano /etc/apache2/httpd.conf` 
+
+	around line 111 uncomment this line: 
+
+	`LoadModule php5_module libexec/apache2/libphp5.so`
+
+7. Setup PHP with it's defaults.
+
+		sudo cp -p /etc/php.ini.default /etc/php.ini
+		sudo chmod 666 /etc/php.ini
+
+8. Restart Apache
+
+	`sudo apachectl restart`
+
+9. In your browser, try out your server!
+
+	`http://localhost`
+
+
+
+    
+
+**Updating SiriProxy**
+
+Once you're up and running, if you modify the code, or you want to grab the latest code from GitHub, you can do that easily using the "siriproxy update" command. Here's a couple of examples:
+
+	`siriproxy update`  
+	
+Installs the latest code from the [master] branch on GitHub.
+	
+	`siriproxy update /path/to/SiriProxy`  
+
+Installs the code from /path/to/SiriProxy
+	
 	
 
 FAQ
