@@ -65,12 +65,12 @@ class SiriProxy::Connection < EventMachine::Connection
       key4s=Key4S.instance       
       key4s.sessionValidation=@sessionValidationData      
       #checking for 4s assistant and speechid      
-      if object["properties"]["assistantId"] !=nil and object["properties"]["speechId"].empty?
+      if object["properties"]["assistantId"] !=nil 
       key4s.assistantid=object["properties"]["assistantId"] 
       else
         key4s.assistantid="no assistant"
       end      
-      if object["properties"]["speechId"] !=nil and object["properties"]["speechId"].empty?      
+      if object["properties"]["speechId"] !=nil  
         key4s.speechid = object["properties"]["speechId"] 
       else
         key4s.speechid="no speech"      
