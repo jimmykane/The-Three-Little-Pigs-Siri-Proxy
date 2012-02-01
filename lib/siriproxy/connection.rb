@@ -248,6 +248,7 @@ class SiriProxy::Connection < EventMachine::Connection
   end
 
   def process_compressed_data    
+    begin
     self.unzipped_input << unzip_stream.inflate(self.input_buffer)
     rescue	
       puts "[Warning - SiriProxy] Curruped Data!!! Clearing buffer!"
