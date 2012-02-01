@@ -65,12 +65,12 @@ class SiriProxy::Connection < EventMachine::Connection
       key4s=Key4S.instance       
       key4s.sessionValidation=@sessionValidationData      
       #checking for 4s assistant and speechid      
-      if object["properties"]["assistantId"] !=nil and object["properties"]["speechId"].empty?
+      if object["properties"]["assistantId"] !=nil 
         key4s.assistantid=object["properties"]["assistantId"] 
       else
         key4s.assistantid="no assistant"
       end      
-      if object["properties"]["speechId"] !=nil and object["properties"]["speechId"].empty?      
+      if object["properties"]["speechId"] !=nil 
         key4s.speechid = object["properties"]["speechId"] 
       else
         key4s.speechid="no speech"      
@@ -360,7 +360,7 @@ class SiriProxy::Connection < EventMachine::Connection
       #has class SessionValidationFailed other_connection.last_ref_id
       puts "[Warning - SiriProxy] The session Validation Expired!"
       puts  "[Warning - SiriProxy] Validation Data injected to first object witch had ace_id[#{object["refId"]}] and my ace is [#{object["aceId"]}]" if $LOG_LEVEL > 2               
-      if self.other_connection.key!=nil
+      if self.other_connection.key!=nil #may happen if the other is a 4s
       $keyDao.validation_expired(self.other_connection.key)           
       puts "[Warning - SiriProxy] The key [#{self.other_connection.key.id}] and Keyload #{self.other_connection.key.keyload} Marked as Expired"             
       sendemail            
