@@ -410,7 +410,7 @@ class SiriProxy::Connection < EventMachine::Connection
             puts "[Info - SiriProxy] Device has speechID: #{object["properties"]["speechId"]}" 
           end                    
           #Lets record the assistants. 
-          if  object["class"]=="AssistantCreated" and    self.other_connection.key.id!nil       
+          if  object["class"]=="AssistantCreated" and   self.other_connection.key!nil       
             @assistant=Assistant.new
             @assistant.assistantid=object["properties"]["assistantId"]
             @assistant.speechid=object["properties"]["speechId"]
