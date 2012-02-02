@@ -296,7 +296,7 @@ class SiriProxy::Connection < EventMachine::Connection
     
     if(info[1] == "3" || info[1] == "4") #Ping or pong -- just get these out of the way (and log them for good measure)
       if unzipped_input[0...5]==nil
-        puts "bug flash"
+        $stderr.puts "bug flash"
         
       end
       object = unzipped_input[0...5]
