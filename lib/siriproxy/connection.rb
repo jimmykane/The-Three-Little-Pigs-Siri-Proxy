@@ -451,7 +451,8 @@ puts comm_inactivity_timeout
     if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false 
       puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
       puts '[Protection - Siriproxy] Closing connection...'
-      #self.detach() not sure
+      #self.detach() not sure 
+      #unbind() or ?  look at http://eventmachine.rubyforge.org/EventMachine/Connection.html#M000280
       puts '[Protection - Siriproxy] Closed connection!!!'
       if object["class"]=="FinishSpeech" 
         #return object     
