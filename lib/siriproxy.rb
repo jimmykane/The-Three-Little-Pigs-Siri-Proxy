@@ -10,6 +10,8 @@ class String
   end
 end
 
+
+
 class SiriProxy
   
   def initialize()
@@ -43,7 +45,7 @@ class SiriProxy
     
     EM.threadpool_size=$conf.max_threads    
     
-    #Print email config
+        #Print email config
     if $APP_CONFIG.send_email=='ON' or $APP_CONFIG.send_email=='on'
       puts '[Info - SiriProxy] Email notifications are [ON]!'
     else
@@ -53,11 +55,12 @@ class SiriProxy
     EventMachine.run do
       begin
         puts "Starting SiriProxy on port #{$APP_CONFIG.port}.."
-        EventMachine::start_server('0.0.0.0', $APP_CONFIG.port, SiriProxy::Connection::Iphone) { |conn|
-          $stderr.puts "start conn #{conn.inspect}" if $LOG_LEVEL > 2
+        EventMachine::start_server('0.0.0.0', $APP_CONFIG.port, SiriProxy::Connection::Iphone ) { |conn|
+          $stderr.puts "start conn #{conn.inspect}" if $LOG_LEVEL > 2     
           conn.plugin_manager = SiriProxy::PluginManager.new()
           conn.plugin_manager.iphone_conn = conn
         }
+   
         puts "Server is Up and Running"
         EventMachine::PeriodicTimer.new(10){
           $conf.active_connections = EM.connection_count          

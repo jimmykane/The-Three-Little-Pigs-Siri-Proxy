@@ -4,7 +4,7 @@ require 'pony'
 
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
-  
+
   attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
@@ -27,7 +27,12 @@ class SiriProxy::Connection < EventMachine::Connection
     self.assistantId = nil			#assistantID
     self.speechId_avail = false		#speechID available
     self.assistantId_avail = false		#assistantId available
-    puts "[Info - SiriProxy] Created a connection!" 		
+    puts "[Info - SiriProxy] Created a connection!" 
+    #self.pending_connect_timeout=5
+    #puts pending_connect_timeout()
+    
+    self.comm_inactivity_timeout=20
+puts comm_inactivity_timeout		
     ##Checks For avalible keys before any object is loaded
     available_keys=$keyDao.listkeys().count
     if available_keys > 0
@@ -155,6 +160,8 @@ class SiriProxy::Connection < EventMachine::Connection
 				#if its iphone4,etc	 			
 				self.is_4S = false	
         puts "[Info - SiriProxy] GSM iPhone 4 connected"
+          
+      puts 'closed'
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPhone3,1"] = "iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
@@ -445,6 +452,9 @@ class SiriProxy::Connection < EventMachine::Connection
     #puts self.name
     if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false 
       puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
+      puts '[Protection - Siriproxy] Closing connection...'
+      #self.detach()
+      puts '[Protection - Siriproxy] Closed connection!!!'
       if object["class"]=="FinishSpeech" 
         #return object     
       end
