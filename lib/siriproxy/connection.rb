@@ -160,8 +160,6 @@ puts comm_inactivity_timeout
 				#if its iphone4,etc	 			
 				self.is_4S = false	
         puts "[Info - SiriProxy] GSM iPhone 4 connected"
-          
-      puts 'closed'
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPhone3,1"] = "iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
@@ -453,7 +451,7 @@ puts comm_inactivity_timeout
     if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false 
       puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
       puts '[Protection - Siriproxy] Closing connection...'
-      #self.detach()
+      #self.detach() not sure
       puts '[Protection - Siriproxy] Closed connection!!!'
       if object["class"]=="FinishSpeech" 
         #return object     
