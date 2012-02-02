@@ -297,9 +297,9 @@ puts comm_inactivity_timeout
     info = unpacked.match(/^0(.)(.{8})$/)
     
     if(info[1] == "3" || info[1] == "4") #Ping or pong -- just get these out of the way (and log them for good measure)
-      if unzipped_input[0...5]=nil
+      if unzipped_input[0...5]==nil
         puts "bug flash"
-        unzipped_input[0...5]=''
+        
       end
       object = unzipped_input[0...5]
       self.unzipped_output << object
