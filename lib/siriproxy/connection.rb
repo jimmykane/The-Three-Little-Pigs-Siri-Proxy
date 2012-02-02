@@ -292,11 +292,15 @@ puts comm_inactivity_timeout
   end
 
   def read_next_object_from_unzipped
-    begin
+   
     unpacked = unzipped_input[0...5].unpack('H*').first
     info = unpacked.match(/^0(.)(.{8})$/)
     
     if(info[1] == "3" || info[1] == "4") #Ping or pong -- just get these out of the way (and log them for good measure)
+      if unzipped_input[0...5]=nil
+        puts "bug flash"
+        unzipped_input[0...5]=''
+      end
       object = unzipped_input[0...5]
       self.unzipped_output << object
       
@@ -314,10 +318,7 @@ puts comm_inactivity_timeout
     self.unzipped_input = unzipped_input[object_size+5..-1]
 
     parse_object(object_data)
-    rescue
-      puts "[Warning - SiriProxy] Curruped Packet? -  Dropping it!"
-      return nil
-    end
+    
   end
   
   
