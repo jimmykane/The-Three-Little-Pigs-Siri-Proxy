@@ -1,4 +1,3 @@
-
 #####
   # This is the connection to the iPhone
 #####
@@ -44,8 +43,8 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
     other_connection.other_connection = self #hehe
     other_connection.plugin_manager = plugin_manager
     rescue
-      puts "[Warning - Siriproxy] Could not connect to Guzzoni!!! Server pausing!"
-      exit (0)
+      puts "[Warning - Siriproxy] Could not connect to Guzzoni!!! "
+      self.close_connection
     end
   end
   
