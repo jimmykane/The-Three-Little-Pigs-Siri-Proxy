@@ -1,11 +1,13 @@
 require 'cfpropertylist'
 require 'siriproxy/interpret_siri'
 require 'pony'
+require 'socket'
+
 
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
 
-  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key
+  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
     self.other_connection.last_ref_id = ref_id if other_connection.last_ref_id != ref_id
@@ -130,6 +132,7 @@ class SiriProxy::Connection < EventMachine::Connection
 
   def ssl_handshake_completed
     self.ssled = true
+    self.clientport, self.clientip = Socket.unpack_sockaddr_in(get_peername)
     
     puts "[Info - #{self.name}] SSL completed for #{self.name}" if $LOG_LEVEL > 1
   end
@@ -151,55 +154,55 @@ class SiriProxy::Connection < EventMachine::Connection
       #if its and iphone4s
 			if line.match(/iPhone4,1;/)
         puts "[RollEyes - Siri*-*Proxy]" 
-				puts "[Info - SiriProxy] iPhone 4S connected"        
+	puts "[Info - SiriProxy] iPhone 4S connected from IP #{self.clientip}"        
         puts "[RollEyes - Siri*-*Proxy]" 
 				self.is_4S = true
 			elsif  line.match(/iPhone3,1;/)
 				#if its iphone4,etc	 			
 				self.is_4S = false	
-        puts "[Info - SiriProxy] GSM iPhone 4 connected"
+        puts "[Info - SiriProxy] GSM iPhone 4 connected from IP #{self.clientip}"
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPhone3,1"] = "iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 			elsif  line.match(/iPhone3,3;/)
 				self.is_4S = false				
-        puts "[Info - SiriProxy] CDMA iPhone 4 connected"
+        puts "[Info - SiriProxy] CDMA iPhone 4 connected from IP #{self.clientip}"
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPhone3,3"] = "iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
       elsif line.match(/iPad2,1;/)	
 				self.is_4S = false				
-        puts "[Info - SiriProxy] iPad2 Wifi Only connected"						
+        puts "[Info - SiriProxy] iPad2 Wifi Only connected from IP #{self.clientip}"						
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPad/iPad2,1"] = "iPhone/iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
 			elsif line.match(/iPad2,2;/)	
 				self.is_4S = false				
-        puts "[Info - SiriProxy] iPad2 GSM connected"						
+        puts "[Info - SiriProxy] iPad2 GSM connected from IP #{self.clientip}"						
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPad/iPad2,2"] = "iPhone/iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
 			elsif line.match(/iPad2,3;/)	
 				self.is_4S = false				
-        puts "[Info - SiriProxy] iPad2 CDMA connected"						
+        puts "[Info - SiriProxy] iPad2 CDMA connected from IP #{self.clientip}"						
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPad/iPad2,3"] = "iPhone/iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
 			elsif line.match(/iPad1,1;/)		
 				self.is_4S = false				
-        puts "[Info - SiriProxy] iPad 1st generation connected"						
+        puts "[Info - SiriProxy] iPad 1st generation connected from IP #{self.clientip}"						
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPad/iPad1,1"] = "iPhone/iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
       elsif line.match(/iPod4,1;/)		
 				self.is_4S = false	
-        puts "[Info - SiriProxy] iPod touch 4th generation connected"					
+        puts "[Info - SiriProxy] iPod touch 4th generation connected from IP #{self.clientip}"					
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line["iPod touch/iPod4,1"] = "iPhone/iPhone4,1"
 				puts "[Info - SiriProxy] Changed header to iphone4s] "
@@ -207,7 +210,7 @@ class SiriProxy::Connection < EventMachine::Connection
 			else
         #Everithing else like android devices, computer apps etc        
         #Change unknown to iPhone to make sure everything works..
-        puts "[Info - SiriProxy] Unknow Device Connected"	
+        puts "[Info - SiriProxy] Unknow Device Connected from IP #{self.clientip}"	
 				self.is_4S = false
 				puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
 				line = "User-Agent: Assistant(iPhone/iPhone4,1; iPhone OS/5.0.1/9A405) Ace/1.0"
