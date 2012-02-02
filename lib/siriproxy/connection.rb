@@ -365,14 +365,7 @@ puts comm_inactivity_timeout
     end
     
     #Check if Validations has Expired
-    if object["class"]=="SessionValidationFailed"
-      puts "expired"      
-      # I think I fixed it via self.otherconnetction and instance attributes
-      #------------@thpryrchn ----------------
-      #Please read this and help if you can. 
-      #this is a big issue. Sometimes When the key changes and the validation expires then the new key is marked as expired
-      #Somehow we must use instance keys @key or track the key that has been used for injection of validation data to the object ref id that,
-      #has class SessionValidationFailed other_connection.last_ref_id
+    if object["class"]=="SessionValidationFailed"  
       puts "[Warning - SiriProxy] The session Validation Expired!"
       puts  "[Warning - SiriProxy] Validation Data injected to first object witch had ace_id[#{object["refId"]}] and my ace is [#{object["aceId"]}]" if $LOG_LEVEL > 2               
       if self.other_connection.key!=nil #may happen if the other is a 4s
@@ -455,11 +448,11 @@ puts comm_inactivity_timeout
     #puts self.name
     if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false 
       puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
-      puts '[Protection - Siriproxy] Closing connection...'
-      #self.detach() not sure 
-      #unbind() or ?  look at http://eventmachine.rubyforge.org/EventMachine/Connection.html#M000280
-      puts '[Protection - Siriproxy] Closed connection!!!'
-      if object["class"]=="FinishSpeech" 
+      puts '[Protection - Siriproxy] Closing both connections...'
+      self.close_connection(after_writing = false)
+      self.other_connection.close_connection(after_writing = false)      
+      puts '[Protection - Siriproxy] Closed both connections!!!'
+      if object["class"]=="FinishSpeech" #will not get here
         #return object     
       end
       pp object if $LOG_LEVEL > 3
