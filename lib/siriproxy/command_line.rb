@@ -154,7 +154,7 @@ class SiriProxy::CommandLine
     
     puts "Created Table config"
 
-    dbh.query("INSERT INTO `config` VALUES ('1', '20', '15', '0', '500', '100', '1200');")
+    dbh.query("INSERT INTO `config` VALUES ('1', '40', '15', '0', '1000', '100', '1200');")
     puts "Added Default setting in Table config"
     dbh.query("DROP TABLE IF EXISTS `assistants`;")
     puts "Table Assistants Droped"   

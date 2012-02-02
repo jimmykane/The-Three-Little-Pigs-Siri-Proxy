@@ -33,6 +33,7 @@ class SiriProxy
     $conf=$confDao.getsettings
     $conf.active_connections=0 
     $confDao.update($conf)
+    EM.threadpool_size=$conf.max_threads    
     #end of config
     
     #initialize key controller    
@@ -43,15 +44,22 @@ class SiriProxy
     $assistantDao=AssistantDao.instance
     $assistantDao.connect_to_db($my_db)
     
-    EM.threadpool_size=$conf.max_threads    
+    #Initialize the Stats controller and setup it
+    $statisticsDao=StatisticsDao.instance
+    $statisticsDao.connect_to_db($my_db)  
+    #Initialize new stats
+    $statistics=$statisticsDao.getstats()
+    $statistics.uptime=0
+    $statisticsDao.savestats($statistics)
     
-        #Print email config
+    #Print email config
     if $APP_CONFIG.send_email=='ON' or $APP_CONFIG.send_email=='on'
       puts '[Info - SiriProxy] Email notifications are [ON]!'
     else
       puts '[Info - SiriProxy] Email notifications are [OFF]!'
     end    
     
+    #Start The EventMacine
     EventMachine.run do
       begin
         puts "Starting SiriProxy on port #{$APP_CONFIG.port}.."
@@ -62,7 +70,25 @@ class SiriProxy
         }
    
         puts "Server is Up and Running"
-        EventMachine::PeriodicTimer.new(10){
+        @timer=5 # set the timer value
+        EventMachine::PeriodicTimer.new(@timer){
+          $statistics=$statisticsDao.getstats()
+          $statistics.elapsed+=@timer
+          $statistics.uptime+=@timer
+          if $statistics.elapsed>$conf.keyload_dropdown_interval            
+            @overloaded_keys_count=$keyDao.findoverloaded().count
+            if (@overloaded_keys_count>0)
+              @overloaded_keys=$keyDao.findoverloaded()     
+              for i in 0..(@overloaded_keys_count-1)            
+                @oldkeyload=@overloaded_keys[i].keyload   
+                @overloaded_keys[i].keyload=@overloaded_keys[i].keyload-$conf.keyload_dropdown
+                $keyDao.setkeyload(@overloaded_keys[i])
+                puts "[Keys - SiriProxy] Decreasing Keyload for Key id=[#{@overloaded_keys[i].id}] and Decreasing keyload from [#{@oldkeyload}] to [#{@overloaded_keys[i].keyload}]"
+              end
+            end
+            $statistics.elapsed=0           
+          end
+          $statisticsDao.savestats($statistics)        
           $conf.active_connections = EM.connection_count          
           $confDao.update($conf)
           ### Per Key based connections
@@ -73,20 +99,11 @@ class SiriProxy
           elsif @availablekeys>0
             @max_connections=$conf.max_connections * @availablekeys
           end
-          puts "[Info - SiriProxy] Active connections [#{$conf.active_connections}] Max connections [#{@max_connections}]"
+          puts "[Info - SiriProxy] Uptime [#{$statistics.uptime}] Active connections [#{$conf.active_connections}] Max connections [#{@max_connections}]"
           
         }
-        EventMachine::PeriodicTimer.new($conf.keyload_dropdown_interval){
-          @overloaded_keys_count=$keyDao.findoverloaded().count
-          if (@overloaded_keys_count>0)
-            @overloaded_keys=$keyDao.findoverloaded()     
-            for i in 0..(@overloaded_keys_count-1)            
-              @oldkeyload=@overloaded_keys[i].keyload   
-              @overloaded_keys[i].keyload=@overloaded_keys[i].keyload-$conf.keyload_dropdown
-              $keyDao.setkeyload(@overloaded_keys[i])
-              puts "[Keys - SiriProxy] Decreasing Keyload for Key id=[#{@overloaded_keys[i].id}] and Decreasing keyload from [#{@oldkeyload}] to [#{@overloaded_keys[i].keyload}]"
-            end
-          end
+        EventMachine::PeriodicTimer.new($conf.keyload_dropdown_interval){ #fix for server crash
+          
         }
       rescue RuntimeError => err
         if err.message == "no acceptor"

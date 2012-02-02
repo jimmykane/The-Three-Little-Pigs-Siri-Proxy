@@ -242,73 +242,132 @@ class KeyDao
 end
 
 class Assistant
-    attr_accessor :id, :key_id,:assistantid,:speechid,:date_created
-    def id=(value)  # The setter method for @id
-      @id =  value
-    end
-    def key_id=(value)  # The setter method for @key_id
-      @key_id =  value
-    end
-    def assistantid=(value)  # The setter method for @assistantid
-      @assistantid =  value
-    end
-    def speechid=(value)  # The setter method for @speechid
-      @speechid =  value
-    end
-    def date_created=(value)  # The setter method for @date_created
-      @date_created =  value
-    end
+  attr_accessor :id, :key_id,:assistantid,:speechid,:date_created
+  def id=(value)  # The setter method for @id
+    @id =  value
   end
+  def key_id=(value)  # The setter method for @key_id
+    @key_id =  value
+  end
+  def assistantid=(value)  # The setter method for @assistantid
+    @assistantid =  value
+  end
+  def speechid=(value)  # The setter method for @speechid
+    @speechid =  value
+  end
+  def date_created=(value)  # The setter method for @date_created
+    @date_created =  value
+  end
+end
 
-  class AssistantDao
+class AssistantDao
 
-    include Singleton
+  include Singleton
 	
-    def initialize()	
+  def initialize()	
       
-    end
-    
-    def connect_to_db(my)
-      @my = my
-    end
-    
-    def getkeyassistants(dto)
-      sql = "SELECT * FROM `assistants` WHERE key_id=?"
-      st = @my.prepare(sql)
-      st.execute(dto.id)
-      result = fetchResults(st)
-      st.close    
-      return result[0]
-    end
-    
-    def check_duplicate(dto)
-      sql = "SELECT * FROM `assistants` WHERE assistantid=?"
-      st = @my.prepare(sql)
-      st.execute(dto.assistantid)
-      result = fetchResults(st)
-      st.close
-      return result[0]		
-    end
-    
-    def createassistant(dto)
-      sql = "INSERT INTO `assistants` (key_id,assistantid,speechid,date_created) VALUES ( ? , ? , ? , NOW())"
-      st = @my.prepare(sql)
-      st.execute(dto.key_id,dto.assistantid,dto.speechid)   
-      st.close    
-    end
-    
-    def fetchResults(stmt)
-      rows = []
-      while row = stmt.fetch do
-        dto = Assistant.new
-        dto.id = row[0]
-        dto.key_id= row[1]
-        dto.assistantid=row[2]
-        dto.speechid=row[3]		
-        dto.date_added=row[4]	      
-        rows << dto
-      end
-      return rows
-    end
-
   end
+    
+  def connect_to_db(my)
+    @my = my
+  end
+    
+  def getkeyassistants(dto)
+    sql = "SELECT * FROM `assistants` WHERE key_id=?"
+    st = @my.prepare(sql)
+    st.execute(dto.id)
+    result = fetchResults(st)
+    st.close    
+    return result[0]
+  end
+    
+  def check_duplicate(dto)
+    sql = "SELECT * FROM `assistants` WHERE assistantid=?"
+    st = @my.prepare(sql)
+    st.execute(dto.assistantid)
+    result = fetchResults(st)
+    st.close
+    return result[0]		
+  end
+    
+  def createassistant(dto)
+    sql = "INSERT INTO `assistants` (key_id,assistantid,speechid,date_created) VALUES ( ? , ? , ? , NOW())"
+    st = @my.prepare(sql)
+    st.execute(dto.key_id,dto.assistantid,dto.speechid)   
+    st.close    
+  end
+    
+  def fetchResults(stmt)
+    rows = []
+    while row = stmt.fetch do
+      dto = Assistant.new
+      dto.id = row[0]
+      dto.key_id= row[1]
+      dto.assistantid=row[2]
+      dto.speechid=row[3]		
+      dto.date_added=row[4]	      
+      rows << dto
+    end
+    return rows
+  end
+
+end  
+#added stats fixes crash with interval
+class Statistics
+  attr_accessor :id, :elapsed,:uptime
+    
+  def id=(value)  # The setter method for @id
+    @id =  value
+  end
+    
+  def elapsed=(value)  # The setter method for @elapsedkeycheck
+    @elapsed =  value
+  end
+    
+  def uptime=(value)  # The setter method for @uptime
+    @uptime =  value
+  end
+    
+end
+
+class StatisticsDao
+
+  include Singleton
+	
+  def initialize()	
+      
+  end
+    
+  def connect_to_db(my)
+    @my = my
+  end
+    
+  def getstats()
+    sql = "SELECT * FROM `stats` WHERE id=1"
+    st = @my.prepare(sql)
+    st.execute()
+    result = fetchResults(st)
+    st.close        
+    return result[0]
+  end
+        
+  def savestats(dto)
+    
+    sql = "UPDATE `stats` SET elapsed_key_check_interval=?,up_time=? WHERE id=1"
+    st = @my.prepare(sql)
+    st.execute(dto.elapsed,dto.uptime)   
+    st.close    
+  end
+    
+  def fetchResults(stmt)
+    rows = []
+    while row = stmt.fetch do
+      dto = Statistics.new
+      dto.id = row[0]
+      dto.elapsed= row[1]
+      dto.uptime=row[2]              
+      rows << dto  
+    end
+    return rows
+  end
+end

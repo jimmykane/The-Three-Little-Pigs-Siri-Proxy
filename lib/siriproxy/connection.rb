@@ -29,10 +29,8 @@ class SiriProxy::Connection < EventMachine::Connection
     self.assistantId_avail = false		#assistantId available
     puts "[Info - SiriProxy] Created a connection!" 
     #self.pending_connect_timeout=5
-    #puts pending_connect_timeout()
-    
+    #puts pending_connect_timeout()    
     self.comm_inactivity_timeout=20
-puts comm_inactivity_timeout		
     ##Checks For avalible keys before any object is loaded
     available_keys=$keyDao.listkeys().count
     if available_keys > 0
