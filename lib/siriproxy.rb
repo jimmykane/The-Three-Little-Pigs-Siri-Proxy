@@ -69,7 +69,7 @@ class SiriProxy
           @max_connections=$conf.max_connections
           @availablekeys=$keyDao.listkeys().count
           if @availablekeys==0
-            @max_connections=999
+            @max_connections=700#max mem
           elsif @availablekeys>0
             @max_connections=$conf.max_connections * @availablekeys
           end

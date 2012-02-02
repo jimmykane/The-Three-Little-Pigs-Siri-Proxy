@@ -17,7 +17,7 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
     @max_connections=$conf.max_connections
     @keysavailable=$keyDao.listkeys().count   
     if @keysavailable==0
-       @max_connections=999
+       @max_connections=700#max mem
     elsif @keysavailable>0
        @max_connections=$conf.max_connections * @keysavailable
     end
