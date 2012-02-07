@@ -325,7 +325,7 @@ class SiriProxy::Connection < EventMachine::Connection
   def read_next_object_from_unzipped
    
     unpacked = unzipped_input[0...5].unpack('H*').first
-    info = unpacked.match(/^0(.)(.{8})$/)
+    info = unpacked.match(/^0(.)(.{8})$/) #some times this doesnt match! 
     #edbug
      if unpacked==nil
       $stderr.puts "bug flash on unpacked"     
@@ -333,8 +333,8 @@ class SiriProxy::Connection < EventMachine::Connection
     
     if info==nil
       $stderr.puts "bug flash on info"      #here lies the stupid bug!!!!!!!!!!!!!!!
-      object=nil
-      return object
+      #object=nil
+      #return object
     end
     
     if(info[1] == "3" || info[1] == "4" and info!=nil) #Ping or pong -- just get these out of the way (and log them for good measure)
