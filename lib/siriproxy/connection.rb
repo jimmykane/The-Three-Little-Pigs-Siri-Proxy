@@ -364,13 +364,13 @@ class SiriProxy::Connection < EventMachine::Connection
         flush_unzipped_output()
         return nil
       end
-    end
+    
     object_size = info[2].to_i(16)
     prefix = unzipped_input[0...5]
     object_data = unzipped_input[5...object_size+5]
     self.unzipped_input = unzipped_input[object_size+5..-1]    
     parse_object(object_data)
-    
+    end
   end
   
   
