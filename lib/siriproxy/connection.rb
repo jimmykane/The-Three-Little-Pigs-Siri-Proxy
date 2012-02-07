@@ -165,8 +165,8 @@ class SiriProxy::Connection < EventMachine::Connection
     self.ssled = true
     #gets on with bug 
     if  Socket.unpack_sockaddr_in(get_peername)!=nil
-    self.clientport, self.clientip = Socket.unpack_sockaddr_in(get_peername)     
-    puts "[Info - #{self.name}] SSL completed for #{self.name}" if $LOG_LEVEL > 1
+      self.clientport, self.clientip = Socket.unpack_sockaddr_in(get_peername)     
+      puts "[Info - #{self.name}] SSL completed for #{self.name}" if $LOG_LEVEL > 1
     else
       self.clientport, self.clientip="Incomplete SSL"
     end
@@ -333,38 +333,38 @@ class SiriProxy::Connection < EventMachine::Connection
     unpacked = unzipped_input[0...5].unpack('H*').first
     info = unpacked.match(/^0(.)(.{8})$/) #some times this doesnt match! 
     #edbug
-     if unpacked==nil
+    if unpacked==nil
       $stderr.puts "bug flash on unpacked"     
     end
     
     if info==nil
       $stderr.puts "bug flash on info"      #here lies the stupid bug!!!!!!!!!!!!!!!
-     $stderr.puts unpacked
+      $stderr.puts unpacked
       
       #object=nil
       #return object
     end
-    
-    if( (info[1] == "3" || info[1] == "4") and info!=nil) #Ping or pong -- just get these out of the way (and log them for good measure)
+    if info!=nil #lets hope for the magic fix
+      if(info[1] == "3" || info[1] == "4"  ) #Ping or pong -- just get these out of the way (and log them for good measure)
       
-      object = unzipped_input[0...5]
+        object = unzipped_input[0...5]
       
-      #debug
-      if object==nil
-        $stderr.puts "bug flash on object"         
+        #debug
+        if object==nil
+          $stderr.puts "bug flash on object"         
+        end
+      
+      
+        self.unzipped_output << object
+      
+        type = (info[1] == "3") ? "Ping" : "Pong"      
+        puts "[#{type} - #{self.name}] (#{info[2].to_i(16)})" if $LOG_LEVEL > 3
+        self.unzipped_input = unzipped_input[5..-1]
+      
+        flush_unzipped_output()
+        return nil
       end
-      
-      
-      self.unzipped_output << object
-      
-      type = (info[1] == "3") ? "Ping" : "Pong"      
-      puts "[#{type} - #{self.name}] (#{info[2].to_i(16)})" if $LOG_LEVEL > 3
-      self.unzipped_input = unzipped_input[5..-1]
-      
-      flush_unzipped_output()
-      return nil
     end
-  
     object_size = info[2].to_i(16)
     prefix = unzipped_input[0...5]
     object_data = unzipped_input[5...object_size+5]
