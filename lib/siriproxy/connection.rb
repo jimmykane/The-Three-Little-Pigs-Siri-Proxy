@@ -334,6 +334,8 @@ class SiriProxy::Connection < EventMachine::Connection
     
     if info==nil
       $stderr.puts "bug flash on info"      #here lies the stupid bug!!!!!!!!!!!!!!!
+     $stderr.puts unpacked
+      
       #object=nil
       #return object
     end
