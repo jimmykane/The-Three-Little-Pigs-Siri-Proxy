@@ -301,5 +301,6 @@ class SiriProxy::CommandLine
     require 'siriproxy/plugin_manager'
     require 'siriproxy/db_classes'
     require 'siriproxy/db_connection'
+    require 'siriproxy/db_classes_client'
   end
 end

@@ -52,6 +52,10 @@ class SiriProxy
     $statistics.uptime=0
     $statisticsDao.savestats($statistics)
     
+    #Initialize Client Controller
+    $clientsDao=ClientsDao.instance
+    $clientsDao.connect_to_db($my_db)  
+    
     #Print email config
     if $APP_CONFIG.send_email=='ON' or $APP_CONFIG.send_email=='on'
       puts '[Info - SiriProxy] Email notifications are [ON]!'

@@ -37,7 +37,7 @@ class Client
 	end
 end
 
-class ClientDao
+class ClientsDao
 	include Singleton
 	
 	def initialize()
@@ -56,9 +56,9 @@ class ClientDao
 	end
 
 	def update(dto)
-		sql = "UPDATE `clients` SET assistantid = ?,fname= ? ,nickname=?,apple_db_id=?,apple_account_id=?,valid=? WHERE id = ?"
+		sql = "UPDATE `clients` SET assistant_id = ?,fname= ? ,nickname=?,apple_db_id=?,apple_account_id=?,valid=? WHERE id = ?"
 		st = @my.prepare(sql)
-		st.execute(dto.assistantid,dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.valid)
+		st.execute(dto.assistantid,dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.valid,dto.id)
 		st.close
 	end
     
@@ -91,9 +91,9 @@ class ClientDao
 	end 
 
 	def check_duplicate(dto)
-		sql = "SELECT * FROM `keys` WHERE sessionValidation=?"
+		sql = "SELECT * FROM `clients` WHERE apple_account_id=?"
 		st = @my.prepare(sql)
-		st.execute(dto.sessionValidation)
+		st.execute(dto.appleAccountid)
 		result = fetchResults(st)
  		st.close
     return result[0]
@@ -104,7 +104,7 @@ class ClientDao
   def fetchResults(stmt)
 		rows = []
 		while row = stmt.fetch do
-			dto = Key.new
+			dto = Client.new
 			dto.id = row[0]
 			dto.assistantid= row[1]
 			dto.fname=row[2]

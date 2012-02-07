@@ -80,7 +80,7 @@ end
 
 class Key  
 
-  attr_accessor :id, :assistantid,:speechid,:speechid,:expired,:sessionValidation,:keyload,:date_added,:availablekeys
+  attr_accessor :id, :assistantid,:speechid,:speechid,:expired,:sessionValidation,:keyload,:date_added,:availablekeys,:banned
 	
 	def id=(value)  # The setter method for @id
 		@id =  value
@@ -101,7 +101,9 @@ class Key
 	def expired=(value)  # The setter method for @expired
 		@expired =  value
 	end
-
+  def banned=(value)  # The setter method for @banned
+		@banned =  value
+	end
 	def keyload=(value)  # The setter method for @load
 		@keyload =  value
 	end
@@ -139,16 +141,16 @@ class KeyDao
 	end
 
 	def insert(dto)
-		sql = "INSERT INTO `keys` (assistantid,speechid,sessionValidation,expired,date_added ) VALUES ( ? ,  ?  , ? , ?,NOW())"
+		sql = "INSERT INTO `keys` (assistantid,speechid,sessionValidation,banned,expired,date_added ) VALUES ( ? ,  ?  , ? , ? , ? ,NOW())"
 		st = @my.prepare(sql)		
-		st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.expired)
+		st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired)
 		st.close
 	end
 
 	def update(dto)
-		sql = "UPDATE `keys` SET assistantid = ?,speechid= ? ,sessionValidation=?,expired=?,keyload=? WHERE id = ?"
+		sql = "UPDATE `keys` SET assistantid = ?,speechid= ? ,sessionValidation=?,banned=?,expired=?,keyload=? WHERE id = ?"
 		st = @my.prepare(sql)
-		st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.expired,dto.keyload,dto.id)
+		st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.keyload,dto.id)
 		st.close
 	end
   
@@ -181,6 +183,13 @@ class KeyDao
 		st.execute(dto.id)
 		st.close		
 	end
+  
+  def key_banned(dto)				
+		sql = "UPDATE `keys` SET banned='True' WHERE id = ?"
+		st = @my.prepare(sql)
+		st.execute(dto.id)
+		st.close		
+	end
 
   def listkeys()
 		sql = "SELECT * FROM `keys` WHERE expired!='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
@@ -188,8 +197,16 @@ class KeyDao
 		st.execute()
 		result = fetchResults(st)
  		st.close
-    return result
-		
+    return result		
+	end
+  
+  def list_keys_for_new_assistant()
+		sql = "SELECT * FROM `keys` WHERE expired!='True' AND banned!='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
+		st = @my.prepare(sql)
+		st.execute()
+		result = fetchResults(st)
+ 		st.close
+    return result		
 	end
   
   def findoverloaded()    
@@ -212,6 +229,17 @@ class KeyDao
 		
 	end
 
+  def next_available_for_new_assistant() #we will need the outer join here
+		sql = "SELECT K.*, Count(1) FROM `keys` K
+ LEFT OUTER JOIN `assistants` A ON A.key_id = K.id  WHERE K.expired='FALSE'   AND K.banned='False'  AND K.keyload<(SELECT max_keyload FROM `config` WHERE id=1)
+GROUP BY K.id ORDER BY Count(1),K.keyload ASC LIMIT 1"
+		st = @my.prepare(sql)
+		st.execute()
+		result = fetchResults(st)    
+ 		st.close
+    return result[0]		
+	end
+  
 	def check_duplicate(dto)
 		sql = "SELECT * FROM `keys` WHERE sessionValidation=?"
 		st = @my.prepare(sql)
@@ -232,8 +260,9 @@ class KeyDao
 			dto.assistantid= row[1]
 			dto.speechid=row[2]
 			dto.sessionValidation=row[3]
-			dto.expired=row[4]
-      dto.keyload=row[5]
+      dto.banned=row[4]
+			dto.expired=row[5]
+      dto.keyload=row[6]
 			rows << dto
 		end
 

@@ -7,7 +7,7 @@ require 'socket'
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
 
-  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport
+  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
     self.other_connection.last_ref_id = ref_id if other_connection.last_ref_id != ref_id
@@ -29,10 +29,13 @@ class SiriProxy::Connection < EventMachine::Connection
     self.assistantId = nil			#assistantID
     self.speechId_avail = false		#speechID available
     self.assistantId_avail = false		#assistantId available
+    self.client=nil
+    @createassistant=false
     puts "[Info - SiriProxy] Created a connection!" 
+    
     #self.pending_connect_timeout=5
     #puts pending_connect_timeout()    
-    self.comm_inactivity_timeout=120 #very important and also depends on how many people connect!!!
+    self.comm_inactivity_timeout=240 #very important and also depends on how many people connect!!!
     ##Checks For avalible keys before any object is loaded
     available_keys=$keyDao.listkeys().count
     if available_keys > 0
@@ -41,6 +44,8 @@ class SiriProxy::Connection < EventMachine::Connection
       self.validationData_avail = false
     end     
   end
+  
+  
   def sendemail()
     #Lets also send an email comming soon
     if $APP_CONFIG.send_email=='ON' or $APP_CONFIG.send_email=='no'
@@ -80,7 +85,7 @@ class SiriProxy::Connection < EventMachine::Connection
       else
         key4s.speechid="no speech"      
       end    
-      
+      key4s.banned='False'
       key4s.expired='False'
       if $keyDao.check_duplicate(key4s)
         puts "[Info - SiriProxy] Duplicate Validation Data. Key NOT saved"
@@ -97,29 +102,55 @@ class SiriProxy::Connection < EventMachine::Connection
   #This way KeyLoad gets the meaning of request. Its updated via request of assistantload/create
   def get_validationData(object)  
     begin      
-      @key=Key.new
-      @available_keys=$keyDao.listkeys().count      
-      if (@available_keys) > 0
-        puts "[Key - SiriProxy] Keys available [#{@available_keys}]"
-        @key=$keyDao.next_available() 
-        puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data" 
-        puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
-        @oldkeyload=@key.keyload          
-        @key.keyload=@key.keyload+10  
-        $keyDao.setkeyload(@key) 
-        puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
-        self.sessionValidationData= @key.sessionValidation	
-        self.validationData_avail = true       
-        #hmmmmm
+      if object["class"]=="CreateAssistant" # now separates initial request to Loadassistant and Create Assistant
+        @createassistant=true 
+        @key=Key.new     
+        @available_keys=$keyDao.list_keys_for_new_assistant().count
+        if (@available_keys) > 0
+          puts "[Key - SiriProxy] Keys available for NEW Clients!!! [#{@available_keys}]"
+          @key=$keyDao.next_available_for_new_assistant()
+          puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data" 
+          puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
+          @oldkeyload=@key.keyload          
+          @key.keyload=@key.keyload+10  
+          $keyDao.setkeyload(@key) 
+          puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
+          self.sessionValidationData= @key.sessionValidation	
+          self.validationData_avail = true       
+          #hmmmmm
+        else 
+          puts "[Key - SiriProxy] No keys available in database"
+          self.validationData_avail = false
+          self.close_connection() #close connections
+          self.other_connection.close_connection() #close 
+        end
       else 
-        puts "[Key - SiriProxy] No keys available in database"
-        self.validationData_avail = false
-      end     
+        @createassistant=false
+        @key=Key.new
+        @available_keys=$keyDao.listkeys().count      
+        if (@available_keys) > 0
+          puts "[Key - SiriProxy] Keys available for registered clients [#{@available_keys}]"
+          @key=$keyDao.next_available() 
+          puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data" 
+          puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
+          @oldkeyload=@key.keyload          
+          @key.keyload=@key.keyload+10  
+          $keyDao.setkeyload(@key) 
+          puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
+          self.sessionValidationData= @key.sessionValidation	
+          self.validationData_avail = true       
+          #hmmmmm
+        else 
+          puts "[Key - SiriProxy] No keys available in database"
+          self.validationData_avail = false
+        end
+      end
     rescue SystemCallError,NoMethodError
       puts "[ERROR - SiriProxy] Error opening the sessionValidationData  file. Connect an iPhone4S first or create them manually!"
     end
 	end  
-  #Revomed the getassistant and speechid 
+  
+  
   def plist_blob(string)
     string = [string].pack('H*')
     #string = [string]
@@ -132,8 +163,7 @@ class SiriProxy::Connection < EventMachine::Connection
 
   def ssl_handshake_completed
     self.ssled = true
-    self.clientport, self.clientip = Socket.unpack_sockaddr_in(get_peername)
-    
+    self.clientport, self.clientip = Socket.unpack_sockaddr_in(get_peername)    
     puts "[Info - #{self.name}] SSL completed for #{self.name}" if $LOG_LEVEL > 1
   end
   
@@ -154,7 +184,7 @@ class SiriProxy::Connection < EventMachine::Connection
       #if its and iphone4s
 			if line.match(/iPhone4,1;/)
         puts "[RollEyes - Siri*-*Proxy]" 
-	puts "[Info - SiriProxy] iPhone 4S connected from IP #{self.clientip}"        
+        puts "[Info - SiriProxy] iPhone 4S connected from IP #{self.clientip}"        
         puts "[RollEyes - Siri*-*Proxy]" 
 				self.is_4S = true
 			elsif  line.match(/iPhone3,1;/)
@@ -255,7 +285,7 @@ class SiriProxy::Connection < EventMachine::Connection
 
   def process_compressed_data    
     begin
-    self.unzipped_input << unzip_stream.inflate(self.input_buffer)
+      self.unzipped_input << unzip_stream.inflate(self.input_buffer)
     rescue	
       puts "[Warning - SiriProxy] Curruped Data!!! Clearing buffer!"
       self.unzipped_input = ""
@@ -296,13 +326,21 @@ class SiriProxy::Connection < EventMachine::Connection
    
     unpacked = unzipped_input[0...5].unpack('H*').first
     info = unpacked.match(/^0(.)(.{8})$/)
+    #edbug
+    if info==nil
+      $stderr.puts "bug flash on info"      #here lies the stupid bug!   
+    end
     
-    if(info[1] == "3" || info[1] == "4") #Ping or pong -- just get these out of the way (and log them for good measure)
-      if unzipped_input[0...5]==nil
-        $stderr.puts "bug flash"
-        
-      end
+    if(info[1] == "3" || info[1] == "4" and info!=nil) #Ping or pong -- just get these out of the way (and log them for good measure)
+      
       object = unzipped_input[0...5]
+      
+      #debug
+      if object==nil
+        $stderr.puts "bug flash on object"        
+      end
+      
+      
       self.unzipped_output << object
       
       type = (info[1] == "3") ? "Ping" : "Pong"      
@@ -378,6 +416,56 @@ class SiriProxy::Connection < EventMachine::Connection
     end
     #inject Validation- Grab Validation
     if object["properties"] != nil 
+      #also maybe better use this insidde the object properties not nil
+      #Check if the key cannot create any more assistants and set it as banned
+      if object["class"]=="CommandFailed"
+        puts "[Warning - SiriProxy] Command Failed The key [#{self.other_connection.key.id}] refid #{object["refId"]} and Creating? #{self.other_connection.createassistant}"
+      end
+      if object["class"]=="CommandFailed" and self.other_connection.createassistant and self.other_connection.key!=nil #lets check if a key got banned!
+        $keyDao.key_banned(self.other_connection.key)       
+        puts "[Warning - SiriProxy] The key [#{self.other_connection.key.id}] Marked as Banned! Still serving with validation..." 
+      end
+      
+      
+      #=begin      
+      #Lets capture the unique ids for every appleid
+      if object["class"]=="SetAssistantData" and self.validationData_avail==true #check this against validation 
+        #this changes by language change also. Please consider re code
+        pp object
+        #work to be done here
+        @client=Client.new        
+        if object["properties"]["meCards"]!=nil
+          if object["properties"]["meCards"][0]["properties"]["firstName"]!=nil 
+            @client.fname=object["properties"]["meCards"][0]["properties"]["firstName"] 
+          else
+            @client.fname="NA"
+          end
+          if object["properties"]["meCards"][0]["properties"]["nickName"]!=nil 
+            @client.nickname=object["properties"]["meCards"][0]["properties"]["nickName"]
+          else
+            @client.nickname="NA"
+          end
+          if object["properties"]["meCards"][0]["properties"]["identifier"]!=nil 
+            @client.appleDBid=object["properties"]["meCards"][0]["properties"]["identifier"]
+          else
+            @client.appleDBid="NA"
+          end
+        else
+          @client.fname="NA"
+          @client.nickname="NA"
+          @client.appleDBid="NA"
+        end
+        if object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil and object["properties"]["abSources"]!=nil
+          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["accountIdentifier"]
+        else
+          @client.appleAccountid="NA"
+        end
+        
+        @client.valid="True"        
+        #pp @client       
+      end
+      #end of capturing
+      #=end
       if object["properties"]["validationData"] !=nil #&& !object["properties"]["validationData"].empty?
         if self.is_4S
           puts "[Info - SiriProxy] Saving iPhone 4S validation Data"          
@@ -420,16 +508,32 @@ class SiriProxy::Connection < EventMachine::Connection
             puts "[Info - SiriProxy] Device has speechID: #{object["properties"]["speechId"]}" 
           end                    
           #Lets record the assistants. 
-          if  object["class"]=="AssistantCreated" and self.other_connection.key != nil       
+          if  object["class"]=="AssistantCreated" and self.other_connection.key != nil   and self.other_connection.client!=nil            
+            
             @assistant=Assistant.new
             @assistant.assistantid=object["properties"]["assistantId"]
             @assistant.speechid=object["properties"]["speechId"]
-            @assistant.key_id=self.other_connection.key.id
+            @assistant.key_id=self.other_connection.key.id            
+            puts "1"
+            pp self.other_connection.client
             if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
               puts "[Info - SiriProxy] Duplicate Assistand ID. Assistant NOT saved"
             else
               $assistantDao.createassistant(@assistant)
-              puts "[Info - SiriProxy] Created Assistantid #{object["properties"]["assistantId"]} using key [#{self.other_connection.key.id}]"              
+              puts "[Info - SiriProxy] Created Assistantid #{@assistant.assistantid} using key [#{self.other_connection.key.id}]"              
+              @oldclient=$clientsDao.check_duplicate(self.other_connection.client)
+              pp @oldclient
+              if @oldclient==nil
+                pp self.other_connection.client
+                self.other_connection.client.assistantid=object["properties"]["assistantId"]
+                $clientsDao.insert(self.other_connection.client)
+                puts "[Client - SiriProxy] NEW Client [#{self.other_connection.client.nickname}] created Assistantid [#{@assistant.assistantid}]"              
+                
+              else
+                @oldclient.assistantid=object["properties"]["assistantId"]
+                $clientsDao.update(@oldclient)
+                puts "[Client - SiriProxy] OLD Client [#{self.other_connection.client.nickname}] created Assistantid [#{@assistant.assistantid}]"              
+              end
             end
           end
           
@@ -451,8 +555,8 @@ class SiriProxy::Connection < EventMachine::Connection
     if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false 
       puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
       puts '[Protection - Siriproxy] Closing both connections...'
-      self.close_connection(after_writing = false)
-      self.other_connection.close_connection(after_writing = false)      
+      self.close_connection()
+      self.other_connection.close_connection()      
       puts '[Protection - Siriproxy] Closed both connections!!!'
       if object["class"]=="FinishSpeech" #will not get here
         #return object     
