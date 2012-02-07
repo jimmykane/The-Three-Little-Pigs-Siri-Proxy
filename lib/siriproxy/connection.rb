@@ -327,8 +327,12 @@ class SiriProxy::Connection < EventMachine::Connection
     unpacked = unzipped_input[0...5].unpack('H*').first
     info = unpacked.match(/^0(.)(.{8})$/)
     #edbug
+     if unpacked==nil
+      $stderr.puts "bug flash on unpacked"      #here lies the stupid bug1!   
+    end
+    
     if info==nil
-      $stderr.puts "bug flash on info"      #here lies the stupid bug!   
+      $stderr.puts "bug flash on info"      #here lies the stupid bug2!   
     end
     
     if(info[1] == "3" || info[1] == "4" and info!=nil) #Ping or pong -- just get these out of the way (and log them for good measure)
@@ -337,7 +341,7 @@ class SiriProxy::Connection < EventMachine::Connection
       
       #debug
       if object==nil
-        $stderr.puts "bug flash on object"        
+        $stderr.puts "bug flash on object"         
       end
       
       
