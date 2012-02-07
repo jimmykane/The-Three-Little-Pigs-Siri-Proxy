@@ -328,11 +328,12 @@ class SiriProxy::Connection < EventMachine::Connection
     info = unpacked.match(/^0(.)(.{8})$/)
     #edbug
      if unpacked==nil
-      $stderr.puts "bug flash on unpacked"      #here lies the stupid bug1!   
+      $stderr.puts "bug flash on unpacked"     
     end
     
     if info==nil
-      $stderr.puts "bug flash on info"      #here lies the stupid bug2!   
+      $stderr.puts "bug flash on info"      #here lies the stupid bug!!!!!!!!!!!!!!!
+      info=""
     end
     
     if(info[1] == "3" || info[1] == "4" and info!=nil) #Ping or pong -- just get these out of the way (and log them for good measure)
@@ -406,7 +407,7 @@ class SiriProxy::Connection < EventMachine::Connection
       puts "[Info - Dropping Object from Guzzoni] #{object["class"]}" if $LOG_LEVEL > 1
       pp object if $LOG_LEVEL > 3
       return nil
-    end
+    end    
     
     #Check if Validations has Expired
     if object["class"]=="SessionValidationFailed"  
@@ -418,6 +419,7 @@ class SiriProxy::Connection < EventMachine::Connection
         sendemail            
       end
     end
+    
     #inject Validation- Grab Validation
     if object["properties"] != nil 
       #also maybe better use this insidde the object properties not nil
