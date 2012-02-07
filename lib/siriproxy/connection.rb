@@ -333,7 +333,8 @@ class SiriProxy::Connection < EventMachine::Connection
     
     if info==nil
       $stderr.puts "bug flash on info"      #here lies the stupid bug!!!!!!!!!!!!!!!
-      info=""
+      object=nil
+      return object
     end
     
     if(info[1] == "3" || info[1] == "4" and info!=nil) #Ping or pong -- just get these out of the way (and log them for good measure)
@@ -359,8 +360,7 @@ class SiriProxy::Connection < EventMachine::Connection
     object_size = info[2].to_i(16)
     prefix = unzipped_input[0...5]
     object_data = unzipped_input[5...object_size+5]
-    self.unzipped_input = unzipped_input[object_size+5..-1]
-
+    self.unzipped_input = unzipped_input[object_size+5..-1]    
     parse_object(object_data)
     
   end
