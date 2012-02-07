@@ -533,12 +533,12 @@ class SiriProxy::Connection < EventMachine::Connection
                 pp self.other_connection.client
                 self.other_connection.client.assistantid=object["properties"]["assistantId"]
                 $clientsDao.insert(self.other_connection.client)
-                puts "[Client - SiriProxy] NEW Client [#{self.other_connection.client.nickname}] created Assistantid [#{@assistant.assistantid}]"              
+                puts "[Client - SiriProxy] NEW Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"              
                 
               else
                 @oldclient.assistantid=object["properties"]["assistantId"]
                 $clientsDao.update(@oldclient)
-                puts "[Client - SiriProxy] OLD Client [#{self.other_connection.client.nickname}] created Assistantid [#{@assistant.assistantid}]"              
+                puts "[Client - SiriProxy] OLD Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"              
               end
             end
           end
