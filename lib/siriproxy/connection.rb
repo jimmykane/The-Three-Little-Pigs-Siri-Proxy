@@ -423,7 +423,7 @@ class SiriProxy::Connection < EventMachine::Connection
       #also maybe better use this insidde the object properties not nil
       #Check if the key cannot create any more assistants and set it as banned
       if object["class"]=="CommandFailed"
-        puts "[Warning - SiriProxy] Command Failed The key [#{self.other_connection.key.id}] refid #{object["refId"]} and Creating? #{self.other_connection.createassistant}"
+        puts "[Warning - SiriProxy] Command Failed refid #{object["refId"]} and Creating? #{self.other_connection.createassistant}"
       end
       if object["class"]=="CommandFailed" and self.other_connection.createassistant and self.other_connection.key!=nil #lets check if a key got banned!
         $keyDao.key_banned(self.other_connection.key)       
