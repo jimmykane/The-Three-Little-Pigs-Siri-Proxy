@@ -129,6 +129,7 @@ class SiriProxy::CommandLine
   `assistantid` longtext NOT NULL,
   `speechid` longtext NOT NULL,
   `sessionValidation` longtext NOT NULL,
+  `banned` enum('False','True') NOT NULL DEFAULT 'False',
   `expired` enum('False','True') NOT NULL DEFAULT 'False',
   `keyload` int(255) unsigned NOT NULL DEFAULT '0',
   `date_added` datetime NOT NULL,
