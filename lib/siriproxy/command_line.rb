@@ -180,6 +180,25 @@ class SiriProxy::CommandLine
     puts "Table Statistics Created"   
     dbh.query("INSERT INTO `stats` VALUES ('1', '0', '0');")
     puts "Table Statistics Initialized"   
+    
+    
+    
+     dbh.query("DROP TABLE IF EXISTS `clients`;")
+     puts "Table Clients Droped"  
+ dbh.query("CREATE TABLE `clients` (
+  `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
+  `assistant_id` longtext NOT NULL,
+  `fname` mediumtext,
+  `nickname` mediumtext,
+  `apple_db_id` longtext NOT NULL,
+  `apple_account_id` longtext NOT NULL,
+  `valid` enum('False','True') NOT NULL DEFAULT 'True',
+  `date_added` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;")
+     puts "Table Clients Created"   
+    
+    
   end
     
   def gen_newtables
@@ -200,6 +219,10 @@ class SiriProxy::CommandLine
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
     puts "Created Table Assistants"
+    
+    
+    
+    
   end  
     
   def update(directory=nil)
