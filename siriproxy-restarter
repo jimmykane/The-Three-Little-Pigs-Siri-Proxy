@@ -7,7 +7,7 @@ echo "Starting Server"
        sleep 30
     else
       echo "[Warning - Crash - SiriProxy] Crashed! Restarting in 2 sec!"
-      sleep 2
+      sleep 1
     fi
 
 done

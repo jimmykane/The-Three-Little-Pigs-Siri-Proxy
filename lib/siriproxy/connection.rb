@@ -163,7 +163,7 @@ class SiriProxy::Connection < EventMachine::Connection
 
   def ssl_handshake_completed
     self.ssled = true
-    self.clientport, self.clientip = Socket.unpack_sockaddr_in(get_peername)    
+    self.clientport, self.clientip = Socket.unpack_sockaddr_in(get_peername) #gets on with bug 
     puts "[Info - #{self.name}] SSL completed for #{self.name}" if $LOG_LEVEL > 1
   end
   
