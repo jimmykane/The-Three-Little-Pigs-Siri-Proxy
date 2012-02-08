@@ -332,6 +332,14 @@ class SiriProxy::Connection < EventMachine::Connection
    
     unpacked = unzipped_input[0...5].unpack('H*').first
     info = unpacked.match(/^0(.)(.{8})$/) #some times this doesnt match! 
+    
+#    if @test==1
+#    @test=2 
+#    else
+#    @test=1  
+#    end
+#    puts @test
+#    info=nil if @test==2
     #edbug
     if unpacked==nil
       $stderr.puts "bug flash on unpacked"     
@@ -364,13 +372,18 @@ class SiriProxy::Connection < EventMachine::Connection
         flush_unzipped_output()
         return nil
       end
-        end
+    
+    
     object_size = info[2].to_i(16)
     prefix = unzipped_input[0...5]
     object_data = unzipped_input[5...object_size+5]
     self.unzipped_input = unzipped_input[object_size+5..-1]    
     parse_object(object_data)
-
+    else
+      flush_unzipped_output()
+        return nil
+    end
+    
   end
   
   
