@@ -505,17 +505,17 @@ class SiriProxy::Connection < EventMachine::Connection
             
             @client.assistantid=@loadedassistant
             $clientsDao.insert(@client)
-            puts "[Client - SiriProxy] NEW Client [#{@client.appleAccountid}] With Assistantid [#{@loadedassistant}]"              
+            puts "[Client - SiriProxy] NEW Client changed settings [#{@client.appleAccountid}] With Assistantid [#{@loadedassistant}]"              
                 
           else
             @oldclient.assistantid=@loadedassistant
             $clientsDao.update(@oldclient)
-            puts "[Client - SiriProxy] OLD Client [#{@oldclient.appleAccountid}] With Assistantid [#{@loadedassistant}]"              
+            puts "[Client - SiriProxy] OLD Client changed settings [#{@oldclient.appleAccountid}] With Assistantid [#{@loadedassistant}]"              
             @client=@oldclient #hehe
           end
           @assistant=Assistant.new
           @assistant.assistantid=@loadedassistant
-          @assistant.key_id=@key.id 
+          @assistant.key_id="" 
           if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
             puts "[Info - SiriProxy] Duplicate Assistand ID. Assistant NOT saved"
           else
