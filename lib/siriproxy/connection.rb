@@ -7,7 +7,7 @@ require 'socket'
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
 
-  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant
+  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
     self.other_connection.last_ref_id = ref_id if other_connection.last_ref_id != ref_id
@@ -32,6 +32,7 @@ class SiriProxy::Connection < EventMachine::Connection
     self.client=nil
     @createassistant=false
     @loadedassistant=nil
+    @loadedspeechid=nil
     puts "[Info - SiriProxy] Created a connection!" 
     
     #self.pending_connect_timeout=5
@@ -130,7 +131,9 @@ class SiriProxy::Connection < EventMachine::Connection
         #grab assistant
         if object["class"]=="LoadAssistant" and object["properties"]["assistantId"] !=nil
           @loadedassistant=object["properties"]["assistantId"]
+          @loadedspeechid=object["properties"]["speechId"]
           puts @loadedassistant
+          puts @loadedspeechid
         end
         @key=Key.new
         @available_keys=$keyDao.listkeys().count      
@@ -515,6 +518,7 @@ class SiriProxy::Connection < EventMachine::Connection
           end
           @assistant=Assistant.new
           @assistant.assistantid=@loadedassistant
+          @assistant.speechid=@loadedspeechid
           @assistant.key_id="" 
           if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
             puts "[Info - SiriProxy] Duplicate Assistand ID. Assistant NOT saved"
