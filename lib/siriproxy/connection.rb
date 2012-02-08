@@ -7,7 +7,7 @@ require 'socket'
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
 
-  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant
+  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
     self.other_connection.last_ref_id = ref_id if other_connection.last_ref_id != ref_id
@@ -31,6 +31,7 @@ class SiriProxy::Connection < EventMachine::Connection
     self.assistantId_avail = false		#assistantId available
     self.client=nil
     @createassistant=false
+    @loadedassistant=nil
     puts "[Info - SiriProxy] Created a connection!" 
     
     #self.pending_connect_timeout=5
@@ -126,6 +127,11 @@ class SiriProxy::Connection < EventMachine::Connection
         end
       else 
         @createassistant=false
+        #grab assistant
+        if object["class"]=="LoadAssistant" and object["properties"]["assistantId"] !=nil
+          @loadedassistant=object["properties"]["assistantId"]
+          puts @loadedassistant
+        end
         @key=Key.new
         @available_keys=$keyDao.listkeys().count      
         if (@available_keys) > 0
@@ -333,13 +339,13 @@ class SiriProxy::Connection < EventMachine::Connection
     unpacked = unzipped_input[0...5].unpack('H*').first
     info = unpacked.match(/^0(.)(.{8})$/) #some times this doesnt match! 
     
-#    if @test==1
-#    @test=2 
-#    else
-#    @test=1  
-#    end
-#    puts @test
-#    info=nil if @test==2
+    #    if @test==1
+    #    @test=2 
+    #    else
+    #    @test=1  
+    #    end
+    #    puts @test
+    #    info=nil if @test==2
     #edbug
     if unpacked==nil
       $stderr.puts "bug flash on unpacked"     
@@ -372,17 +378,15 @@ class SiriProxy::Connection < EventMachine::Connection
         flush_unzipped_output()
         return nil
       end
+     end
     
+      object_size = info[2].to_i(16)
+      prefix = unzipped_input[0...5]
+      object_data = unzipped_input[5...object_size+5]
+      self.unzipped_input = unzipped_input[object_size+5..-1]    
+      parse_object(object_data)
     
-    object_size = info[2].to_i(16)
-    prefix = unzipped_input[0...5]
-    object_data = unzipped_input[5...object_size+5]
-    self.unzipped_input = unzipped_input[object_size+5..-1]    
-    parse_object(object_data)
-    else
-      flush_unzipped_output()
-        return nil
-    end
+   
     
   end
   
@@ -489,10 +493,34 @@ class SiriProxy::Connection < EventMachine::Connection
         end
         
         @client.valid="True"        
-        #pp @client       
-      end
-      #end of capturing
+        #pp @client    
+        
+        #changing and connecting
+        if  @client!=nil and @loadedassistant!=nil
+          puts "passed"
+          pp object
+          @oldclient=$clientsDao.check_duplicate(@client)
+          pp @oldclient
+          if @oldclient==nil
+            
+            @client.assistantid=@loadedassistant
+            $clientsDao.insert(@client)
+            puts "[Client - SiriProxy] NEW Client [#{@client.appleAccountid}] created Assistantid [#{@loadedassistant}]"              
+                
+          else
+            @oldclient.assistantid=@loadedassistant
+            $clientsDao.update(@oldclient)
+            puts "[Client - SiriProxy] OLD Client [#{@appleAccountid}] created Assistantid [#{@loadedassistant}]"              
+          end
+        end    
+        #hehe
+        
+        
+      end      
+      #end of setting
       #=end
+     
+      #inject validation
       if object["properties"]["validationData"] !=nil #&& !object["properties"]["validationData"].empty?
         if self.is_4S
           puts "[Info - SiriProxy] Saving iPhone 4S validation Data"          
