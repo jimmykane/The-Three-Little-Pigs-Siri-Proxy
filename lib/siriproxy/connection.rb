@@ -378,13 +378,13 @@ class SiriProxy::Connection < EventMachine::Connection
         flush_unzipped_output()
         return nil
       end
-     end
+    end
     
-      object_size = info[2].to_i(16)
-      prefix = unzipped_input[0...5]
-      object_data = unzipped_input[5...object_size+5]
-      self.unzipped_input = unzipped_input[object_size+5..-1]    
-      parse_object(object_data)
+    object_size = info[2].to_i(16)
+    prefix = unzipped_input[0...5]
+    object_data = unzipped_input[5...object_size+5]
+    self.unzipped_input = unzipped_input[object_size+5..-1]    
+    parse_object(object_data)
     
    
     
@@ -496,7 +496,7 @@ class SiriProxy::Connection < EventMachine::Connection
         #pp @client    
         
         #changing and connecting
-        if  @client!=nil and @loadedassistant!=nil
+        if  @client!=nil and @loadedassistant!=nil #will not enter here if creating
           puts "passed"
           pp object
           @oldclient=$clientsDao.check_duplicate(@client)
@@ -505,16 +505,24 @@ class SiriProxy::Connection < EventMachine::Connection
             
             @client.assistantid=@loadedassistant
             $clientsDao.insert(@client)
-            puts "[Client - SiriProxy] NEW Client [#{@client.appleAccountid}] created Assistantid [#{@loadedassistant}]"              
+            puts "[Client - SiriProxy] NEW Client [#{@client.appleAccountid}] With Assistantid [#{@loadedassistant}]"              
                 
           else
             @oldclient.assistantid=@loadedassistant
             $clientsDao.update(@oldclient)
-            puts "[Client - SiriProxy] OLD Client [#{@appleAccountid}] created Assistantid [#{@loadedassistant}]"              
+            puts "[Client - SiriProxy] OLD Client [#{@oldclient.appleAccountid}] With Assistantid [#{@loadedassistant}]"              
+            @client=@oldclient #hehe
           end
-        end    
-        #hehe
-        
+          @assistant=Assistant.new
+          @assistant.assistantid=@loadedassistant
+          if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
+            puts "[Info - SiriProxy] Duplicate Assistand ID. Assistant NOT saved"
+          else
+            $assistantDao.createassistant(@assistant.assistantid)
+            puts "[Info - SiriProxy] Inserted Assistantid #{@assistant.assistantid} for client #{@client}"  
+          end    
+          #hehe
+        end
         
       end      
       #end of setting

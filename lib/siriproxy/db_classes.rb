@@ -334,7 +334,7 @@ class AssistantDao
       dto.key_id= row[1]
       dto.assistantid=row[2]
       dto.speechid=row[3]		
-      dto.date_added=row[4]	      
+      dto.date_created=row[4]	      
       rows << dto
     end
     return rows
