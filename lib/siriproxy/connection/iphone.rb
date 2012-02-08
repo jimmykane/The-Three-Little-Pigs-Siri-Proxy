@@ -1,5 +1,5 @@
 #####
-  # This is the connection to the iPhone
+# This is the connection to the iPhone
 #####
 class SiriProxy::Connection::Iphone < SiriProxy::Connection
   def initialize
@@ -9,39 +9,20 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
     self.name = "iPhone"
   end
 
-  def post_init
-    puts "[Info - iPhone] Curent connections [#{$conf.active_connections}]"
-    #Some code in order connections to depend on the evailable keys
-    #if no keys then maximize the connections in order to prevent max connection reach and 4s not be able to connect
-    #
-    @max_connections=$conf.max_connections
-    @keysavailable=$keyDao.listkeys().count   
-    if @keysavailable==0
-       @max_connections=700#max mem
-    elsif @keysavailable>0
-       @max_connections=$conf.max_connections * @keysavailable
-    end
-   
-    if $conf.active_connections>=@max_connections
-      puts "[Warning - Siriproxy] Max Connections reached! Connection dropping...."
-      super
-      self.close_connection
-      start_tls(:verify_peer      => false)
-      else        
-      super
-      start_tls(:cert_chain_file  => File.expand_path("~/.siriproxy/server.passless.crt"),
-                :private_key_file => File.expand_path("~/.siriproxy/server.passless.key"),
-                :verify_peer      => false)
-    end
+  def post_init   #removed code from here to allow a 4s to connect!
+    super
+    start_tls(:cert_chain_file  => File.expand_path("~/.siriproxy/server.passless.crt"),
+      :private_key_file => File.expand_path("~/.siriproxy/server.passless.key"),
+      :verify_peer      => false)
   end
 
   def ssl_handshake_completed
     super
     begin
-    self.other_connection = EventMachine.connect('guzzoni.apple.com', 443, SiriProxy::Connection::Guzzoni)
-    self.plugin_manager.guzzoni_conn = self.other_connection
-    other_connection.other_connection = self #hehe
-    other_connection.plugin_manager = plugin_manager
+      self.other_connection = EventMachine.connect('guzzoni.apple.com', 443, SiriProxy::Connection::Guzzoni)
+      self.plugin_manager.guzzoni_conn = self.other_connection
+      other_connection.other_connection = self #hehe
+      other_connection.plugin_manager = plugin_manager
     rescue
       puts "[Warning - Siriproxy] Could not connect to Guzzoni!!! "
       self.close_connection
