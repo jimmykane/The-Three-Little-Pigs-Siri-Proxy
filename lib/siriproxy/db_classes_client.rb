@@ -56,6 +56,8 @@ class ClientsDao
 	end
 
 	def update(dto)
+    puts "test"
+    pp dto
 		sql = "UPDATE `clients` SET assistant_id = ?,fname= ? ,nickname=?,apple_db_id=?,apple_account_id=?,valid=? WHERE id = ?"
 		st = @my.prepare(sql)
 		st.execute(dto.assistantid,dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.valid,dto.id)

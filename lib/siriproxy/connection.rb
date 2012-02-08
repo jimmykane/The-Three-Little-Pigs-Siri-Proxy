@@ -539,8 +539,7 @@ class SiriProxy::Connection < EventMachine::Connection
           else
             @oldclient.assistantid=@loadedassistant
             @oldclient.fname=@client.fname
-            @oldclient.nickname=@client.nickname #in case he changes this
-            
+            @oldclient.nickname=@client.nickname #in case he changes this            
             $clientsDao.update(@oldclient)
             puts "[Client - SiriProxy] OLD Client changed settings [#{@oldclient.appleAccountid}] With Assistantid [#{@loadedassistant}]"              
             @client=@oldclient #hehe
