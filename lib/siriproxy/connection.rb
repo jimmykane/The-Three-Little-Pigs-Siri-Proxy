@@ -496,7 +496,7 @@ class SiriProxy::Connection < EventMachine::Connection
         #pp @client    
         
         #changing and connecting
-        if  @client!=nil and @loadedassistant!=nil #will not enter here if creating
+        if  @client!=nil and @loadedassistant!=nil and @loadedassistant!=""#will not enter here if creating
           puts "passed"
           pp object
           @oldclient=$clientsDao.check_duplicate(@client)
@@ -515,6 +515,7 @@ class SiriProxy::Connection < EventMachine::Connection
           end
           @assistant=Assistant.new
           @assistant.assistantid=@loadedassistant
+          @assistant.key_id=@key.id 
           if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
             puts "[Info - SiriProxy] Duplicate Assistand ID. Assistant NOT saved"
           else
