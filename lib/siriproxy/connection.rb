@@ -519,7 +519,7 @@ class SiriProxy::Connection < EventMachine::Connection
           if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
             puts "[Info - SiriProxy] Duplicate Assistand ID. Assistant NOT saved"
           else
-            $assistantDao.createassistant(@assistant.assistantid)
+            $assistantDao.createassistant(@assistant)
             puts "[Info - SiriProxy] Inserted Assistantid #{@assistant.assistantid} for client #{@client}"  
           end    
           #hehe
