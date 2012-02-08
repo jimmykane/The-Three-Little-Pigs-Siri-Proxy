@@ -199,7 +199,7 @@ class SiriProxy::Connection < EventMachine::Connection
       #this is a Proxy Server.
 		elsif line.match(/^User-Agent:/)   
       #if its and iphone4s
-                self.clientport, self.clientip = Socket.unpack_sockaddr_in(get_peername) 
+      self.clientport, self.clientip = Socket.unpack_sockaddr_in(get_peername) 
 			if line.match(/iPhone4,1;/)
         puts "[RollEyes - Siri*-*Proxy]" 
         puts "[Info - SiriProxy] iPhone 4S connected from IP #{self.clientip}"        
@@ -548,7 +548,7 @@ class SiriProxy::Connection < EventMachine::Connection
             puts "[Info - SiriProxy] Duplicate Assistand ID. Assistant NOT saved"
           else
             $assistantDao.createassistant(@assistant)
-            puts "[Info - SiriProxy] Inserted Assistantid #{@assistant.assistantid} for client #{@client}"  
+            puts "[Info - SiriProxy] Inserted Assistant ID #{@assistant.assistantid} for client #{@client}"  
           end    
           #hehe
         end
