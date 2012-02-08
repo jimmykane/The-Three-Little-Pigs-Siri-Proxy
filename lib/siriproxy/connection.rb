@@ -121,10 +121,12 @@ class SiriProxy::Connection < EventMachine::Connection
           self.validationData_avail = true       
           #hmmmmm
         else 
-          puts "[Key - SiriProxy] No keys available in database"
+          puts "[Key - SiriProxy] No keys available in database Closing connections"
+          
           self.validationData_avail = false
           self.close_connection() #close connections
           self.other_connection.close_connection() #close other
+          
         end
       else 
         @createassistant=false
@@ -138,7 +140,7 @@ class SiriProxy::Connection < EventMachine::Connection
         @key=Key.new
         @available_keys=$keyDao.listkeys().count      
         if (@available_keys) > 0
-          puts "[Key - SiriProxy] Keys available for registered clients [#{@available_keys}]"
+          puts "[Key - SiriProxy] Keys available for Registered Only clients [#{@available_keys}]"
           @key=$keyDao.next_available() 
           puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data" 
           puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
@@ -150,7 +152,7 @@ class SiriProxy::Connection < EventMachine::Connection
           self.validationData_avail = true       
           #hmmmmm
         else 
-          puts "[Key - SiriProxy] No keys available in database"
+          puts "[Key - SiriProxy] No keys available in database Closing connections"
           self.validationData_avail = false
           self.close_connection() #close connections
           self.other_connection.close_connection() #close other
@@ -536,6 +538,9 @@ class SiriProxy::Connection < EventMachine::Connection
                 
           else
             @oldclient.assistantid=@loadedassistant
+            @oldclient.fname=@client.fname
+            @oldclient.nickname=@client.nickname #in case he changes this
+            
             $clientsDao.update(@oldclient)
             puts "[Client - SiriProxy] OLD Client changed settings [#{@oldclient.appleAccountid}] With Assistantid [#{@loadedassistant}]"              
             @client=@oldclient #hehe
