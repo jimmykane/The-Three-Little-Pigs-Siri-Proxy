@@ -366,7 +366,7 @@ class SiriProxy::Connection < EventMachine::Connection
   end
 
   def read_next_object_from_unzipped
-   
+    begin
     unpacked = unzipped_input[0...5].unpack('H*').first
     #the problem here is that the packet is now complete or something unknown for the match!
     #if first character is 0
@@ -412,9 +412,14 @@ class SiriProxy::Connection < EventMachine::Connection
     object_data = unzipped_input[5...object_size+5]
     self.unzipped_input = unzipped_input[object_size+5..-1]    
     parse_object(object_data)
-    
-   
-    
+    rescue 
+    self.close_connection() #close connections
+    self.other_connection.close_connection() #close other
+    $stderr.puts "bug flash on object" 
+    puts "[Warning - Siriproxy] Unzip Error occured. Closing connection & krrping server running."
+    return nil
+    end
+
   end
   
   
