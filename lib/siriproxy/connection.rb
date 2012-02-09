@@ -208,6 +208,7 @@ class SiriProxy::Connection < EventMachine::Connection
         puts "[Info - SiriProxy] iPhone 4S connected from IP #{self.clientip}"        
         puts "[RollEyes - Siri*-*Proxy]" 
 				self.is_4S = true
+        @devicetype="iPhone4S"
       else # now seperates anything else exept 4s
         #we can close connections here .... and we can count them here       
         puts "[Info - Siriproxy] Curent connections [#{$conf.active_connections}]"
