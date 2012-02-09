@@ -368,16 +368,12 @@ class SiriProxy::Connection < EventMachine::Connection
   def read_next_object_from_unzipped
    
     unpacked = unzipped_input[0...5].unpack('H*').first
+    #the problem here is that the packet is now complete or something unknown for the match!
+    #if first character is 0
+    unpacked="0400000001" if unpacked=="04000000" # its the value that couses the bug! Will treat it as ping pong!!! Hope this resolves this
+    #fingers crossed    
     info = unpacked.match(/^0(.)(.{8})$/) #some times this doesnt match! 
-    
-    #    if @test==1
-    #    @test=2 
-    #    else
-    #    @test=1  
-    #    end
-    #    puts @test
-    #    info=nil if @test==2
-    #edbug
+   
     if unpacked==nil
       $stderr.puts "bug flash on unpacked"     
     end
@@ -391,7 +387,7 @@ class SiriProxy::Connection < EventMachine::Connection
     end
     if info!=nil #lets hope for the magic fix
       if(info[1] == "3" || info[1] == "4"  ) #Ping or pong -- just get these out of the way (and log them for good measure)
-      
+        puts "Ping Pong #{unpacked}"
         object = unzipped_input[0...5]
       
         #debug
