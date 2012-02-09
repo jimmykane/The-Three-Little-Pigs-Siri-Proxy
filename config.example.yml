@@ -9,6 +9,13 @@ db_user: 'root'
 db_pass: 'pass'
 db_database: 'siri'
 
+#Programm options
+#1. Auto Key Ban -> When a key cannot create more assistants then it is marked as banned,
+# and wont be used for creating assistants in apple db 
+# Default = ON , Recommended='ON'
+
+enable_auto_key_ban: 'ON'
+
 #For Generating Certs for iPhones. Has 2 hosts, so that you can use guzzoni on a 4S, 
 #and your server also using the same instance.
 ca_name: 'SiriProxyCA'

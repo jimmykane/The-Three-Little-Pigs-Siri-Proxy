@@ -7,7 +7,7 @@ require 'socket'
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
 
-  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid
+  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid,:devicetype
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
     self.other_connection.last_ref_id = ref_id if other_connection.last_ref_id != ref_id
@@ -33,6 +33,7 @@ class SiriProxy::Connection < EventMachine::Connection
     @createassistant=false
     @loadedassistant=nil
     @loadedspeechid=nil
+    @devicetype=nil
     puts "[Info - SiriProxy] Created a connection!" 
     
     #self.pending_connect_timeout=5
@@ -50,7 +51,7 @@ class SiriProxy::Connection < EventMachine::Connection
   #send email function
   def sendemail()
     #Lets also send an email comming soon
-    if $APP_CONFIG.send_email=='ON' or $APP_CONFIG.send_email=='no'
+    if $APP_CONFIG.send_email=='ON' or $APP_CONFIG.send_email=='on'
       begin
         Pony.mail(
           :to => $APP_CONFIG.email_to, 
@@ -230,6 +231,7 @@ class SiriProxy::Connection < EventMachine::Connection
         if  line.match(/iPhone3,1;/)
           #if its iphone4,etc	 			
           self.is_4S = false	
+          @devicetype="GSM iPhone4"
           puts "[Info - SiriProxy] GSM iPhone 4 connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line["iPhone3,1"] = "iPhone4,1"
@@ -237,6 +239,7 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2      
         elsif  line.match(/iPhone3,3;/)
           self.is_4S = false				
+          @devicetype="CDMA iPhone4"
           puts "[Info - SiriProxy] CDMA iPhone 4 connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line["iPhone3,3"] = "iPhone4,1"
@@ -244,6 +247,7 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
         elsif line.match(/iPad2,1;/)	
           self.is_4S = false				
+          @devicetype="iPad2 Wifi Only"
           puts "[Info - SiriProxy] iPad2 Wifi Only connected from IP #{self.clientip}"						
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line["iPad/iPad2,1"] = "iPhone/iPhone4,1"
@@ -251,6 +255,7 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
         elsif line.match(/iPad2,2;/)	
           self.is_4S = false				
+          @devicetype="iPad2 GSM"
           puts "[Info - SiriProxy] iPad2 GSM connected from IP #{self.clientip}"						
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line["iPad/iPad2,2"] = "iPhone/iPhone4,1"
@@ -258,13 +263,15 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
         elsif line.match(/iPad2,3;/)	
           self.is_4S = false				
+          @devicetype="iPad2 CDMA"
           puts "[Info - SiriProxy] iPad2 CDMA connected from IP #{self.clientip}"						
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line["iPad/iPad2,3"] = "iPhone/iPhone4,1"
           puts "[Info - SiriProxy] Changed header to iphone4s] "
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
         elsif line.match(/iPad1,1;/)		
-          self.is_4S = false				
+          self.is_4S = false		
+          @devicetype="iPad 1st generation"
           puts "[Info - SiriProxy] iPad 1st generation connected from IP #{self.clientip}"						
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line["iPad/iPad1,1"] = "iPhone/iPhone4,1"
@@ -272,6 +279,7 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2				
         elsif line.match(/iPod4,1;/)		
           self.is_4S = false	
+          @devicetype="iPod touch 4th generation"
           puts "[Info - SiriProxy] iPod touch 4th generation connected from IP #{self.clientip}"					
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line["iPod touch/iPod4,1"] = "iPhone/iPhone4,1"
@@ -282,6 +290,7 @@ class SiriProxy::Connection < EventMachine::Connection
           #Change unknown to iPhone to make sure everything works..
           puts "[Info - SiriProxy] Unknow Device Connected from IP #{self.clientip}"	
           self.is_4S = false
+          @devicetype="Unknown Device"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line = "User-Agent: Assistant(iPhone/iPhone4,1; iPhone OS/5.0.1/9A405) Ace/1.0"
           puts "[Info - SiriProxy] Changed header to iphone4s] "
@@ -477,15 +486,17 @@ class SiriProxy::Connection < EventMachine::Connection
     #inject Validation- Grab Validation
     if object["properties"] != nil 
       #also maybe better use this insidde the object properties not nil
-      #Check if the key cannot create any more assistants and set it as banned
-      if object["class"]=="CommandFailed"
-        puts "[Warning - SiriProxy] Command Failed refid #{object["refId"]} and Creating? #{self.other_connection.createassistant}"
+      #Check if the key cannot create any more assistants and set it as banned 
+      #ADDED Option in config file for this
+      if $APP_CONFIG.enable_auto_key_ban=='ON' or $APP_CONFIG.enable_auto_key_ban=='on'
+        if object["class"]=="CommandFailed"
+          puts "[Warning - SiriProxy] Command Failed refid #{object["refId"]} and Creating? #{self.other_connection.createassistant}"
+        end
+        if object["class"]=="CommandFailed" and self.other_connection.createassistant and self.other_connection.key!=nil #lets check if a key got banned!
+          $keyDao.key_banned(self.other_connection.key)       
+          puts "[Warning - SiriProxy] The key [#{self.other_connection.key.id}] Marked as Banned! Still serving with validation..." 
+        end
       end
-      if object["class"]=="CommandFailed" and self.other_connection.createassistant and self.other_connection.key!=nil #lets check if a key got banned!
-        $keyDao.key_banned(self.other_connection.key)       
-        puts "[Warning - SiriProxy] The key [#{self.other_connection.key.id}] Marked as Banned! Still serving with validation..." 
-      end
-      
       
       #=begin      
       #Lets capture the unique ids for every appleid
@@ -525,29 +536,32 @@ class SiriProxy::Connection < EventMachine::Connection
         #pp @client    
         
         #changing and connecting
-        if  @client!=nil and @loadedassistant!=nil and @loadedassistant!=""#will not enter here if creating
+        if  @client!=nil and @loadedassistant!=nil and @loadedassistant!=""#will not enter here if creating!
+          #need to get in here if changing upon creation is needed
           puts "passed"
           pp object
           @oldclient=$clientsDao.check_duplicate(@client)
           pp @oldclient
-          if @oldclient==nil
-            
-            @client.assistantid=@loadedassistant
+          if @oldclient==nil        
+           
             $clientsDao.insert(@client)
             puts "[Client - SiriProxy] NEW Client changed settings [#{@client.appleAccountid}] With Assistantid [#{@loadedassistant}]"              
                 
           else
-            @oldclient.assistantid=@loadedassistant
+            
             @oldclient.fname=@client.fname
             @oldclient.nickname=@client.nickname #in case he changes this            
             $clientsDao.update(@oldclient)
             puts "[Client - SiriProxy] OLD Client changed settings [#{@oldclient.appleAccountid}] With Assistantid [#{@loadedassistant}]"              
             @client=@oldclient #hehe
           end
+          
           @assistant=Assistant.new
           @assistant.assistantid=@loadedassistant
           @assistant.speechid=@loadedspeechid
-          @assistant.key_id="" 
+          @assistant.client_apple_account_id=@client.appleAccountid
+          @assistant.key_id=@key.id #suspicius
+          @assistant.devicetype=@devicetype
           if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
             puts "[Info - SiriProxy] Duplicate Assistand ID. Assistant NOT saved"
           else
@@ -604,30 +618,39 @@ class SiriProxy::Connection < EventMachine::Connection
             puts "[Info - SiriProxy] Device has speechID: #{object["properties"]["speechId"]}" 
           end                    
           #Lets record the assistants. 
-          if  object["class"]=="AssistantCreated" and self.other_connection.key != nil   and self.other_connection.client!=nil            
-            
+          if  object["class"]=="AssistantCreated" and self.other_connection.key != nil   and self.other_connection.client!=nil and self.other_connection.createassistant==true
+            puts "Creating new Assistant"
             @assistant=Assistant.new
             @assistant.assistantid=object["properties"]["assistantId"]
             @assistant.speechid=object["properties"]["speechId"]
-            @assistant.key_id=self.other_connection.key.id            
-            puts "1"
+            @assistant.key_id=self.other_connection.key.id               
+            @assistant.devicetype=self.other_connection.devicetype
             pp self.other_connection.client
+            
             if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
+              
               puts "[Info - SiriProxy] Duplicate Assistand ID. Assistant NOT saved"
+              
             else
-              $assistantDao.createassistant(@assistant)
-              puts "[Info - SiriProxy] Created Assistantid #{@assistant.assistantid} using key [#{self.other_connection.key.id}]"              
+              
+              #  $assistantDao.createassistant(@assistant)
+              #puts "[Info - SiriProxy] Created Assistantid #{@assistant.assistantid} using key [#{self.other_connection.key.id}]"              
               @oldclient=$clientsDao.check_duplicate(self.other_connection.client)
-              pp @oldclient
+              #pp @oldclient
               if @oldclient==nil
-                pp self.other_connection.client
-                self.other_connection.client.assistantid=object["properties"]["assistantId"]
+                
+                # pp self.other_connection.client 
                 $clientsDao.insert(self.other_connection.client)
+                @assistant.client_apple_account_id=self.other_connection.client.appleAccountid
+                $assistantDao.createassistant(@assistant)
+                puts "[Client - SiriProxy] Created Assistant ID  #{@assistant.assistantid} using key [#{self.other_connection.key.id}]"              
                 puts "[Client - SiriProxy] NEW Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"              
                 
-              else
-                @oldclient.assistantid=object["properties"]["assistantId"]
+              else               
                 $clientsDao.update(@oldclient)
+                @assistant.client_apple_account_id=@oldclient.appleAccountid
+                $assistantDao.createassistant(@assistant)
+                puts "[Client - SiriProxy] Created Assistant ID #{@assistant.assistantid} using key [#{self.other_connection.key.id}]"              
                 puts "[Client - SiriProxy] OLD Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"              
               end
             end

@@ -154,16 +154,18 @@ class SiriProxy::CommandLine
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;")
     
     puts "Created Table config"
-
     dbh.query("INSERT INTO `config` VALUES ('1', '40', '15', '0', '1000', '100', '1200');")
-    puts "Added Default setting in Table config"
+        puts "Added Default setting in Table config"
+        
     dbh.query("DROP TABLE IF EXISTS `assistants`;")
     puts "Table Assistants Droped"   
     dbh.query("CREATE TABLE `assistants` (
   `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
   `key_id` int(255) unsigned NOT NULL,
+  `client_apple_account_id` longtext NOT NULL,
   `assistantid` longtext NOT NULL,
   `speechid` longtext NOT NULL,
+  `device_type` mediumtext NOT NULL,
   `date_created` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
@@ -188,7 +190,6 @@ class SiriProxy::CommandLine
      puts "Table Clients Droped"  
  dbh.query("CREATE TABLE `clients` (
   `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
-  `assistant_id` longtext NOT NULL,
   `fname` mediumtext,
   `nickname` mediumtext,
   `apple_db_id` longtext NOT NULL,
@@ -196,36 +197,16 @@ class SiriProxy::CommandLine
   `valid` enum('False','True') NOT NULL DEFAULT 'True',
   `date_added` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;")
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
      puts "Table Clients Created"   
     
+    dbh.query("INSERT INTO `clients` VALUES ('1', 'NA', 'NA', 'NA', 'NA', 'False', '0000-00-00 00:00:00');")
+    
+         puts "Table Clients Populated"   
     
   end
-    
-  def gen_newtables
-    require 'siriproxy/db_connection'
-    if dbh=db_connect()
-      puts "DATABASE FOUND"
-    else 
-      puts "Could not connect to database"
-    end
-    dbh.query("DROP TABLE IF EXISTS `assistants`;")
-    puts "Table Assistants Droped"   
-    dbh.query("CREATE TABLE `assistants` (
-  `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
-  `key_id` int(255) unsigned NOT NULL,
-  `assistantid` longtext NOT NULL,
-  `speechid` longtext NOT NULL,
-  `date_created` datetime NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
-    puts "Created Table Assistants"
-    
-    
-    
-    
-  end  
-    
+   
+   
   def update(directory=nil)
     if(directory)
       puts "=== Installing from '#{directory}' ==="

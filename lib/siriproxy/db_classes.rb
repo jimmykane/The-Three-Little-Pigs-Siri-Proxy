@@ -271,18 +271,24 @@ GROUP BY K.id ORDER BY Count(1),K.keyload ASC LIMIT 1"
 end
 
 class Assistant
-  attr_accessor :id, :key_id,:assistantid,:speechid,:date_created
+  attr_accessor :id, :key_id,:client_apple_account_id,:assistantid,:speechid,:devicetype,:date_created
   def id=(value)  # The setter method for @id
     @id =  value
   end
   def key_id=(value)  # The setter method for @key_id
     @key_id =  value
   end
+  def client_apple_account_id=(value)  # The setter method for @key_id
+    @client_apple_account_id =  value
+  end
   def assistantid=(value)  # The setter method for @assistantid
     @assistantid =  value
   end
   def speechid=(value)  # The setter method for @speechid
     @speechid =  value
+  end
+  def devicetype=(value)  # The setter method for @speechid
+    @devicetype =  value
   end
   def date_created=(value)  # The setter method for @date_created
     @date_created =  value
@@ -320,9 +326,9 @@ class AssistantDao
   end
     
   def createassistant(dto)
-    sql = "INSERT INTO `assistants` (key_id,assistantid,speechid,date_created) VALUES ( ? , ? , ? , NOW())"
+    sql = "INSERT INTO `assistants` (key_id,client_apple_account_id,assistantid,speechid,device_type,date_created) VALUES ( ? ,? , ? , ? , ? ,NOW())"
     st = @my.prepare(sql)
-    st.execute(dto.key_id,dto.assistantid,dto.speechid)   
+    st.execute(dto.key_id,dto.client_apple_account_id,dto.assistantid,dto.speechid,dto.devicetype)   
     st.close    
   end
     
@@ -332,9 +338,11 @@ class AssistantDao
       dto = Assistant.new
       dto.id = row[0]
       dto.key_id= row[1]
-      dto.assistantid=row[2]
-      dto.speechid=row[3]		
-      dto.date_created=row[4]	      
+      dto.client_apple_account_id=row[2]
+      dto.assistantid=row[3]
+      dto.speechid=row[4]		
+      dto.devicetype=row[5]
+      dto.date_created=row[6]	      
       rows << dto
     end
     return rows

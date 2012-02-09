@@ -3,14 +3,10 @@ require 'singleton'
 require 'siriproxy/db_connection'
 class Client
 
-  attr_accessor :id, :assistantid,:fname,:nickname,:appleDBid,:appleAccountid,:valid,:date_added
+  attr_accessor :id, :fname,:nickname,:appleDBid,:appleAccountid,:valid,:date_added
 	
 	def id=(value)  # The setter method for @id
 		@id =  value
-	end
-
-	def assistantid=(value)  # The setter method for @assistantid
-		@assistantid =  value
 	end
 
 	def fname=(value)  # The setter method for @fname
@@ -49,18 +45,18 @@ class ClientsDao
 	end
 
 	def insert(dto)
-		sql = "INSERT INTO `clients` (assistant_id,fname,nickname,apple_db_id,apple_account_id,valid,date_added ) VALUES ( ? ,  ?  , ? , ? , ?, ?,NOW())"
+		sql = "INSERT INTO `clients` (fname,nickname,apple_db_id,apple_account_id,valid,date_added ) VALUES ( ?  , ? , ? , ?, ?,NOW())"
 		st = @my.prepare(sql)		
-		st.execute(dto.assistantid,dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.valid)
+		st.execute(dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.valid)
 		st.close
 	end
 
 	def update(dto)
     puts "test"
     pp dto
-		sql = "UPDATE `clients` SET assistant_id = ?,fname= ? ,nickname=?,apple_db_id=?,apple_account_id=?,valid=? WHERE id = ?"
+		sql = "UPDATE `clients` SET fname= ? ,nickname=?,apple_db_id=?,apple_account_id=?,valid=? WHERE id = ?"
 		st = @my.prepare(sql)
-		st.execute(dto.assistantid,dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.valid,dto.id)
+		st.execute(dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.valid,dto.id)
 		st.close
 	end
     
@@ -107,14 +103,13 @@ class ClientsDao
 		rows = []
 		while row = stmt.fetch do
 			dto = Client.new
-			dto.id = row[0]
-			dto.assistantid= row[1]
-			dto.fname=row[2]
-			dto.nickname=row[3]
-			dto.appleDBid=row[4]
-      dto.appleAccountid=row[5]
-      dto.valid=row[6]
-      dto.date_added=row[7]
+			dto.id = row[0]	
+			dto.fname=row[1]
+			dto.nickname=row[2]
+			dto.appleDBid=row[3]
+      dto.appleAccountid=row[4]
+      dto.valid=row[5]
+      dto.date_added=row[6]
 			rows << dto
 		end
 
