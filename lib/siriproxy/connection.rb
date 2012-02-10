@@ -350,7 +350,7 @@ class SiriProxy::Connection < EventMachine::Connection
   end
 
   def has_next_object?
-    return false if unzipped_input.empty? #empty
+    return false if unzipped_input.empty? or unzipped_input==nil #empty
     unpacked = unzipped_input[0...5].unpack('H*').first
     return true if(unpacked.match(/^0[34]/)) #Ping or pong
     begin

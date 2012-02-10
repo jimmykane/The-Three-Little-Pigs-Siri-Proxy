@@ -191,6 +191,13 @@ class KeyDao
 		st.close		
 	end
 
+  def unban_keys()
+    sql = "UPDATE `keys` SET banned='False' WHERE expired='True'"
+		st = @my.prepare(sql)
+		st.execute()
+		st.close		
+  end
+  
   def listkeys()
 		sql = "SELECT * FROM `keys` WHERE expired!='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
 		st = @my.prepare(sql)

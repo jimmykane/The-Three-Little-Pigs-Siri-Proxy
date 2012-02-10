@@ -78,7 +78,7 @@ class SiriProxy
         EventMachine::PeriodicTimer.new(@timer){
           $statistics=$statisticsDao.getstats()
           $statistics.elapsed+=@timer
-          $statistics.uptime+=@timer
+          $statistics.uptime+=@timer 
           if $statistics.elapsed>$conf.keyload_dropdown_interval            
             @overloaded_keys_count=$keyDao.findoverloaded().count
             if (@overloaded_keys_count>0)
