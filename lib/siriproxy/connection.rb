@@ -516,7 +516,8 @@ class SiriProxy::Connection < EventMachine::Connection
           @client.nickname="NA"
           @client.appleDBid="NA"
         end
-        if object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil and object["properties"]["abSources"]!=nil
+        
+        if object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil and object["properties"]["abSources"]!=nil and object["properties"]!=nil
           @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["accountIdentifier"]
         else
           @client.appleAccountid="NA"
