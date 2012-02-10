@@ -358,7 +358,7 @@ class AssistantDao
 end  
 #added stats fixes crash with interval
 class Statistics
-  attr_accessor :id, :elapsed,:uptime
+  attr_accessor :id, :elapsed,:uptime,:happy_hour_elapsed
     
   def id=(value)  # The setter method for @id
     @id =  value
@@ -366,6 +366,10 @@ class Statistics
     
   def elapsed=(value)  # The setter method for @elapsedkeycheck
     @elapsed =  value
+  end
+  
+  def happy_hour_elapsed=(value)  # The setter method for @uptime
+    @happy_hour_elapsed =  value
   end
     
   def uptime=(value)  # The setter method for @uptime
@@ -395,11 +399,10 @@ class StatisticsDao
     return result[0]
   end
         
-  def savestats(dto)
-    
-    sql = "UPDATE `stats` SET elapsed_key_check_interval=?,up_time=? WHERE id=1"
+  def savestats(dto)    
+    sql = "UPDATE `stats` SET elapsed_key_check_interval=?,up_time=?,happy_hour_elapsed=? WHERE id=1"
     st = @my.prepare(sql)
-    st.execute(dto.elapsed,dto.uptime)   
+    st.execute(dto.elapsed,dto.uptime,dto.happy_hour_elapsed)   
     st.close    
   end
     
@@ -408,8 +411,9 @@ class StatisticsDao
     while row = stmt.fetch do
       dto = Statistics.new
       dto.id = row[0]
-      dto.elapsed= row[1]
+      dto.elapsed= row[1]      
       dto.uptime=row[2]              
+      dto.happy_hour_elapsed=row[3]      
       rows << dto  
     end
     return rows

@@ -177,11 +177,11 @@ class SiriProxy::CommandLine
     dbh.query("CREATE TABLE `stats` (
   `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
   `elapsed_key_check_interval` int(255) NOT NULL,
-  `up_time` int(255) NOT NULL,
+  `up_time` int(255) NOT NULL,`happy_hour_elapsed` int(255) NOT NULL     
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;")
     puts "Table Statistics Created"   
-    dbh.query("INSERT INTO `stats` VALUES ('1', '0', '0');")
+    dbh.query("INSERT INTO `stats` VALUES ('1', '0', '0','0');")
     puts "Table Statistics Initialized"   
     
     

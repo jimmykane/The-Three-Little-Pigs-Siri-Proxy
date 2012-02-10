@@ -79,6 +79,16 @@ class SiriProxy
           $statistics=$statisticsDao.getstats()
           $statistics.elapsed+=@timer
           $statistics.uptime+=@timer 
+          $statistics.happy_hour_elapsed+=@timer 
+          
+          #Happy hour enabler
+          if $statistics.happy_hour_elapsed > $APP_CONFIG.happy_hour_countdown and ($APP_CONFIG.enable_auto_key_ban=='ON' or $APP_CONFIG.enable_auto_key_ban=='on')
+            $keyDao.unban_keys
+            $statistics.happy_hour_elapsed=0
+            puts "[Happy hour - SiriProxy] Unbanning Keys and Doors are open"
+          end
+          
+          #KeyLoad DropDown
           if $statistics.elapsed>$conf.keyload_dropdown_interval            
             @overloaded_keys_count=$keyDao.findoverloaded().count
             if (@overloaded_keys_count>0)
@@ -92,6 +102,7 @@ class SiriProxy
             end
             $statistics.elapsed=0           
           end
+          
           $statisticsDao.savestats($statistics)        
           $conf.active_connections = EM.connection_count          
           $confDao.update($conf)

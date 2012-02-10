@@ -11,9 +11,12 @@ db_database: 'siri'
 
 #Programm options
 #1. Auto Key Ban -> When a key cannot create more assistants then it is marked as banned,
-# and wont be used for creating assistants in apple db 
-# Default = ON , Recommended='ON'
-
+# and wont be used for creating assistants in apple db. This doesnt imply that the key is banned though :-)
+# Just a precation measure
+# Default = ON , Recommended='ON' 
+# Also if this is set to on there is a happy_hour_countdown that when is reached sets the keys unbanned again
+# Defalut 6 hours = 21600 sec
+happy_hour_countdown: 21600
 enable_auto_key_ban: 'ON'
 
 #For Generating Certs for iPhones. Has 2 hosts, so that you can use guzzoni on a 4S, 
