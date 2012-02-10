@@ -608,9 +608,9 @@ class SiriProxy::Connection < EventMachine::Connection
             puts "[Info - SiriProxy] Device has assistantId: #{object["properties"]["assistantId"]}"
             puts "[Info - SiriProxy] Device has speechID: #{object["properties"]["speechId"]}" 
           end                    
-          #Lets record the assistants. 
+          #Lets record the assistants, and verify users
           if  object["class"]=="AssistantCreated" and self.other_connection.key != nil   and self.other_connection.client!=nil and self.other_connection.createassistant==true
-            puts "Creating new Assistant"
+            puts "[Info - SiriProxy] Creating new Assistant..."
             @assistant=Assistant.new
             @assistant.assistantid=object["properties"]["assistantId"]
             @assistant.speechid=object["properties"]["speechId"]
@@ -624,10 +624,8 @@ class SiriProxy::Connection < EventMachine::Connection
               
             else
               
-              #  $assistantDao.createassistant(@assistant)
-              #puts "[Info - SiriProxy] Created Assistantid #{@assistant.assistantid} using key [#{self.other_connection.key.id}]"              
               @oldclient=$clientsDao.check_duplicate(self.other_connection.client)
-              #pp @oldclient
+
               if @oldclient==nil
                 
                 # pp self.other_connection.client 
@@ -637,7 +635,9 @@ class SiriProxy::Connection < EventMachine::Connection
                 puts "[Client - SiriProxy] Created Assistant ID  #{@assistant.assistantid} using key [#{self.other_connection.key.id}]"              
                 puts "[Client - SiriProxy] NEW Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"              
                 
-              else               
+              else 
+                @oldclient.fname=@client.fname
+                @oldclient.nickname=@client.nickname #in case he changes this      
                 $clientsDao.update(@oldclient)
                 @assistant.client_apple_account_id=@oldclient.appleAccountid
                 $assistantDao.createassistant(@assistant)

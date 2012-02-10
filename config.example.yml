@@ -25,6 +25,11 @@ ca_name: 'SiriProxyCA'
 server1: 'guzzoni.apple.com'
 server2: 'your.siri.proxy.server.com'
 
+#Private or public server. The difference is that public automaticaly sets new clients as valid and private as invalid
+# thus denying access
+private_server: 'OFF'
+
+
 #For your email configuration. Edit to your email address and set send_email to 'ON'. 
 #Also plase notice that you have to configure sendmail for you pc if its required
 #It is possible that this email will be delivered to your spam/junk folder.
