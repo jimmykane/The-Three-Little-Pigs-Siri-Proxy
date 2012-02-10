@@ -370,9 +370,10 @@ class SiriProxy::Connection < EventMachine::Connection
     unpacked = unzipped_input[0...5].unpack('H*').first
     #the problem here is that the packet is now complete or something unknown for the match!
     #if first character is 0
-    unpacked="0400000001" if unpacked=="04000000" # its the value that couses the bug! Will treat it as ping pong!!! Hope this resolves this
+    
+    unpacked="0400000001" if !unpacked.match(/^0(.)(.{8})$/) # its the value that couses the bug! Will treat it as ping pong!!! Hope this resolves this
     #fingers crossed    
-    info = unpacked.match(/^0(.)(.{8})$/) #some times this doesnt match! 
+    info = unpacked.match(/^0(.)(.{8})$/) #some times this doesnt match! needs 10 chars !!!
    
     if unpacked==nil
       $stderr.puts "bug flash on unpacked"     
