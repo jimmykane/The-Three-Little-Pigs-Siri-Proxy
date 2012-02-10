@@ -636,8 +636,8 @@ class SiriProxy::Connection < EventMachine::Connection
                 puts "[Client - SiriProxy] NEW Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"              
                 
               else 
-                @oldclient.fname=@client.fname
-                @oldclient.nickname=@client.nickname #in case he changes this      
+                @oldclient.fname=self.other_connection.client.fname
+                @oldclient.nickname=self.other_connection.client.nickname #in case he changes this      
                 $clientsDao.update(@oldclient)
                 @assistant.client_apple_account_id=@oldclient.appleAccountid
                 $assistantDao.createassistant(@assistant)
