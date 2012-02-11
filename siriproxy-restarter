@@ -2,7 +2,7 @@
 while true; 
 do 
 echo "Starting Server"
-    if siriproxy-expr server; then
+    if siriproxy server; then
        echo "[Info - SiriProxy] Pausing for 30 seconds" 
        sleep 30
     else
