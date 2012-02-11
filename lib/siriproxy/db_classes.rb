@@ -192,7 +192,7 @@ class KeyDao
 	end
 
   def unban_keys()
-    sql = "UPDATE `keys` SET banned='False' WHERE expired='True'"
+    sql = "UPDATE `keys` SET banned='False' WHERE expired='False'"
 		st = @my.prepare(sql)
 		st.execute()
 		st.close		

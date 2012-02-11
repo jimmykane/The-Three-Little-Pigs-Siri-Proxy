@@ -67,13 +67,13 @@ class ClientsDao
 		st.close
 	end
 
-	def find(dto)
-		sql = "SELECT * FROM `clients` WHERE id=?"
+	def find_by_assistant(dto)
+		sql = "SELECT * FROM `clients` WHERE apple_account_id=? LIMIT 1" #put the limit on in case of colision
 		st = @my.prepare(sql)
-		st.execute(dto.id)
+		st.execute(dto.client_apple_account_id)
 		result = fetchResults(st)
  		st.close
-    return result
+    return result[0]
 	end
 
 	

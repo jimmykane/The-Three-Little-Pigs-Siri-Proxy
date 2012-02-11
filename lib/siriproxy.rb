@@ -14,7 +14,16 @@ end
 
 class SiriProxy
   
-  def initialize()
+  def initialize()  
+    #Lets make the Ctrl+C a little more user friendly
+    trap("INT") {quit_on_int} 
+    def quit_on_int 
+      puts "\nTerminating TLP version [#{SiriProxy::VERSION}]"
+      puts "Done, bye bye!!!"
+      exit 
+    end
+    
+    
     # @todo shouldnt need this, make centralize logging instead
     $LOG_LEVEL = $APP_CONFIG.log_level.to_i
     #Version support added
@@ -63,6 +72,12 @@ class SiriProxy
       puts '[Info - SiriProxy] Email notifications are [OFF]!'
     end    
     
+    #Print the server if its publc or not 
+    if $APP_CONFIG.private_server=="ON" or $APP_CONFIG.private_server=="on" 
+      puts '[Info - SiriProxy] Private Server [ON]!'
+    else
+      puts '[Info - SiriProxy] Private Server [OFF]!'
+    end
     #Start The EventMacine
     EventMachine.run do
       begin

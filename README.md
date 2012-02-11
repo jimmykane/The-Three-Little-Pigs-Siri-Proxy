@@ -36,6 +36,43 @@ Solution 2: Use other iPhone4s DATA
 
 
 
+Version 0.9.8-expr (This is a beta release! More work is needed)
+------------------
+
+-Public and private mode
+
+-Authorization :-) -> Requires the client to have an apple account! (97% have!!!) Read here on how to use (http://quartzcoding.blogspot.com/2012/02/three-little-pigs-authentication-system.html)
+
+-Ban Detection. Detects witch keys cannot create more assistants and sets them as banned. Read what this is here (http://quartzcoding.blogspot.com/2012/02/three-little-pigs-authentication-system.html)
+
+-Improved grabber. Now the connection limit wont apply on the 4S devices. Max active connections reached? No problem! :-) 
+
+-Improved Connection dropping
+
+-Now stores counters in database so even after a crash the keyload dropdown works
+
+-Happy hour. When this timers is reached then sets the keys as unbanned in order for new people to connect. Mostly useful by public servers.
+
+-Many many many bug fixes, almost everything reported in github!!!
+
+
+**Updating from previous versions**
+
+- Just download the experimental branch into a new folder using
+
+    `git clone -b experimental https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy`
+
+- Copy the new config to `~/.siriproxy/` and edit it to your needs
+
+- Do a rake install and a bundle again
+
+    `rake install && siriproxy bundle`
+
+- Regenerate all tables (Warning this will erase everything in the Database so make sure you backup your keys and settings)
+
+    `siriproxy gentables`
+
+
 Version 0.9ba
 -------------
 
@@ -119,6 +156,20 @@ There is no need to do anything more (create db etc) than these steps
 Features
 --------
 
+-Authentication 
+
+-Ban protection
+
+-Improved statistics
+
+-User device logging
+
+-User logging
+
+-Improved connection limits 
+
+-Improved Grabber
+
 -Plugins api and config capable (NEW)
 
 -Email Notifications when the key expires (NEW) - Dont forget to setup your email on the config.yml
@@ -156,9 +207,11 @@ Set-up Instructions
 
 **Tutorial for Ubuntu is now here**
 
-Thanks to am3yrus we have a tutorial for ubuntu lovers: [http://am3yrus.over-blog.com/]
+Thanks to am3yrus we have a tutorial for ubuntu lovers: [http://www.am3yrus.com/]
 
-If you go for the above tutorial then there is no need to follow any instructions below. 
+If you go for the above tutorial then there is no need to follow any instructions below.  
+
+Also the above site holds different setup instructions
 
 
 
@@ -366,6 +419,8 @@ Acknowledgements
 **Credits, greetings and big thanks to all the following.. RESPECT**
 
 Mr. Nirodimos for helping with the iphone4s 
+
+  @Appdium For explaining the Siri protocol and cracking it! 
 
   @plamoni ([http://twitter.com/plamoni])
 

@@ -95,6 +95,8 @@ class SiriProxy::Connection < EventMachine::Connection
       else
         $keyDao.insert(key4s)
         puts "[Info - SiriProxy] Keys written to Database"        
+        $keyDao.unban_keys #unBan because a key was inserted! should spoof enough
+        puts "[Info - SiriProxy] New Key added and keys set to unbanned"         
       end
     else
       puts "[Info - SiriProxy] Something went wrong. Please file this bug. Key NOT saved!"
@@ -110,7 +112,7 @@ class SiriProxy::Connection < EventMachine::Connection
         @key=Key.new     
         @available_keys=$keyDao.list_keys_for_new_assistant().count
         if (@available_keys) > 0
-          puts "[Key - SiriProxy] Keys available for NEW Clients!!! [#{@available_keys}]"
+          puts "[Key - SiriProxy] Keys available for Creation of Assistants [#{@available_keys}]"
           @key=$keyDao.next_available_for_new_assistant()
           puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data" 
           puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
@@ -138,6 +140,44 @@ class SiriProxy::Connection < EventMachine::Connection
           puts @loadedassistant
           puts @loadedspeechid
         end
+        #Lets put some auth here!!!
+        #if the assistant that the client is trying to load is not registered (was not created on this server)
+        #or if the client is not valid then protection gets on the way
+        if $APP_CONFIG.private_server=="ON" or  $APP_CONFIG.private_server=="on" #if its a private one
+          @userassistant=Assistant.new
+          @userassistant.assistantid=@loadedassistant
+          @userassistant.speechid=@loadedspeechid
+          @userassistant=$assistantDao.check_duplicate(@userassistant)  #check if there is a registerd assistant
+          
+          if  @userassistant!=nil #If there is one then
+            
+            puts "[Authentication - SiriProxy] Registered Assistant Found "
+            @user=$clientsDao.find_by_assistant(@userassistant) #find the user with that assistant
+            pp @user
+            if @user==nil #Incase this user doesnt exist!!!!!!! Bug or not complete transaction
+              puts "[Authentication - SiriProxy] No client for Assistant [#{@loadedassistant}]  Found :-("
+              self.validationData_avail = false
+              self.close_connection() #close connections
+              self.other_connection.close_connection() #close other
+            end
+            
+            if @user.valid=='False' 
+              puts "[Authentication - SiriProxy] Access Denied!! -> Client name:[#{@user.fname}] nickname[#{@user.nickname}] appleid[#{@user.appleAccountid}] Connected "
+              self.validationData_avail = false
+              self.close_connection() #close connections
+              self.other_connection.close_connection() #close other
+            else
+              puts "[Authentication - SiriProxy] Access Granted! -> Client name:[#{@user.fname}] nickname[#{@user.nickname}] appleid[#{@user.appleAccountid}] Connected "
+            end
+            
+          else #if no assistant registed found
+            puts "[Authentication - SiriProxy] Assistant [#{@loadedassistant}] is not registered. Banning Connection"
+            self.validationData_avail = false
+            self.close_connection() #close connections
+            self.other_connection.close_connection() #close other
+          end
+        end
+        
         @key=Key.new
         @available_keys=$keyDao.listkeys().count      
         if (@available_keys) > 0
@@ -159,7 +199,8 @@ class SiriProxy::Connection < EventMachine::Connection
           self.other_connection.close_connection() #close other
         end
       end
-    rescue SystemCallError,NoMethodError
+      #rescue SystemCallError,NoMethodError
+    rescue SystemCallError
       puts "[ERROR - SiriProxy] Error opening the sessionValidationData  file. Connect an iPhone4S first or create them manually!"
     end
 	end  
@@ -388,7 +429,7 @@ class SiriProxy::Connection < EventMachine::Connection
     end
     if info!=nil #lets hope for the magic fix
       if(info[1] == "3" || info[1] == "4"  ) #Ping or pong -- just get these out of the way (and log them for good measure)
-        puts "Ping Pong #{unpacked}"
+        #puts "Ping Pong #{unpacked}"
         object = unzipped_input[0...5]
       
         #debug
@@ -420,7 +461,7 @@ class SiriProxy::Connection < EventMachine::Connection
   
   
   def parse_object(object_data)
-    plist = CFPropertyList::List.new(:data => object_data)    
+    plist = CFPropertyList::List.new(:data => object_data)    #here is another bug sometimes
     object = CFPropertyList.native_types(plist.value)
     
     object
@@ -490,7 +531,7 @@ class SiriProxy::Connection < EventMachine::Connection
       
       #=begin      
       #Lets capture the unique ids for every appleid
-      if object["class"]=="SetAssistantData" and self.validationData_avail==true #check this against validation 
+      if object["class"]=="SetAssistantData" and self.validationData_avail==true #check this against validation  for the 4s 
         #this changes by language change also. Please consider re code
         pp object
         #work to be done here
@@ -517,29 +558,64 @@ class SiriProxy::Connection < EventMachine::Connection
           @client.appleDBid="NA"
         end
         
-        if  object["properties"]!=nil and object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil and object["properties"]["abSources"]!=nil 
+        if object["properties"]["abSources"]!=nil and object["properties"]["abSources"][0] and object["properties"]["abSources"][0]["properties"] and object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil 
           @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["accountIdentifier"]
         else
           @client.appleAccountid="NA"
         end
-        
-        @client.valid="True"        
+        @client.valid="True" #needed if config in empy for the below
+        @client.valid="False" if $APP_CONFIG.private_server=="ON" or $APP_CONFIG.private_server=="on"     
+        @client.valid="True" if $APP_CONFIG.private_server=="OFF" or $APP_CONFIG.private_server=="off"
+        #this must not be updated in onld clients from here
         #pp @client    
+               
+        #Lets put some auth here Log the clients even though they may not have access
+        if @createassistant==true and @client!=nil 
+          puts 'Debug Step one of creating assistants'
+          pp object
+          @oldclient=$clientsDao.check_duplicate(@client)
+          pp @oldclient
+          if @oldclient==nil                   
+            $clientsDao.insert(@client)
+            puts "[Client - SiriProxy] NEW Client [#{@client.appleAccountid}] and Valid=[#{@client.valid}] added To database"
+            if @client.valid!='True' 
+              self.close_connection()
+              self.other_connection.close_connection()   
+              self.validationData_avail=false #extra protection on alive packets
+              puts "[Authentication - Siriproxy] NEW Client [#{@client.appleAccountid}] is not Valid. Access denied!!!"
+              puts "[Authentication - Siriproxy] Dropping Connection"
+              return nil
+            end    
+          else            
+            @oldclient.fname=@client.fname
+            @oldclient.nickname=@client.nickname #in case he changes this            
+            $clientsDao.update(@oldclient)
+            puts "[Client - SiriProxy] OLD Client changed settings [#{@oldclient.appleAccountid}]"              
+            if @oldclient.valid!='True'  and ($APP_CONFIG.private_server=="ON" or  $APP_CONFIG.private_server=="on")
+              self.close_connection()
+              self.other_connection.close_connection()   
+              self.validationData_avail=false #extra protection on alive packets
+              puts "[Authentication - Siriproxy] OLD Client [#{@client.appleAccountid}] is not Valid. Access denied!!!"
+              puts "[Authentication - Siriproxy] Dropping Connection"
+              return nil
+            end
+          end
+        end
+        #end of here
+        
         
         #changing and connecting
-        if  @client!=nil and @loadedassistant!=nil and @loadedassistant!=""#will not enter here if creating!
+        if  @client!=nil and @loadedassistant!=nil and @loadedassistant!="" and @createassistant==false #will not enter here if creating!
           #need to get in here if changing upon creation is needed
           puts "passed"
           pp object
           @oldclient=$clientsDao.check_duplicate(@client)
           pp @oldclient
-          if @oldclient==nil        
-           
+          if @oldclient==nil #should never get in here exept on public                   
             $clientsDao.insert(@client)
             puts "[Client - SiriProxy] NEW Client changed settings [#{@client.appleAccountid}] With Assistantid [#{@loadedassistant}]"              
                 
-          else
-            
+          else            
             @oldclient.fname=@client.fname
             @oldclient.nickname=@client.nickname #in case he changes this            
             $clientsDao.update(@oldclient)
@@ -609,6 +685,8 @@ class SiriProxy::Connection < EventMachine::Connection
             puts "[Info - SiriProxy] Device has speechID: #{object["properties"]["speechId"]}" 
           end                    
           #Lets record the assistants, and verify users
+          #will not get in here if the private is on and user is not valid
+          #Also i know that the users are already checked but the double check comes only due to that i didnt have time to clean this up
           if  object["class"]=="AssistantCreated" and self.other_connection.key != nil   and self.other_connection.client!=nil and self.other_connection.createassistant==true
             puts "[Info - SiriProxy] Creating new Assistant..."
             @assistant=Assistant.new
@@ -643,6 +721,7 @@ class SiriProxy::Connection < EventMachine::Connection
                 $assistantDao.createassistant(@assistant)
                 puts "[Client - SiriProxy] Created Assistant ID #{@assistant.assistantid} using key [#{self.other_connection.key.id}]"              
                 puts "[Client - SiriProxy] OLD Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"              
+               
               end
             end
           end
