@@ -27,7 +27,7 @@ server2: 'your.siri.proxy.server.com'
 
 #Private or public server. The difference is that public automaticaly sets new clients as valid and private as invalid
 # thus denying access
-private_server: 'OFF'
+private_server: 'ON'
 
 
 #For your email configuration. Edit to your email address and set send_email to 'ON'. 
