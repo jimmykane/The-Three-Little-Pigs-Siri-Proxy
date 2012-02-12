@@ -78,6 +78,11 @@ class SiriProxy
     else
       puts '[Info - SiriProxy] Private Server [OFF]!'
     end
+    #Set default to revent errors.
+    if $APP_CONFIG.happy_hour_countdown==nil
+      puts '[Info - SiriProxy] Happy Hour Countdown not set in config.yml. Using default'
+      $APP_CONFIG.happy_hour_countdown = 21600
+    end
     #Start The EventMacine
     EventMachine.run do
       begin
