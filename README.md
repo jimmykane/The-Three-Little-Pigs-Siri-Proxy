@@ -40,11 +40,18 @@ Version 0.9.8-expr (This is a beta release! More work is needed)
 
 * Please keep in mind that you need new clients to delete the`assistnat.plist` in `/var/mobile/Library/com.apple.assistant.plist` or chnage Spire host 
 
-* Also they must have a contact card for use with siri that contains the email that use for apple id
+* Also they must have iCloud enabled on their phones!!! -> This on what clients are unique!!!!
 
 * Always reboot after that!!!
 
+* You can also run the server with the following command for less verbose output in the terminal and error logging
 
+     ./siriproxy-restarter 2> error2.log | grep -E 'Processing|NEW Client|OLD Client|RollEyes|Assistant ID|nickname|Happy hour'
+
+
+
+**New Features**
+ 
 
 * Public and private mode
 
