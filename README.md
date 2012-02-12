@@ -38,6 +38,12 @@ Solution 2: Use other iPhone4s DATA
 Version 0.9.8-expr (This is a beta release! More work is needed)
 ----------------------------------------------------------------
 
+
+* Please keep in mind that you need new clients to delete the`assistnat.plist` in `/var/mobile/Library/com.apple.assistant.plist` or chnage Spire host 
+
+*Always reboot after that!!!
+
+
 * Public and private mode
 
 * Authorization :-) -> Requires the client to have an apple account! (97% have!!!) Read here on how to use (http://quartzcoding.blogspot.com/2012/02/three-little-pigs-authentication-system.html)
