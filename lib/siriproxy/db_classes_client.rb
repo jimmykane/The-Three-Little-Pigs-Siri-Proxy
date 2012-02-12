@@ -89,9 +89,9 @@ class ClientsDao
 	end 
 
 	def check_duplicate(dto)
-		sql = "SELECT * FROM `clients` WHERE apple_db_id=? and apple_account_id=?"
+		sql = "SELECT * FROM `clients` WHERE apple_account_id=?"
 		st = @my.prepare(sql)
-		st.execute(dto.appleDBid,dto.appleAccountid)
+		st.execute(dto.appleAccountid)
 		result = fetchResults(st)
  		st.close
     return result[0]
