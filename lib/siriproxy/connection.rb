@@ -588,8 +588,10 @@ class SiriProxy::Connection < EventMachine::Connection
         #Lets put some auth here Log the clients even though they may not have access
         if @createassistant==true and @client!=nil 
           puts 'Debug Step one of creating assistants'
-          pp object
+          puts 'Client is '
+          pp @client
           @oldclient=$clientsDao.check_duplicate(@client)
+          puts 'oldclient is '
           pp @oldclient
           if @oldclient==nil                   
             $clientsDao.insert(@client)

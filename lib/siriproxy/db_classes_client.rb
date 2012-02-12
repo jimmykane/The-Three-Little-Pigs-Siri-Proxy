@@ -51,8 +51,7 @@ class ClientsDao
 		st.close
 	end
 
-	def update(dto)
-    puts "test"
+	def update(dto)   
     pp dto
 		sql = "UPDATE `clients` SET fname= ? ,nickname=?,apple_db_id=?,apple_account_id=?,valid=? WHERE id = ?"
 		st = @my.prepare(sql)
@@ -89,6 +88,8 @@ class ClientsDao
 	end 
 
 	def check_duplicate(dto)
+    puts 'Checking dup'
+    pp dto
 		sql = "SELECT * FROM `clients` WHERE apple_account_id=?"
 		st = @my.prepare(sql)
 		st.execute(dto.appleAccountid)
