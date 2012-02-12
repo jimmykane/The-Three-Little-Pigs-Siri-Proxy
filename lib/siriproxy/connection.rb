@@ -574,9 +574,12 @@ class SiriProxy::Connection < EventMachine::Connection
           @client.appleDBid="NA"
         end
         
-        if object["properties"]["abSources"]!=nil and object["properties"]["abSources"][0] and object["properties"]["abSources"][0]["properties"] and object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil 
-          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["accountIdentifier"]
+        if object["properties"]["abSources"]!=nil and object["properties"]["abSources"][0]!=nil and object["properties"]["abSources"][0]["properties"]!=nil and (object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil or  (object["properties"]["abSources"][0]["properties"]["properties"]!=nil and object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"]!=nil) 
+          puts 'Debug found Icloud'
+          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["accountIdentifier"] if object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil
+          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"] if object["properties"]["abSources"][0]["properties"]["properties"] and object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"]!=nil
         else
+          puts 'Fell into nil'
           @client.appleAccountid="NA"
         end
         @client.valid="True" #needed if config in empy for the below
