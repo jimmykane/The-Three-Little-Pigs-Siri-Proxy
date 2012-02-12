@@ -158,17 +158,21 @@ class SiriProxy::Connection < EventMachine::Connection
               @user=$clientsDao.find_by_assistant(@userassistant) #find the user with that assistant
               pp @user
               if @user==nil #Incase this user doesnt exist!!!!!!! Bug or not complete transaction
+                
                 puts "[Authentication - SiriProxy] No client for Assistant [#{@loadedassistant}]  Found :-("
                 self.validationData_avail = false
                 self.close_connection() #close connections
                 self.other_connection.close_connection() #close other
-              end
-            
-              if @user.valid=='False' 
+                return false
+                
+              elsif @user.valid=='False' 
+                
                 puts "[Authentication - SiriProxy] Access Denied!! -> Client name:[#{@user.fname}] nickname[#{@user.nickname}] appleid[#{@user.appleAccountid}] Connected "
                 self.validationData_avail = false
                 self.close_connection() #close connections
                 self.other_connection.close_connection() #close other
+                return false
+                
               else
                 puts "[Authentication - SiriProxy] Access Granted! -> Client name:[#{@user.fname}] nickname[#{@user.nickname}] appleid[#{@user.appleAccountid}] Connected "
               end
@@ -178,6 +182,7 @@ class SiriProxy::Connection < EventMachine::Connection
               self.validationData_avail = false
               self.close_connection() #close connections
               self.other_connection.close_connection() #close other
+              return false
             end
           end
         
