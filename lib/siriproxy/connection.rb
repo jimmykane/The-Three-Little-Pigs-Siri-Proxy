@@ -95,8 +95,11 @@ class SiriProxy::Connection < EventMachine::Connection
       else
         $keyDao.insert(key4s)
         puts "[Info - SiriProxy] Keys written to Database"        
+        #also unban all keys available.
+        if $APP_CONFIG.private_server=="ON" or  $APP_CONFIG.private_server=="on"
         $keyDao.unban_keys #unBan because a key was inserted! should spoof enough
         puts "[Info - SiriProxy] New Key added and keys set to unbanned"         
+        end
       end
     else
       puts "[Info - SiriProxy] Something went wrong. Please file this bug. Key NOT saved!"
