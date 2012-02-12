@@ -97,8 +97,8 @@ class SiriProxy::Connection < EventMachine::Connection
         puts "[Info - SiriProxy] Keys written to Database"        
         #also unban all keys available.
         if $APP_CONFIG.private_server=="ON" or  $APP_CONFIG.private_server=="on"
-        $keyDao.unban_keys #unBan because a key was inserted! should spoof enough
-        puts "[Info - SiriProxy] New Key added and keys set to unbanned"         
+          $keyDao.unban_keys #unBan because a key was inserted! should spoof enough
+          puts "[Info - SiriProxy] New Key added and keys set to unbanned"         
         end
       end
     else
@@ -573,15 +573,32 @@ class SiriProxy::Connection < EventMachine::Connection
           @client.nickname="NA"
           @client.appleDBid="NA"
         end
-        
-        if object["properties"]["abSources"]!=nil and object["properties"]["abSources"][0]!=nil and object["properties"]["abSources"][0]["properties"]!=nil and (object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil or  ( object["properties"]["abSources"][0]["properties"]["properties"]!=nil and object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"]!=nil )) 
-          puts 'Debug found Icloud'
-          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["accountIdentifier"] if object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil
-          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"] if object["properties"]["abSources"][0]["properties"]["properties"] and object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"]!=nil
-        else
-          puts 'Fell into nil'
-          @client.appleAccountid="NA"
+        #arg i will solve this 
+        #the absources can contain more than icloud id and thus not just one row is available !!!!!
+        if object["properties"]["abSources"]!=nil
+          puts   @absources_count=object["properties"]["abSources"].count
+         
+          for i in (0...@absources_count)
+            if object["properties"]["abSources"][i]["properties"]!=nil and object["properties"]["abSources"][i]["properties"]["accountName"]!=nil and object["properties"]["abSources"][i]["properties"]["accountName"]="Card" and object["properties"]["abSources"][i]["properties"]["accountIdentifier"]!=nil
+              puts "test"
+              puts i
+              puts object["properties"]["abSources"][i]["properties"]["accountIdentifier"]
+               @client.appleAccountid=object["properties"]["abSources"][i]["properties"]["accountIdentifier"]
+            end
+          end
         end
+        
+        @client.appleAccountid="NA" if @client.appleAccountid==nil
+        
+#        if object["properties"]["abSources"]!=nil and object["properties"]["abSources"][0]!=nil and object["properties"]["abSources"][0]["properties"]!=nil and (object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil or  ( object["properties"]["abSources"][0]["properties"]["properties"]!=nil and object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"]!=nil )) 
+#          puts 'Debug found Icloud'
+#          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["accountIdentifier"] if object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil
+#          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"] if object["properties"]["abSources"][0]["properties"]["properties"] and object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"]!=nil
+#        else
+#          puts 'Fell into nil'
+#          @client.appleAccountid="NA"
+#        end
+
         @client.valid="True" #needed if config in empy for the below
         @client.valid="False" if $APP_CONFIG.private_server=="ON" or $APP_CONFIG.private_server=="on"     
         @client.valid="True" if $APP_CONFIG.private_server=="OFF" or $APP_CONFIG.private_server=="off"
