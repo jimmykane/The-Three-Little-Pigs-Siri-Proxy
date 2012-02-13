@@ -87,9 +87,7 @@ class ClientsDao
 		
 	end 
 
-	def check_duplicate(dto)
-    puts 'Checking dup'
-    pp dto
+	def check_duplicate(dto)   
 		sql = "SELECT * FROM `clients` WHERE apple_account_id=?"
 		st = @my.prepare(sql)
 		st.execute(dto.appleAccountid)

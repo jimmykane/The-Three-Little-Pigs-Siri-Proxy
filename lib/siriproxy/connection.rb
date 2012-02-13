@@ -536,10 +536,10 @@ class SiriProxy::Connection < EventMachine::Connection
       #Check if the key cannot create any more assistants and set it as banned 
       #ADDED Option in config file for this
       if $APP_CONFIG.enable_auto_key_ban=='ON' or $APP_CONFIG.enable_auto_key_ban=='on'
-        if object["class"]=="CommandFailed"
+        if object["class"]=="CommandFailed" 
           puts "[Warning - SiriProxy] Command Failed refid #{object["refId"]} and Creating? #{self.other_connection.createassistant}"
-        end
-        if object["class"]=="CommandFailed" and self.other_connection.createassistant and self.other_connection.key!=nil #lets check if a key got banned!
+        end#should join these
+        if object["class"]=="CommandFailed" and self.other_connection.createassistant and self.other_connection.key!=nil 
           $keyDao.key_banned(self.other_connection.key)       
           puts "[Warning - SiriProxy] The key [#{self.other_connection.key.id}] Marked as Banned! Still serving with validation..." 
         end
@@ -549,25 +549,50 @@ class SiriProxy::Connection < EventMachine::Connection
       #Lets capture the unique ids for every appleid
       if object["class"]=="SetAssistantData" and self.validationData_avail==true #check this against validation  for the 4s 
         #this changes by language change also. Please consider re code
-        pp object
+        pp object if $LOG_LEVEL > 2
         #work to be done here
-        @client=Client.new        
+        @client=Client.new     
+        
         if object["properties"]["meCards"]!=nil
-          if object["properties"]["meCards"][0]["properties"]["firstName"]!=nil 
-            @client.fname=object["properties"]["meCards"][0]["properties"]["firstName"] 
-          else
-            @client.fname="NA"
-          end
-          if object["properties"]["meCards"][0]["properties"]["nickName"]!=nil 
-            @client.nickname=object["properties"]["meCards"][0]["properties"]["nickName"]
-          else
-            @client.nickname="NA"
-          end
-          if object["properties"]["meCards"][0]["properties"]["identifier"]!=nil 
-            @client.appleDBid=object["properties"]["meCards"][0]["properties"]["identifier"]
-          else
-            @client.appleDBid="NA"
-          end
+          
+          @mecards_count=object["properties"]["meCards"].count
+          for i in (0...@mecards_count)
+            if object["properties"]["meCards"][i]["properties"]!=nil 
+              if object["properties"]["meCards"][i]["properties"]["firstName"]!=nil
+                @client.fname=object["properties"]["meCards"][i]["properties"]["firstName"]            
+              else            
+                @client.fname="NA"                
+              end
+              if object["properties"]["meCards"][i]["properties"]["nickName"]!=nil 
+                @client.nickname=object["properties"]["meCards"][i]["properties"]["nickName"]
+              else
+                @client.nickname="NA"
+              end
+              if object["properties"]["meCards"][i]["properties"]["identifier"]!=nil 
+                @client.appleDBid=object["properties"]["meCards"][i]["properties"]["identifier"]
+              else
+                @client.appleDBid="NA"
+              end  
+            end 
+          end     
+          
+          #          if object["properties"]["meCards"][0]["properties"]["firstName"]!=nil #may have more than one me cards
+          #            @client.fname=object["properties"]["meCards"][0]["properties"]["firstName"]
+          #            
+          #          else
+          #            
+          #            @client.fname="NA"
+          #          end
+          #          if object["properties"]["meCards"][0]["properties"]["nickName"]!=nil 
+          #            @client.nickname=object["properties"]["meCards"][0]["properties"]["nickName"]
+          #          else
+          #            @client.nickname="NA"
+          #          end
+          #          if object["properties"]["meCards"][0]["properties"]["identifier"]!=nil 
+          #            @client.appleDBid=object["properties"]["meCards"][0]["properties"]["identifier"]
+          #          else
+          #            @client.appleDBid="NA"
+          #          end
         else
           @client.fname="NA"
           @client.nickname="NA"
@@ -576,28 +601,31 @@ class SiriProxy::Connection < EventMachine::Connection
         #arg i will solve this 
         #the absources can contain more than icloud id and thus not just one row is available !!!!!
         if object["properties"]["abSources"]!=nil
-          puts   @absources_count=object["properties"]["abSources"].count
-         
+          @absources_count=object["properties"]["abSources"].count #count how many sources the object may have
+          
           for i in (0...@absources_count)
+            
             if object["properties"]["abSources"][i]["properties"]!=nil and object["properties"]["abSources"][i]["properties"]["accountName"]!=nil and object["properties"]["abSources"][i]["properties"]["accountName"]="Card" and object["properties"]["abSources"][i]["properties"]["accountIdentifier"]!=nil
-              puts "test"
-              puts i
-              puts object["properties"]["abSources"][i]["properties"]["accountIdentifier"]
-               @client.appleAccountid=object["properties"]["abSources"][i]["properties"]["accountIdentifier"]
+             
+              puts object["properties"]["abSources"][i]["properties"]["accountIdentifier"] if $LOG_LEVEL > 2
+              @client.appleAccountid=object["properties"]["abSources"][i]["properties"]["accountIdentifier"]
+               
             end
+            
           end
+          
         end
         
         @client.appleAccountid="NA" if @client.appleAccountid==nil
         
-#        if object["properties"]["abSources"]!=nil and object["properties"]["abSources"][0]!=nil and object["properties"]["abSources"][0]["properties"]!=nil and (object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil or  ( object["properties"]["abSources"][0]["properties"]["properties"]!=nil and object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"]!=nil )) 
-#          puts 'Debug found Icloud'
-#          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["accountIdentifier"] if object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil
-#          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"] if object["properties"]["abSources"][0]["properties"]["properties"] and object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"]!=nil
-#        else
-#          puts 'Fell into nil'
-#          @client.appleAccountid="NA"
-#        end
+        #        if object["properties"]["abSources"]!=nil and object["properties"]["abSources"][0]!=nil and object["properties"]["abSources"][0]["properties"]!=nil and (object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil or  ( object["properties"]["abSources"][0]["properties"]["properties"]!=nil and object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"]!=nil )) 
+        #          puts 'Debug found Icloud'
+        #          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["accountIdentifier"] if object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil
+        #          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"] if object["properties"]["abSources"][0]["properties"]["properties"] and object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"]!=nil
+        #        else
+        #          puts 'Fell into nil'
+        #          @client.appleAccountid="NA"
+        #        end
 
         @client.valid="True" #needed if config in empy for the below
         @client.valid="False" if $APP_CONFIG.private_server=="ON" or $APP_CONFIG.private_server=="on"     
@@ -607,9 +635,9 @@ class SiriProxy::Connection < EventMachine::Connection
                
         #Lets put some auth here Log the clients even though they may not have access
         if @createassistant==true and @client!=nil 
-          puts 'Debug Step one of creating assistants'
-          puts 'Client is '
-          pp @client
+          puts 'Debug Step one of creating assistants' if $LOG_LEVEL > 2
+          puts 'Client is 'if $LOG_LEVEL > 2
+          pp @client if $LOG_LEVEL > 2
           @oldclient=$clientsDao.check_duplicate(@client)
           puts 'oldclient is '
           pp @oldclient
@@ -629,7 +657,7 @@ class SiriProxy::Connection < EventMachine::Connection
             @oldclient.nickname=@client.nickname #in case he changes this            
             $clientsDao.update(@oldclient)
             puts "[Client - SiriProxy] OLD Client changed settings [#{@oldclient.appleAccountid}]"              
-            if @oldclient.valid!='True'  and ($APP_CONFIG.private_server=="ON" or  $APP_CONFIG.private_server=="on")
+            if @oldclient.valid!='True' #make a perm ban
               self.close_connection()
               self.other_connection.close_connection()   
               self.validationData_avail=false #extra protection on alive packets
@@ -645,10 +673,10 @@ class SiriProxy::Connection < EventMachine::Connection
         #changing and connecting
         if  @client!=nil and @loadedassistant!=nil and @loadedassistant!="" and @createassistant==false #will not enter here if creating!
           #need to get in here if changing upon creation is needed
-          puts "passed"
-          pp object
+          puts "passed" if $LOG_LEVEL > 2
+          pp object if $LOG_LEVEL > 2
           @oldclient=$clientsDao.check_duplicate(@client)
-          pp @oldclient
+          pp @oldclient if $LOG_LEVEL > 2
           if @oldclient==nil #should never get in here exept on public                   
             $clientsDao.insert(@client)
             puts "[Client - SiriProxy] NEW Client changed settings [#{@client.appleAccountid}] With Assistantid [#{@loadedassistant}]"              
@@ -732,7 +760,7 @@ class SiriProxy::Connection < EventMachine::Connection
             @assistant.speechid=object["properties"]["speechId"]
             @assistant.key_id=self.other_connection.key.id               
             @assistant.devicetype=self.other_connection.devicetype
-            pp self.other_connection.client
+            pp self.other_connection.client if $LOG_LEVEL > 2
             
             if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
               
@@ -780,7 +808,7 @@ class SiriProxy::Connection < EventMachine::Connection
     new_obj = received_object(object)
     #puts self.name
     if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false 
-      puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to no validation available" if $LOG_LEVEL >= 1      
+      puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to no Validation or Authentication available" if $LOG_LEVEL >= 1      
       puts '[Protection - Siriproxy] Closing both connections...'
       self.close_connection()
       self.other_connection.close_connection()      
