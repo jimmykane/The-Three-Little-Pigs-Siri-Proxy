@@ -41,7 +41,7 @@ Version 0.9.8.2-expr (This is a beta release! More work is needed)
 
 * Added Temporary fix for Expiration of Validation Data! Now keys in database will be checked every 10 minutes and any key found existing in database longer than 24 hours is set to expired! Working on a better fix.
 
-* Added 4S exploit
+* Added 4S exploit tnx for helping @xnlzee, Matthew Lau and @786IC0NIC
 
 ** UPDATE HOW TO **
 
