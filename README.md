@@ -35,6 +35,47 @@ Solution 1: Change IP/Network
 Solution 2: Use other iPhone4s DATA
 
 
+Version 0.9bb
+-------------
+
+* Added Temporary fix for Expiration of Validation Data! Now keys in database will be checked every 10 minutes and any key found existing in database longer than 24 hours is set to expired! Working on a better fix.
+
+* Added 4S exploit
+
+
+** UPDATE HOW TO **
+
+* In the `Three-Little_Pigs` Folder do 
+
+    git pull
+
+    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
+
+    rake install && siriproxy bundle    
+
+-Done
+
+
+
+** The Exploit WARNING!!!! YOU DO THIS ON YOUR OWN RISK. **
+
+* More on 
+
+* Steps 
+
+    0. Requires JailBroken iPhone4s! So do the following
+
+    1. Go to config.yml and set regenarate_interval to how many seconds you want the iPhone4S generate new Validation Data good value is 15 seconds
+
+    2. Delete /var/mobile/Library/Preferences/com.apple.assistant.plist
+
+    3. Connect to the server and make a request. You should see something like -> "[Exploit - SiriProxy] Command send to iPhone4s to regenerate multiple keys every 15 seconds"
+
+    4. Done. Wait 15 seconds and use Siri again! You should have another key in your DB
+
+    5. Repeat as many times you want! 
+
+    To restore just delete again assistant.plist
 
 Version 0.9ba
 -------------

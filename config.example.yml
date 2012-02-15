@@ -3,6 +3,10 @@ port: 443
 #Log level 2 to see whats going on
 log_level: 2
 
+#HOT! THis will force the 4S to regenerate new Validation data every time give Do not use lowe than 15 seconds
+#default response from apple is 90000. Change this to what you please! 12 is a good value
+regenerate_interval: 90000 
+
 #This is your Database config:
 db_host: 'localhost'
 db_user: 'root'

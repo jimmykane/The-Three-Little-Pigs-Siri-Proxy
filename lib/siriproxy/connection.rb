@@ -367,6 +367,16 @@ class SiriProxy::Connection < EventMachine::Connection
     end
     #inject Validation- Grab Validation
     if object["properties"] != nil 
+      
+      
+      #OMG !!!! This is what i needed! Now the 4s creates new keys every 15 secods
+      if object["class"]=="CreateSessionInfoResponse" and object["properties"]["validityDuration"]!=nil and  self.other_connection.is_4S==true 
+        object["properties"]["validityDuration"]=$APP_CONFIG.regenerate_interval #this timer can be customized
+        puts "[Exploit - SiriProxy] Command send to iPhone4s to regenerate multiple keys every [#{$APP_CONFIG.regenerate_interval}] seconds !!!"
+      end
+      
+      
+      
       if object["properties"]["validationData"] !=nil #&& !object["properties"]["validationData"].empty?
         if self.is_4S
           puts "[Info - SiriProxy] Saving iPhone 4S validation Data"          

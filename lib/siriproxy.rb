@@ -59,6 +59,13 @@ class SiriProxy
           conn.plugin_manager.iphone_conn = conn
         }
         puts "Server is Up and Running"
+          @timer2=600 # The expirer
+        
+        #Temp fix and guard to apple not replying command failed
+         EventMachine::PeriodicTimer.new(@timer2){
+            puts "[Expirer - SiriProxy] Expiring past 24 hour Keys"
+           $keyDao.expire_24h_hour_keys
+         }
         EventMachine::PeriodicTimer.new(10){
           $conf.active_connections = EM.connection_count          
           $confDao.update($conf)
