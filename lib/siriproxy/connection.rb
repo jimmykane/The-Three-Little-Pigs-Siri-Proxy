@@ -370,7 +370,7 @@ class SiriProxy::Connection < EventMachine::Connection
       
       
       #OMG !!!! This is what i needed! Now the 4s creates new keys every 15 secods
-      if object["class"]=="CreateSessionInfoResponse" and object["properties"]["validityDuration"]!=nil and  self.other_connection.is_4S==true 
+      if object["class"]=="CreateSessionInfoResponse" and object["properties"]["validityDuration"]!=nil and  self.other_connection.is_4S==true and $APP_CONFIG.regenerate_interval!=nil
         object["properties"]["validityDuration"]=$APP_CONFIG.regenerate_interval #this timer can be customized
         puts "[Exploit - SiriProxy] Command send to iPhone4s to regenerate multiple keys every [#{$APP_CONFIG.regenerate_interval}] seconds !!!"
       end
