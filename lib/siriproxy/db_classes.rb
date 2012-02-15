@@ -184,6 +184,13 @@ class KeyDao
 		st.close		
 	end
   
+  def expire_24h_hour_keys()				
+		sql = "UPDATE `keys` SET expired='TRUE'  WHERE date_added < NOW() -  INTERVAL 1 DAY "
+		st = @my.prepare(sql)
+		st.execute()
+		st.close		
+	end
+  
   def key_banned(dto)				
 		sql = "UPDATE `keys` SET banned='True' WHERE id = ?"
 		st = @my.prepare(sql)
@@ -197,7 +204,12 @@ class KeyDao
 		st.execute()
 		st.close		
   end
-  
+  def ban_keys()
+    sql = "UPDATE `keys` SET banned='True' WHERE expired='False'"
+		st = @my.prepare(sql)
+		st.execute()
+		st.close		
+  end
   def listkeys()
 		sql = "SELECT * FROM `keys` WHERE expired!='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
 		st = @my.prepare(sql)
@@ -239,7 +251,7 @@ class KeyDao
   def next_available_for_new_assistant() #we will need the outer join here
 		sql = "SELECT K.*, Count(1) FROM `keys` K
  LEFT OUTER JOIN `assistants` A ON A.key_id = K.id  WHERE K.expired='FALSE'   AND K.banned='False'  AND K.keyload<(SELECT max_keyload FROM `config` WHERE id=1)
-GROUP BY K.id ORDER BY Count(1),K.keyload ASC LIMIT 1"
+GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
 		st = @my.prepare(sql)
 		st.execute()
 		result = fetchResults(st)    

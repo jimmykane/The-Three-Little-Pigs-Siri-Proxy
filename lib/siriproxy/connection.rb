@@ -7,7 +7,7 @@ require 'socket'
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
 
-  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid,:devicetype
+  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid,:devicetype,:activation_token_recieved,:assistant_found,:connectionfromguzzoni,:commandFailed
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
     self.other_connection.last_ref_id = ref_id if other_connection.last_ref_id != ref_id
@@ -34,6 +34,10 @@ class SiriProxy::Connection < EventMachine::Connection
     @loadedassistant=nil
     @loadedspeechid=nil
     @devicetype=nil
+    @activation_token_recieved=false
+    @assistant_found=false
+    @connectionfromguzzoni=false
+    @commandFailed=false
     puts "[Info - SiriProxy] Created a connection!" 
     
     #self.pending_connect_timeout=5
@@ -112,6 +116,7 @@ class SiriProxy::Connection < EventMachine::Connection
     begin      
       if object["class"]=="CreateAssistant" # now separates initial request to Loadassistant and Create Assistant
         @createassistant=true 
+        @assistant_found=false
         @key=Key.new     
         @available_keys=$keyDao.list_keys_for_new_assistant().count
         if (@available_keys) > 0
@@ -120,7 +125,7 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data" 
           puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
           @oldkeyload=@key.keyload          
-          @key.keyload=@key.keyload+10  
+          @key.keyload=@key.keyload+20  
           $keyDao.setkeyload(@key) 
           puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
           self.sessionValidationData= @key.sessionValidation	
@@ -136,6 +141,7 @@ class SiriProxy::Connection < EventMachine::Connection
         end
       else 
         @createassistant=false
+        @assistant_found=true
         #grab assistant
         if object["class"]=="LoadAssistant" and object["properties"]["assistantId"] !=nil and object["properties"]["speechId"] !=nil
           @loadedassistant=object["properties"]["assistantId"]
@@ -242,6 +248,10 @@ class SiriProxy::Connection < EventMachine::Connection
       puts "[Debug - #{self.name}] Found end of headers" if $LOG_LEVEL > 3
       set_binary_mode
       self.processed_headers = true
+      if self.name=="Guzzoni" 
+        puts "   @connectionfromguzzoni=true "
+        @connectionfromguzzoni=true
+      end
       ##############
       #A Device has connected!!!
       #Check for User Agent and replace correctly
@@ -518,31 +528,59 @@ class SiriProxy::Connection < EventMachine::Connection
       pp object if $LOG_LEVEL > 3
       return nil
     end    
+ 
     
-    #Check if Validations has Expired
-    if object["class"]=="SessionValidationFailed"  
-      puts "[Warning - SiriProxy] The session Validation Expired!"
-      puts  "[Warning - SiriProxy] Validation Data injected to first object witch had ace_id[#{object["refId"]}] and my ace is [#{object["aceId"]}]" if $LOG_LEVEL > 2               
-      if self.other_connection.key!=nil #may happen if the other is a 4s
-        $keyDao.validation_expired(self.other_connection.key)           
-        puts "[Warning - SiriProxy] The key [#{self.other_connection.key.id}] and Keyload #{self.other_connection.key.keyload} Marked as Expired"             
-        sendemail            
-      end
+    
+    
+  #HELP NEEDED HERE UPON VALIDATION EXPIRES  
+    #Check if Validations has Expired. Apple wont reply back and most of these points wont work on many cuncurrent connections
+#    if object["class"]=="FinishSpeech"  and self.other_connection.activation_token_recieved==false and self.other_connection.connectionfromguzzoni==true and self.other_connection.commandFailed==false and(@assistant_found==true or @createassistant==true) #stupid apple      puts "[Warning - SiriProxy] The session Validation Expired!"
+#      
+#      if @key!=nil #may happen if the other is a 4s
+#        $keyDao.validation_expired(@key)           
+#        puts "[Warning - SiriProxy] The key [#{@key.id}] Marked as Expired"             
+#        sendemail            
+#        puts "[Protection - SiriProxy] Closing Connections"             
+#        self.close_connection()
+#        self.other_connection.close_connection()   
+#        return nil
+#      end
+#    end
+    
+    #this comes as an reply from spire to set access token
+    if(object["class"] == "CommandIgnored")
+			puts "[Info - SiriProxy] Maybe a Bug or just ignoring the Authentication Token"
+      pp object      
+			return nil
+		end
+
+    #The Key banner
+   
+    if object["class"]=="CommandFailed" 
+      @commandFailed=true
+      puts "[Warning - SiriProxy] Command Failed refid #{object["refId"]} and Creating? #{self.other_connection.createassistant}"
+    end#should join these
+    if object["class"]=="CommandFailed" and self.other_connection.createassistant  and self.other_connection.key!=nil and ($APP_CONFIG.enable_auto_key_ban=='ON' or $APP_CONFIG.enable_auto_key_ban=='on')
+      $keyDao.key_banned(self.other_connection.key)       
+      puts "[Warning - SiriProxy] The key [#{self.other_connection.key.id}] Marked as Banned! Still serving with validation..." 
+      #Should we close connections here? I
+      self.close_connection()
+      self.other_connection.close_connection()   
+      return nil
     end
+
     
-    #inject Validation- Grab Validation
-    if object["properties"] != nil 
-      #also maybe better use this insidde the object properties not nil
-      #Check if the key cannot create any more assistants and set it as banned 
-      #ADDED Option in config file for this
-      if $APP_CONFIG.enable_auto_key_ban=='ON' or $APP_CONFIG.enable_auto_key_ban=='on'
-        if object["class"]=="CommandFailed" 
-          puts "[Warning - SiriProxy] Command Failed refid #{object["refId"]} and Creating? #{self.other_connection.createassistant}"
-        end#should join these
-        if object["class"]=="CommandFailed" and self.other_connection.createassistant and self.other_connection.key!=nil 
-          $keyDao.key_banned(self.other_connection.key)       
-          puts "[Warning - SiriProxy] The key [#{self.other_connection.key.id}] Marked as Banned! Still serving with validation..." 
-        end
+    if object["properties"] != nil  
+      
+      #OMG !!!! This is what i needed! Now the 4s creates new keys every 30 secods
+      if object["class"]=="CreateSessionInfoResponse" and object["properties"]["validityDuration"]!=nil and  self.other_connection.is_4S==true 
+        object["properties"]["validityDuration"]=$APP_CONFIG.regenerate_interval #this timer can be customized
+        puts "[Exploit - SiriProxy] Command send to iPhone4s to regenerate multiple keys every [#{$APP_CONFIG.regenerate_interval}] seconds !!!"
+      end
+      
+      if object["class"]=="SetActivationToken" and self.name=="Guzzoni" 
+        puts '[Info - SiriProxy] Recieved token'
+        @activation_token_recieved=true
       end
       
       #=begin      
@@ -755,6 +793,7 @@ class SiriProxy::Connection < EventMachine::Connection
           #Also i know that the users are already checked but the double check comes only due to that i didnt have time to clean this up
           if  object["class"]=="AssistantCreated" and self.other_connection.key != nil   and self.other_connection.client!=nil and self.other_connection.createassistant==true
             puts "[Info - SiriProxy] Creating new Assistant..."
+            pp object
             @assistant=Assistant.new
             @assistant.assistantid=object["properties"]["assistantId"]
             @assistant.speechid=object["properties"]["speechId"]

@@ -19,6 +19,11 @@ db_database: 'siri'
 happy_hour_countdown: 21600
 enable_auto_key_ban: 'ON'
 
+
+#HOT! THis will force the 4S to regenerate new Validation data every time give Do not use lowe than 15 seconds
+#default response from apple is 90000.Change this to what you please! 12 is a good value
+regenerate_interval: 90000
+
 #For Generating Certs for iPhones. Has 2 hosts, so that you can use guzzoni on a 4S, 
 #and your server also using the same instance.
 ca_name: 'SiriProxyCA'

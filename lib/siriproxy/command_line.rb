@@ -146,7 +146,7 @@ class SiriProxy::CommandLine
   `id` int(2) NOT NULL,
   `max_threads` int(5) unsigned NOT NULL DEFAULT '20',
   `max_connections` int(5) unsigned NOT NULL DEFAULT '100',
-  `active_connections` int(5) unsigned NOT NULL DEFAULT '0',
+  `active_connections` int(100) unsigned NOT NULL DEFAULT '0',
   `max_keyload` int(5) unsigned NOT NULL DEFAULT '1000',
   `keyload_dropdown` int(5) unsigned NOT NULL,
   `keyload_dropdown_interval` int(5) unsigned NOT NULL,

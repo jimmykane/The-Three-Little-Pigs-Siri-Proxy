@@ -31,7 +31,7 @@ class SiriProxy
 
     #Initialization of event machine variables overider +epoll mode on by default    		
 		EM.epoll
-    
+    EM.set_descriptor_table_size( 60000 )
     #Database connection
     $my_db=db_connect()    
     
@@ -95,6 +95,14 @@ class SiriProxy
    
         puts "Server is Up and Running"
         @timer=5 # set the timer value
+        @timer2=600 # The expirer
+        
+        #Temp fix and guard to apple not replying command failed
+         EventMachine::PeriodicTimer.new(@timer2){
+            puts "[Expirer - SiriProxy] Expiring past 24 hour Keys"
+           $keyDao.expire_24h_hour_keys
+         }
+        @unbanned=false
         EventMachine::PeriodicTimer.new(@timer){
           $statistics=$statisticsDao.getstats()
           $statistics.elapsed+=@timer
@@ -102,12 +110,17 @@ class SiriProxy
           $statistics.happy_hour_elapsed+=@timer 
           
           #Happy hour enabler
-          if $statistics.happy_hour_elapsed > $APP_CONFIG.happy_hour_countdown and ($APP_CONFIG.enable_auto_key_ban=='ON' or $APP_CONFIG.enable_auto_key_ban=='on')
+          if $statistics.happy_hour_elapsed > $APP_CONFIG.happy_hour_countdown and ($APP_CONFIG.enable_auto_key_ban=='ON' or $APP_CONFIG.enable_auto_key_ban=='on') and @unbanned==false
             $keyDao.unban_keys
-            $statistics.happy_hour_elapsed=0
+           @unbanned=true 
             puts "[Happy hour - SiriProxy] Unbanning Keys and Doors are open"
           end
-          
+          if $statistics.happy_hour_elapsed > ($APP_CONFIG.happy_hour_countdown + 300) and ($APP_CONFIG.enable_auto_key_ban=='ON' or $APP_CONFIG.enable_auto_key_ban=='on') and @unbanned==true
+            $keyDao.ban_keys
+            puts "[Happy hour - SiriProxy] Banning Keys and Doors are Closed"
+            $statistics.happy_hour_elapsed=0
+            @unbanned=false
+          end
           #KeyLoad DropDown
           if $statistics.elapsed>$conf.keyload_dropdown_interval            
             @overloaded_keys_count=$keyDao.findoverloaded().count
