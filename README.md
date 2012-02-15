@@ -69,11 +69,13 @@ Version 0.9bb
 
     2. Delete /var/mobile/Library/Preferences/com.apple.assistant.plist
 
-    3. Connect to the server and make a request. You should see something like -> "[Exploit - SiriProxy] Command send to iPhone4s to regenerate multiple keys every 15 seconds"
+    4. Respring!!!
 
-    4. Done. Wait 15 seconds and use Siri again! You should have another key in your DB
+    5. Connect to the server and make a request. You should see something like -> "[Exploit - SiriProxy] Command send to iPhone4s to regenerate multiple keys every 15 seconds"
 
-    5. Repeat as many times you want! 
+    6. Done. Wait 15 seconds and use Siri again! You should have another key in your DB
+
+    7. Repeat as many times you want! 
 
     To restore just delete again assistant.plist
 
