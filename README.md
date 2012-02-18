@@ -90,7 +90,7 @@ Version 0.9bb
 
 * Steps 
 
-    0. Requires JailBroken iPhone4s! So do the following
+    0. Requires JailBroken iPhone4s! Preferably with Spire installed, and your server address setup on it. So do the following
 
     1. Go to config.yml and set regenarate_interval to how many seconds you want the iPhone4S generate new Validation Data good value is 15 seconds
 
@@ -235,7 +235,7 @@ If you go for the above tutorial then there is no need to follow any instruction
 
 **Set up DNS**
 
-* __Not needed if you Jailbrake an iPhone 4S. Just add repo [http://cydia.myrepospace.com/thpryrchn](http://cydia.myrepospace.com/thpryrchn) and install Spire 4S. Then you can point it to your server just like you do with any other iPhone 4.__
+* __Not needed if you Jailbrake an iPhone 4S. Just install Spire on your 4S. Then you can point it to your server just like you do with any other iPhone 4.__
 
 Before you can use SiriProxy, you must set up a DNS server on your network to forward requests for guzzoni.apple.com to the computer running the proxy (make sure that computer is not using your DNS server!). I recommend dnsmasq for this purpose. It's easy to get running and can easily handle this sort of behavior. ([http://www.youtube.com/watch?v=a9gO4L0U59s](http://www.youtube.com/watch?v=a9gO4L0U59s))
 Also if you dont have static ip you can use this dns python server. ([https://github.com/jimmykane/Roque-Dns-Server])
@@ -395,7 +395,7 @@ Snow Leopard & Lion Set-up Instructions
 
 **Set up DNS**
 
-* __Not needed if you Jailbrake an iPhone 4S. Just add repo [http://cydia.myrepospace.com/thpryrchn](http://cydia.myrepospace.com/thpryrchn) and install Spire 4S. Then you can point it to your server just like you do with any other iPhone 4.__
+* __Not needed if you Jailbrake an iPhone 4S. Just install Spire on your 4S. Then you can point it to your server just like you do with any other iPhone 4.__
 
 Before you can use SiriProxy, you must set up a DNS server on your network to forward requests for guzzoni.apple.com to the computer running the proxy (make sure that computer is not using your DNS server!). I recommend dnsmasq for this purpose. It's easy to get running and can easily handle this sort of behavior. ([http://www.youtube.com/watch?v=a9gO4L0U59s](http://www.youtube.com/watch?v=a9gO4L0U59s))
 Also if you dont have static ip you can use this dns python server. ([https://github.com/jimmykane/Roque-Dns-Server])
