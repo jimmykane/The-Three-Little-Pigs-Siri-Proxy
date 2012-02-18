@@ -5,7 +5,7 @@ require 'pony'
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
   
-  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key
+  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key,:activation_token_recieved,:createassistant
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
     self.other_connection.last_ref_id = ref_id if other_connection.last_ref_id != ref_id
@@ -27,6 +27,8 @@ class SiriProxy::Connection < EventMachine::Connection
     self.assistantId = nil			#assistantID
     self.speechId_avail = false		#speechID available
     self.assistantId_avail = false		#assistantId available
+    @activation_token_recieved=false
+    @createassistant=false
     puts "[Info - SiriProxy] Created a connection!" 		
     ##Checks For avalible keys before any object is loaded
     available_keys=$keyDao.listkeys().count
@@ -66,7 +68,7 @@ class SiriProxy::Connection < EventMachine::Connection
       key4s.sessionValidation=@sessionValidationData      
       #checking for 4s assistant and speechid      
       if object["properties"]["assistantId"] !=nil 
-      key4s.assistantid=object["properties"]["assistantId"] 
+        key4s.assistantid=object["properties"]["assistantId"] 
       else
         key4s.assistantid="no assistant"
       end      
@@ -92,6 +94,9 @@ class SiriProxy::Connection < EventMachine::Connection
   #This way KeyLoad gets the meaning of request. Its updated via request of assistantload/create
   def get_validationData(object)  
     begin      
+      if object["class"]=="CreateAssistant"
+        @createassistant=true 
+      end
       @key=Key.new
       @available_keys=$keyDao.listkeys().count      
       if (@available_keys) > 0
@@ -100,7 +105,7 @@ class SiriProxy::Connection < EventMachine::Connection
         puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data" 
         puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
         @oldkeyload=@key.keyload          
-        @key.keyload=@key.keyload+10  
+        @key.keyload=@key.keyload + 10  
         $keyDao.setkeyload(@key) 
         puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
         self.sessionValidationData= @key.sessionValidation	
@@ -375,7 +380,52 @@ class SiriProxy::Connection < EventMachine::Connection
         puts "[Exploit - SiriProxy] Command send to iPhone4s to regenerate multiple keys every [#{$APP_CONFIG.regenerate_interval}] seconds !!!"
       end
       
+      if object["class"]=="SetActivationToken" and self.name=="Guzzoni"  and self.other_connection.key!=nil
+        puts '[Info - SiriProxy] Recieved token'
+        @activation_token_recieved=true
+        @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+        if @keystats==nil
+          $keystatisticsDao.insert(self.other_connection.key) 
+          @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+        end
+        @keystats.total_tokens_recieved+=1
+        $keystatisticsDao.save_key_stats(@keystats)
+        pp @keystats
+      end
       
+      #Lets record how many Finish speech requests are made without the activation token and not by creating witch may not include the token if max assistants are reached
+      if object["class"]=="FinishSpeech" and self.name=="iPhone" and  self.other_connection.activation_token_recieved==false and @key!=nil and self.validationData_avail==true and  @createassistant==false
+        if  $APP_CONFIG.expiration_sesitivity!=nil and $APP_CONFIG.expiration_sesitivity > 0
+          @expiration_sesitivity=$APP_CONFIG.expiration_sesitivity
+        else
+          @expiration_sesitivity=5 #default value
+        end
+        @keystats=$keystatisticsDao.get_key_stats(@key)
+        if @keystats==nil
+          $keystatisticsDao.insert(@key) 
+          @keystats=$keystatisticsDao.get_key_stats(@key)
+          @keystats.total_finishspeech_requests+=1
+          $keystatisticsDao.save_key_stats(@keystats)
+          puts '[Info - SiriProxy] Recorded FinishSpeech'
+          pp @keystats
+        elsif  @keystats.total_finishspeech_requests > @expiration_sesitivity #consider a dynamic number instead of 15 
+          #here comes the ceck!          
+          if @keystats.total_tokens_recieved==0
+            $keyDao.validation_expired(@key) #probalby expired
+              
+            puts '[Key - SiriProxy] Probably the validation expired! '            
+          else
+            #reset them if no anomaly detected such as  expiration
+            @keystats.total_finishspeech_requests=0
+            @keystats.total_tokens_recieved=0
+            $keystatisticsDao.save_key_stats(@keystats)
+          end  
+        else
+          @keystats.total_finishspeech_requests+=1
+          $keystatisticsDao.save_key_stats(@keystats)
+          puts '[Info - SiriProxy] Recorded FinishSpeech'
+        end        
+      end
       
       if object["properties"]["validationData"] !=nil #&& !object["properties"]["validationData"].empty?
         if self.is_4S

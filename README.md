@@ -35,6 +35,26 @@ Solution 1: Change IP/Network
 Solution 2: Use other iPhone4s DATA
 
 
+Version 0.9bc
+-------------
+
+* Fixed detection of validation data due to apple not replying back with validation expired
+
+** UPDATE HOW TO **
+
+* In the `Three-Little_Pigs` Folder do 
+
+    git pull
+
+    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
+
+    rake install && siriproxy bundle    
+
+    siriproxy gennewtables
+
+-Done
+
+
 Version 0.9bb
 -------------
 

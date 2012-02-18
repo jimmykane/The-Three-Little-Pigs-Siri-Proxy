@@ -42,6 +42,7 @@ class SiriProxy::CommandLine
     when 'server'           then run_server(subcommand)
     when 'gencerts'         then gen_certs
     when 'gentables'        then gen_tables  
+    when 'gennewtables'        then gen_new_tables   
     when 'bundle'           then run_bundle(subcommand)
     when 'console'          then run_console
     when 'update'           then update(subcommand)
@@ -111,7 +112,28 @@ class SiriProxy::CommandLine
     sp_root = File.join(File.dirname(__FILE__), '..', "..")
     puts `#{command} "#{sp_root}" "#{ca_name}" "#{server1}" "#{server2}"`
   end
-    
+   
+  def gen_new_tables
+     require 'siriproxy/db_connection'
+    if dbh=db_connect()
+      puts "DATABASE FOUND"
+    else 
+      puts "Could not connect to database"
+    end
+    dbh.query("DROP TABLE IF EXISTS `key_stats`;")
+    puts "Table Key_stats Droped"  
+    dbh.query("CREATE TABLE `key_stats` (
+  `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
+  `key_id` int(255) unsigned NOT NULL,
+  `total_finishspeech_requests` int(255) unsigned NOT NULL,
+  `total_tokens_recieved` int(255) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
+    puts "Table KeyStats Created"   
+  end
+  
+  
+  
   def gen_tables
     require 'siriproxy/db_connection'
     if dbh=db_connect()
@@ -155,6 +177,19 @@ class SiriProxy::CommandLine
 
     dbh.query("INSERT INTO `config` VALUES ('1', '20', '15', '0', '500', '100', '1200');")
     puts "Added Default setting in Table config"
+    
+    
+    dbh.query("DROP TABLE IF EXISTS `key_stats`;")
+    puts "Table Key_stats Droped"  
+    dbh.query("CREATE TABLE `key_stats` (
+  `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
+  `key_id` int(255) unsigned NOT NULL,
+  `total_finishspeech_requests` int(255) unsigned NOT NULL,
+  `total_tokens_recieved` int(255) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
+    puts "Table KeyStats Created"   
+    
     
   end
     

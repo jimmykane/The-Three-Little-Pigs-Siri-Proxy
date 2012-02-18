@@ -37,6 +37,10 @@ class SiriProxy
 		$keyDao=KeyDao.instance#instansize Dao object controller
 		$keyDao.connect_to_db($my_db)       
     
+    #initialize key stats controller    
+    $keystatisticsDao=KeyStatisticsDao.instance
+    $keystatisticsDao.connect_to_db($my_db)
+    
     #Initialize The Assistant Controller
     $assistantDao=AssistantDao.instance
     $assistantDao.connect_to_db($my_db)
@@ -59,13 +63,15 @@ class SiriProxy
           conn.plugin_manager.iphone_conn = conn
         }
         puts "Server is Up and Running"
-          @timer2=600 # The expirer
+        @timer2=120 # The expirer
         
         #Temp fix and guard to apple not replying command failed
-         EventMachine::PeriodicTimer.new(@timer2){
-            puts "[Expirer - SiriProxy] Expiring past 24 hour Keys"
-           $keyDao.expire_24h_hour_keys
-         }
+        EventMachine::PeriodicTimer.new(@timer2){
+          puts "[Expirer - SiriProxy] Expiring past 24 hour Keys"
+          $keyDao.expire_24h_hour_keys
+          $keystatisticsDao.delete_keystats
+          puts "[Stats - SiriProxy] Cleaning up key statistics"
+        }
         EventMachine::PeriodicTimer.new(10){
           $conf.active_connections = EM.connection_count          
           $confDao.update($conf)

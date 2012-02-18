@@ -13,6 +13,18 @@ db_user: 'root'
 db_pass: 'pass'
 db_database: 'siri'
 
+
+#Validation Sesitivity. This is the value that will force the key to be expired due to apple not responding to invalid keys
+#The pholoshopy behind this is that when some Finish speech requests are made and apple doesnt reply back then the server marks the keys as invalid
+#default value 5
+#default value for small servers 5
+#recommended for medium sized server 10-15
+#recomended for large servers like paradox 30
+
+expiration_sesitivity: 5
+
+
+
 #For Generating Certs for iPhones. Has 2 hosts, so that you can use guzzoni on a 4S, 
 #and your server also using the same instance.
 ca_name: 'SiriProxyCA'
