@@ -1,6 +1,7 @@
 require 'cfpropertylist'
 require 'siriproxy/interpret_siri'
 require 'pony'
+require "siriproxy/functions"
 
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
@@ -411,9 +412,9 @@ class SiriProxy::Connection < EventMachine::Connection
         elsif  @keystats.total_finishspeech_requests > @expiration_sesitivity #consider a dynamic number instead of 15 
           #here comes the ceck!          
           if @keystats.total_tokens_recieved==0
-            $keyDao.validation_expired(@key) #probalby expired
-              
-            puts '[Key - SiriProxy] Probably the validation expired! '            
+            $keyDao.validation_expired(@key) #probalby expired              
+            puts '[Key - SiriProxy] Probably the validation expired! '  
+            sendemail()
           else
             #reset them if no anomaly detected such as  expiration
             @keystats.total_finishspeech_requests=0

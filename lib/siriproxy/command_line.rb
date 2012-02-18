@@ -42,7 +42,7 @@ class SiriProxy::CommandLine
     when 'server'           then run_server(subcommand)
     when 'gencerts'         then gen_certs
     when 'gentables'        then gen_tables  
-    when 'gennewtables'        then gen_new_tables   
+    when 'gennewtables'     then gen_new_tables   
     when 'bundle'           then run_bundle(subcommand)
     when 'console'          then run_console
     when 'update'           then update(subcommand)

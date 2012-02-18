@@ -2,7 +2,7 @@ require 'eventmachine'
 require 'zlib'
 require 'pp'
 require "siriproxy/version"
-       
+require "siriproxy/functions"       
 
 class String
   def to_hex(seperator=" ")
@@ -65,13 +65,18 @@ class SiriProxy
         puts "Server is Up and Running"
         @timer2=120 # The expirer
         
-        #Temp fix and guard to apple not replying command failed
-        EventMachine::PeriodicTimer.new(@timer2){
-          puts "[Expirer - SiriProxy] Expiring past 24 hour Keys"
-          $keyDao.expire_24h_hour_keys
-          $keystatisticsDao.delete_keystats
-          puts "[Stats - SiriProxy] Cleaning up key statistics"
-        }
+         #Temp fix and guard to apple not replying command failed
+         EventMachine::PeriodicTimer.new(@timer2){
+            puts "[Expirer - SiriProxy] Expiring past 24 hour Keys"
+           @totalkeysexpired=$keyDao.expire_24h_hour_keys
+           puts @totalkeysexpired
+           for i in (0...@totalkeysexpired) 
+               sendemail()
+           end          
+           $keystatisticsDao.delete_keystats
+            puts "[Stats - SiriProxy] Cleaning up key statistics"
+           
+         }
         EventMachine::PeriodicTimer.new(10){
           $conf.active_connections = EM.connection_count          
           $confDao.update($conf)

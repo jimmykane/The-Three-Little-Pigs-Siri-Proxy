@@ -182,10 +182,12 @@ class KeyDao
 		st.close		
 	end
   def expire_24h_hour_keys()				
-		sql = "UPDATE `keys` SET expired='TRUE'  WHERE date_added < NOW() -  INTERVAL 20 HOUR "
+		sql = "UPDATE `keys` SET expired='TRUE'  WHERE date_added < NOW() -  INTERVAL 24 HOUR "
 		st = @my.prepare(sql)
 		st.execute()
-		st.close		
+    result = st.affected_rows
+ 		st.close
+    return result		
 	end
   def listkeys()
 		sql = "SELECT * FROM `keys` WHERE expired!='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
