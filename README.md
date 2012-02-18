@@ -35,6 +35,11 @@ Solution 1: Change IP/Network
 Solution 2: Use other iPhone4s DATA
 
 
+Version 0.9bd
+-------------
+
+* Fixed email Notifications
+
 Version 0.9bc
 -------------
 
@@ -50,6 +55,8 @@ Version 0.9bc
 ** UPDATE HOW TO **
 
 * In the `Three-Little_Pigs` Folder do 
+
+    gem uninstall siriproxy and press yes for all
 
     git pull
 
