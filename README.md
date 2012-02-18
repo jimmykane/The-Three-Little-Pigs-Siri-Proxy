@@ -40,13 +40,16 @@ Version 0.9bc
 
 * Fixed detection of validation data due to apple not replying back with validation expired
 
+* Added default sensitivity to 5 invalid requests without apple response! You can change that and read more info in config.yml
+
+
 ** UPDATE HOW TO **
 
 * In the `Three-Little_Pigs` Folder do 
 
     git pull
 
-    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
+    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml` . Edit it to your needs
 
     rake install && siriproxy bundle    
 
