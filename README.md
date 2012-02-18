@@ -42,6 +42,10 @@ Version 0.9bc
 
 * Added default sensitivity to 5 invalid requests without apple response! You can change that and read more info in config.yml
 
+**Info about the Validation System**
+
+* Go to (http://quartzcoding.blogspot.com/2012/02/siri-validation-data-and-access-token.html)
+
 
 ** UPDATE HOW TO **
 
@@ -82,7 +86,7 @@ Version 0.9bb
 
 ** The Exploit WARNING!!!! YOU DO THIS ON YOUR OWN RISK. **
 
-* More on 
+* More on (http://quartzcoding.blogspot.com/2012/02/siri-protocol-exploit-for-multiple-key.html)
 
 * Steps 
 
