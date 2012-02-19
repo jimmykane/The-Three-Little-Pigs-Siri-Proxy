@@ -79,6 +79,8 @@ Version 0.9.8.2-expr (This is a beta release! More work is needed)
 
 **UPDATE HOW TO**
 
+* Backup your keys and tables that you need!
+
 * In the `Three-Little_Pigs` Folder do 
 
     git pull
@@ -86,7 +88,8 @@ Version 0.9.8.2-expr (This is a beta release! More work is needed)
     copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
 
     rake install && siriproxy bundle
-
+    
+    siriproxy gentables 
 
 -Done
 
