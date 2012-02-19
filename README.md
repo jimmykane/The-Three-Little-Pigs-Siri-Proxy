@@ -53,7 +53,7 @@ Version 0.9.8.3-expr
 * Go to (http://quartzcoding.blogspot.com/2012/02/siri-validation-data-and-access-token.html)
 
 
-** UPDATE HOW TO **
+**UPDATE HOW TO**
 
 * In the `Three-Little_Pigs` Folder do 
 
