@@ -167,6 +167,8 @@ class SiriProxy::CommandLine
   `speechid` longtext NOT NULL,
   `device_type` mediumtext NOT NULL,
   `date_created` datetime NOT NULL,
+  `last_login` datetime NOT NULL,
+  `last_ip` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
     puts "Created Table Assistants"
@@ -204,6 +206,20 @@ class SiriProxy::CommandLine
     dbh.query("INSERT INTO `clients` VALUES ('1', 'NA', 'NA', 'NA', 'NA', 'False', '0000-00-00 00:00:00');")
     
          puts "Table Clients Populated"   
+    
+     dbh.query("DROP TABLE IF EXISTS `key_stats`;")
+     puts "Table Key_stats Droped"  
+ dbh.query("CREATE TABLE `key_stats` (
+  `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
+  `key_id` int(255) unsigned NOT NULL,
+  `total_finishspeech_requests` int(255) unsigned NOT NULL,
+  `total_tokens_recieved` int(255) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
+     puts "Table KeyStats Created"   
+   
+    
+    
     
   end
    

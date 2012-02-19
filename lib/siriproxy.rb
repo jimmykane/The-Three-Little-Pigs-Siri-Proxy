@@ -2,7 +2,7 @@ require 'eventmachine'
 require 'zlib'
 require 'pp'
 require "siriproxy/version"
-       
+require "siriproxy/functions"       
 
 class String
   def to_hex(seperator=" ")
@@ -48,6 +48,10 @@ class SiriProxy
     #initialize key controller    
 		$keyDao=KeyDao.instance#instansize Dao object controller
 		$keyDao.connect_to_db($my_db)       
+    
+    #initialize key stats controller    
+    $keystatisticsDao=KeyStatisticsDao.instance
+    $keystatisticsDao.connect_to_db($my_db)
     
     #Initialize The Assistant Controller
     $assistantDao=AssistantDao.instance
@@ -95,13 +99,32 @@ class SiriProxy
    
         puts "Server is Up and Running"
         @timer=5 # set the timer value
-        @timer2=600 # The expirer
-        
+        @timer2=300 # The expirer
+        @timer3=900 # the expirer of old assistnats
+        #
         #Temp fix and guard to apple not replying command failed
          EventMachine::PeriodicTimer.new(@timer2){
             puts "[Expirer - SiriProxy] Expiring past 24 hour Keys"
-           $keyDao.expire_24h_hour_keys
+           @totalkeysexpired=$keyDao.expire_24h_hour_keys
+           puts @totalkeysexpired
+           for i in (0...@totalkeysexpired) 
+               sendemail()
+           end
+          
+           $keystatisticsDao.delete_keystats
+            puts "[Stats - SiriProxy] Cleaning up key statistics"
+           
          }
+         
+        #Delete old assistants. If i am not mistaken each assistant is valid for only 7 days.
+        #Delete 14 days assistants for database cleaning 
+        EventMachine::PeriodicTimer.new(@timer3){
+            puts "[Expirer - SiriProxy] DELETING past 14 DAYS Assistants"
+           $assistantDao.delete_expired_assistants
+         } 
+        
+        
+        
         @unbanned=false
         EventMachine::PeriodicTimer.new(@timer){
           $statistics=$statisticsDao.getstats()

@@ -1,13 +1,12 @@
 require 'cfpropertylist'
 require 'siriproxy/interpret_siri'
-require 'pony'
 require 'socket'
-
-
+require "siriproxy/functions"
+require 'cora'
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
 
-  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid,:devicetype,:activation_token_recieved,:assistant_found,:connectionfromguzzoni,:commandFailed
+  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid,:devicetype,:activation_token_recieved,:activation_token,:assistant_found,:connectionfromguzzoni,:commandFailed,:finishspeech
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
     self.other_connection.last_ref_id = ref_id if other_connection.last_ref_id != ref_id
@@ -38,6 +37,7 @@ class SiriProxy::Connection < EventMachine::Connection
     @assistant_found=false
     @connectionfromguzzoni=false
     @commandFailed=false
+    @finishspeech=false
     puts "[Info - SiriProxy] Created a connection!" 
     
     #self.pending_connect_timeout=5
@@ -52,24 +52,7 @@ class SiriProxy::Connection < EventMachine::Connection
     end     
   end
   
-  #send email function
-  def sendemail()
-    #Lets also send an email comming soon
-    if $APP_CONFIG.send_email=='ON' or $APP_CONFIG.send_email=='on'
-      begin
-        Pony.mail(
-          :to => $APP_CONFIG.email_to, 
-          :from => $APP_CONFIG.email_from,
-          :subject => $APP_CONFIG.email_subject,
-          :html_body => $APP_CONFIG.email_message
-        )
-        puts "[Email - SiriProxy] Expired key email sent to [#{$APP_CONFIG.email_to}]"
-      rescue 
-        puts "[Email - SiriProxy] Warning Cannot send mail. Check your ~/.siriproxy/config.yml"            
-      end
-    end        
-    #Done with email
-  end
+
   
   #Changes
   def checkHave4SData(object) 
@@ -151,67 +134,95 @@ class SiriProxy::Connection < EventMachine::Connection
         
           #Lets put some auth here!!!
           #if the assistant that the client is trying to load is not registered (was not created on this server)
-          #or if the client is not valid then protection gets on the way
-          if $APP_CONFIG.private_server=="ON" or  $APP_CONFIG.private_server=="on" #if its a private one
-            @userassistant=Assistant.new
-            @userassistant.assistantid=@loadedassistant
-            @userassistant.speechid=@loadedspeechid
-            @userassistant=$assistantDao.check_duplicate(@userassistant)  #check if there is a registerd assistant
+          #or if the client is not valid then protection gets on the way          
+          @userassistant=Assistant.new
+          @userassistant.assistantid=@loadedassistant
+          @userassistant.speechid=@loadedspeechid
+          @userassistant.last_ip=@clientip
+          @userassistant=$assistantDao.check_duplicate(@userassistant)  #check if there is a registerd assistant
           
-            if  @userassistant!=nil #If there is one then
+          if  @userassistant!=nil #If there is one then
             
-              puts "[Authentication - SiriProxy] Registered Assistant Found "
-              @user=$clientsDao.find_by_assistant(@userassistant) #find the user with that assistant
-              pp @user
-              if @user==nil #Incase this user doesnt exist!!!!!!! Bug or not complete transaction
+            puts "[Authentication - SiriProxy] Registered Assistant Found "
+            @user=$clientsDao.find_by_assistant(@userassistant) #find the user with that assistant
+            pp @user
+            if @user==nil #Incase this user doesnt exist!!!!!!! Bug or not complete transaction
                 
-                puts "[Authentication - SiriProxy] No client for Assistant [#{@loadedassistant}]  Found :-("
+              puts "[Authentication - SiriProxy] No client for Assistant [#{@loadedassistant}]  Found :-("
+              self.validationData_avail = false
+              self.close_connection() #close connections
+              self.other_connection.close_connection() #close other
+              return false
+                
+            elsif @user.valid=='False' 
+              $assistantDao.updateassistant(@userassistant) # to update with last login and ip
+              puts "[Authentication - SiriProxy] Access Denied!! -> Client name:[#{@user.fname}] nickname[#{@user.nickname}] appleid[#{@user.appleAccountid}] Connected "
+              self.validationData_avail = false
+              self.close_connection() #close connections
+              self.other_connection.close_connection() #close other Here needs fake mode
+              return false
+                
+            elsif @user.valid=='True' #if its valid!!!
+              @key=Key.new
+              @available_keys=$keyDao.listkeys().count      
+              if (@available_keys) > 0
+                puts "[Key - SiriProxy] Keys available for Registered Only clients [#{@available_keys}]"
+                @key=$keyDao.next_available() 
+                puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data" 
+                puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
+                @oldkeyload=@key.keyload          
+                @key.keyload=@key.keyload+10  
+                $keyDao.setkeyload(@key) 
+                puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
+                self.sessionValidationData= @key.sessionValidation	
+                self.validationData_avail = true  
+                #hmmmmm
+              else 
+                puts "[Key - SiriProxy] No keys available in database Closing connections"
                 self.validationData_avail = false
                 self.close_connection() #close connections
                 self.other_connection.close_connection() #close other
-                return false
-                
-              elsif @user.valid=='False' 
-                
-                puts "[Authentication - SiriProxy] Access Denied!! -> Client name:[#{@user.fname}] nickname[#{@user.nickname}] appleid[#{@user.appleAccountid}] Connected "
-                self.validationData_avail = false
-                self.close_connection() #close connections
-                self.other_connection.close_connection() #close other
-                return false
-                
-              else
-                puts "[Authentication - SiriProxy] Access Granted! -> Client name:[#{@user.fname}] nickname[#{@user.nickname}] appleid[#{@user.appleAccountid}] Connected "
               end
+                
+              $assistantDao.updateassistant(@userassistant)
+              puts "[Authentication - SiriProxy] Access Granted! -> Client name:[#{@user.fname}] nickname[#{@user.nickname}] appleid[#{@user.appleAccountid}] Connected "
+            end
             
-            else #if no assistant registed found
+          else #if no assistant registed found 
+            if $APP_CONFIG.private_server=="ON" or  $APP_CONFIG.private_server=="on"
+              
               puts "[Authentication - SiriProxy] Assistant [#{@loadedassistant}] is not registered. Banning Connection"
               self.validationData_avail = false
               self.close_connection() #close connections
               self.other_connection.close_connection() #close other
               return false
+            
+            else # if its a public server 
+              @key=Key.new
+              @available_keys=$keyDao.listkeys().count      
+              if (@available_keys) > 0
+                puts "[Key - SiriProxy] Keys available for Public  [#{@available_keys}]"
+                @key=$keyDao.next_available() 
+                puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data" 
+                puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
+                @oldkeyload=@key.keyload          
+                @key.keyload=@key.keyload+10  
+                $keyDao.setkeyload(@key) 
+                puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
+                self.sessionValidationData= @key.sessionValidation	
+                self.validationData_avail = true  
+                #hmmmmm
+              else 
+                puts "[Key - SiriProxy] No keys available in database Closing connections"
+                self.validationData_avail = false
+                self.close_connection() #close connections
+                self.other_connection.close_connection() #close other
+              end
             end
+            
           end
-        
-          @key=Key.new
-          @available_keys=$keyDao.listkeys().count      
-          if (@available_keys) > 0
-            puts "[Key - SiriProxy] Keys available for Registered Only clients [#{@available_keys}]"
-            @key=$keyDao.next_available() 
-            puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data" 
-            puts "[Keys - SiriProy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
-            @oldkeyload=@key.keyload          
-            @key.keyload=@key.keyload+10  
-            $keyDao.setkeyload(@key) 
-            puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
-            self.sessionValidationData= @key.sessionValidation	
-            self.validationData_avail = true       
-            #hmmmmm
-          else 
-            puts "[Key - SiriProxy] No keys available in database Closing connections"
-            self.validationData_avail = false
-            self.close_connection() #close connections
-            self.other_connection.close_connection() #close other
-          end
+          
+       
           
         else          
           puts "[Key - SiriProxy] No keys available in database Closing connections"
@@ -229,8 +240,7 @@ class SiriProxy::Connection < EventMachine::Connection
   
   
   def plist_blob(string)
-    string = [string].pack('H*')
-    #string = [string]
+    string = [string].pack('H*')    
     string.blob = true
     string
 	end
@@ -527,31 +537,16 @@ class SiriProxy::Connection < EventMachine::Connection
       puts "[Info - Dropping Object from Guzzoni] #{object["class"]}" if $LOG_LEVEL > 1
       pp object if $LOG_LEVEL > 3
       return nil
-    end    
- 
-    
-    
-    
-  #HELP NEEDED HERE UPON VALIDATION EXPIRES  
-    #Check if Validations has Expired. Apple wont reply back and most of these points wont work on many cuncurrent connections
-#    if object["class"]=="FinishSpeech"  and self.other_connection.activation_token_recieved==false and self.other_connection.connectionfromguzzoni==true and self.other_connection.commandFailed==false and(@assistant_found==true or @createassistant==true) #stupid apple      puts "[Warning - SiriProxy] The session Validation Expired!"
-#      
-#      if @key!=nil #may happen if the other is a 4s
-#        $keyDao.validation_expired(@key)           
-#        puts "[Warning - SiriProxy] The key [#{@key.id}] Marked as Expired"             
-#        sendemail            
-#        puts "[Protection - SiriProxy] Closing Connections"             
-#        self.close_connection()
-#        self.other_connection.close_connection()   
-#        return nil
-#      end
-#    end
+    end  
     
     #this comes as an reply from spire to set access token
     if(object["class"] == "CommandIgnored")
 			puts "[Info - SiriProxy] Maybe a Bug or just ignoring the Authentication Token"
-      pp object      
-			return nil
+      if self.other_connection.activation_token_recieved==true and self.other_connection.activation_token.aceid==object["refId"]
+        puts "[Info - SiriProxy] Letting the activation command ignored pass throught"
+      else  
+        return nil
+      end			
 		end
 
     #The Key banner
@@ -573,17 +568,71 @@ class SiriProxy::Connection < EventMachine::Connection
     if object["properties"] != nil  
       
       #OMG !!!! This is what i needed! Now the 4s creates new keys every 30 secods
-      if object["class"]=="CreateSessionInfoResponse" and object["properties"]["validityDuration"]!=nil and  self.other_connection.is_4S==true 
+      if object["class"]=="CreateSessionInfoResponse" and object["properties"]["validityDuration"]!=nil and  self.other_connection.is_4S==true and $APP_CONFIG.regenerate_interval!=nil
         object["properties"]["validityDuration"]=$APP_CONFIG.regenerate_interval #this timer can be customized
         puts "[Exploit - SiriProxy] Command send to iPhone4s to regenerate multiple keys every [#{$APP_CONFIG.regenerate_interval}] seconds !!!"
       end
       
-      if object["class"]=="SetActivationToken" and self.name=="Guzzoni" 
+      #let record how many activation token get per key
+      if object["class"]=="SetActivationToken" and self.name=="Guzzoni"  and self.other_connection.key!=nil
         puts '[Info - SiriProxy] Recieved token'
+        pp object
         @activation_token_recieved=true
+        @activation_token=ActivationToken.new
+        @activation_token.aceid=object["aceId"]
+        @activation_token.data=object["properties"]["activationToken"]
+        pp @activation_token
+        @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+        if @keystats==nil
+          $keystatisticsDao.insert(self.other_connection.key) 
+          @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+        end
+        @keystats.total_tokens_recieved+=1
+        $keystatisticsDao.save_key_stats(@keystats)
+        pp @keystats
+      end
+     
+      #Lets record how many Finish speech requests are made without the activation token and not by creating witch may not include the token if max assistants are reached
+      if object["class"]=="FinishSpeech" and self.name=="iPhone" and  self.other_connection.activation_token_recieved==false and @key!=nil and self.validationData_avail==true and  @createassistant==false and @finishspeech==false
+        
+        if  $APP_CONFIG.expiration_sesitivity!=nil and $APP_CONFIG.expiration_sesitivity > 0
+       
+          @expiration_sesitivity=$APP_CONFIG.expiration_sesitivity
+        else
+          @expiration_sesitivity=5 #default value
+        end
+        #if the device has a wrong assistant.plist then it will make constant finish speech and will break this code.
+        #lets fix that 
+        @finishspeech=true
+        @keystats=$keystatisticsDao.get_key_stats(@key)
+        if @keystats==nil
+          $keystatisticsDao.insert(@key) 
+          @keystats=$keystatisticsDao.get_key_stats(@key)
+          @keystats.total_finishspeech_requests+=1
+          $keystatisticsDao.save_key_stats(@keystats)
+          puts '[Info - SiriProxy] Recorded FinishSpeech'
+          pp @keystats
+        elsif  @keystats.total_finishspeech_requests > @expiration_sesitivity #consider a dynamic number instead of 15 
+          #here comes the ceck!          
+          if @keystats.total_tokens_recieved==0
+            $keyDao.validation_expired(@key) #probalby expired              
+            puts '[Key - SiriProxy] Probably the validation expired! '
+            sendemail()
+          else
+            #reset them if no anomaly detected such as  expiration
+            @keystats.total_finishspeech_requests=0
+            @keystats.total_tokens_recieved=0
+            $keystatisticsDao.save_key_stats(@keystats)
+          end  
+        else
+          @keystats.total_finishspeech_requests+=1
+          $keystatisticsDao.save_key_stats(@keystats)
+          puts '[Info - SiriProxy] Recorded FinishSpeech'
+        end        
       end
       
-      #=begin      
+      
+            
       #Lets capture the unique ids for every appleid
       if object["class"]=="SetAssistantData" and self.validationData_avail==true #check this against validation  for the 4s 
         #this changes by language change also. Please consider re code
@@ -612,31 +661,13 @@ class SiriProxy::Connection < EventMachine::Connection
                 @client.appleDBid="NA"
               end  
             end 
-          end     
-          
-          #          if object["properties"]["meCards"][0]["properties"]["firstName"]!=nil #may have more than one me cards
-          #            @client.fname=object["properties"]["meCards"][0]["properties"]["firstName"]
-          #            
-          #          else
-          #            
-          #            @client.fname="NA"
-          #          end
-          #          if object["properties"]["meCards"][0]["properties"]["nickName"]!=nil 
-          #            @client.nickname=object["properties"]["meCards"][0]["properties"]["nickName"]
-          #          else
-          #            @client.nickname="NA"
-          #          end
-          #          if object["properties"]["meCards"][0]["properties"]["identifier"]!=nil 
-          #            @client.appleDBid=object["properties"]["meCards"][0]["properties"]["identifier"]
-          #          else
-          #            @client.appleDBid="NA"
-          #          end
+          end 
         else
           @client.fname="NA"
           @client.nickname="NA"
           @client.appleDBid="NA"
         end
-        #arg i will solve this 
+        
         #the absources can contain more than icloud id and thus not just one row is available !!!!!
         if object["properties"]["abSources"]!=nil
           @absources_count=object["properties"]["abSources"].count #count how many sources the object may have
@@ -656,15 +687,6 @@ class SiriProxy::Connection < EventMachine::Connection
         
         @client.appleAccountid="NA" if @client.appleAccountid==nil
         
-        #        if object["properties"]["abSources"]!=nil and object["properties"]["abSources"][0]!=nil and object["properties"]["abSources"][0]["properties"]!=nil and (object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil or  ( object["properties"]["abSources"][0]["properties"]["properties"]!=nil and object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"]!=nil )) 
-        #          puts 'Debug found Icloud'
-        #          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["accountIdentifier"] if object["properties"]["abSources"][0]["properties"]["accountIdentifier"]!=nil
-        #          @client.appleAccountid=object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"] if object["properties"]["abSources"][0]["properties"]["properties"] and object["properties"]["abSources"][0]["properties"]["properties"]["accountIdentifier"]!=nil
-        #        else
-        #          puts 'Fell into nil'
-        #          @client.appleAccountid="NA"
-        #        end
-
         @client.valid="True" #needed if config in empy for the below
         @client.valid="False" if $APP_CONFIG.private_server=="ON" or $APP_CONFIG.private_server=="on"     
         @client.valid="True" if $APP_CONFIG.private_server=="OFF" or $APP_CONFIG.private_server=="off"
@@ -733,6 +755,7 @@ class SiriProxy::Connection < EventMachine::Connection
           @assistant.client_apple_account_id=@client.appleAccountid
           @assistant.key_id=@key.id #suspicius
           @assistant.devicetype=@devicetype
+          @assistant.last_ip=@clientip
           if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
             puts "[Info - SiriProxy] Duplicate Assistand ID. Assistant NOT saved"
           else
@@ -781,6 +804,8 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Warning - SiriProxy] This device is Not setup!"				
           self.speechId_avail=false #useless     
           self.assistantId_avail=false #useless
+          #lets close the connection and even better maybe destroy the assisatnt
+          
         else
           self.speechId_avail=true #useless
           self.assistantId_avail=true #useless
@@ -799,6 +824,7 @@ class SiriProxy::Connection < EventMachine::Connection
             @assistant.speechid=object["properties"]["speechId"]
             @assistant.key_id=self.other_connection.key.id               
             @assistant.devicetype=self.other_connection.devicetype
+            @assistant.last_ip=self.other_connection.clientip
             pp self.other_connection.client if $LOG_LEVEL > 2
             
             if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
@@ -851,10 +877,8 @@ class SiriProxy::Connection < EventMachine::Connection
       puts '[Protection - Siriproxy] Closing both connections...'
       self.close_connection()
       self.other_connection.close_connection()      
-      puts '[Protection - Siriproxy] Closed both connections!!!'
-      if object["class"]=="FinishSpeech" #will not get here
-        #return object     
-      end
+     
+      
       pp object if $LOG_LEVEL > 3
       return nil
     end    

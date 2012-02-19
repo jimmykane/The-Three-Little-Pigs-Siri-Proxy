@@ -185,10 +185,13 @@ class KeyDao
 	end
   
   def expire_24h_hour_keys()				
-		sql = "UPDATE `keys` SET expired='TRUE'  WHERE date_added < NOW() -  INTERVAL 20 HOUR"
+		sql = "UPDATE `keys` SET expired='TRUE'  WHERE date_added < NOW() -  INTERVAL 24 HOUR"
 		st = @my.prepare(sql)
 		st.execute()
-		st.close		
+    result = st.affected_rows
+ 		st.close
+    return result		
+		
 	end
   
   def key_banned(dto)				
@@ -290,7 +293,7 @@ GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
 end
 
 class Assistant
-  attr_accessor :id, :key_id,:client_apple_account_id,:assistantid,:speechid,:devicetype,:date_created
+  attr_accessor :id, :key_id,:client_apple_account_id,:assistantid,:speechid,:devicetype,:date_created,:last_login,:last_ip
   def id=(value)  # The setter method for @id
     @id =  value
   end
@@ -312,6 +315,13 @@ class Assistant
   def date_created=(value)  # The setter method for @date_created
     @date_created =  value
   end
+  def last_login=(value)  # The setter method for @last_login
+    @last_login =  value
+  end
+  def last_ip=(value)  # The setter method for @last_ip
+    @last_ip =  value
+  end
+  
 end
 
 class AssistantDao
@@ -345,12 +355,26 @@ class AssistantDao
   end
     
   def createassistant(dto)
-    sql = "INSERT INTO `assistants` (key_id,client_apple_account_id,assistantid,speechid,device_type,date_created) VALUES ( ? ,? , ? , ? , ? ,NOW())"
+    sql = "INSERT INTO `assistants` (key_id,client_apple_account_id,assistantid,speechid,device_type,date_created,last_login,last_ip) VALUES ( ? ,? , ? , ? , ? ,NOW(), NOW() , ? )"
     st = @my.prepare(sql)
-    st.execute(dto.key_id,dto.client_apple_account_id,dto.assistantid,dto.speechid,dto.devicetype)   
+    st.execute(dto.key_id,dto.client_apple_account_id,dto.assistantid,dto.speechid,dto.devicetype,dto.last_ip)   
     st.close    
   end
     
+  def updateassistant(dto)
+    sql = "UPDATE `assistants` SET last_login=NOW(), last_ip=? WHERE id=?"
+    st = @my.prepare(sql)
+    st.execute(dto.last_ip,dto.id)   
+    st.close    
+  end
+  
+  def delete_expired_assistants    
+    sql = "DELETE FROM `assistants` WHERE date_created < NOW() -  INTERVAL 14 DAY"
+    st = @my.prepare(sql)
+    st.execute()   
+    st.close        
+  end
+  
   def fetchResults(stmt)
     rows = []
     while row = stmt.fetch do
@@ -361,7 +385,9 @@ class AssistantDao
       dto.assistantid=row[3]
       dto.speechid=row[4]		
       dto.devicetype=row[5]
-      dto.date_created=row[6]	      
+      dto.date_created=row[6]	   
+      dto.last_login=row[7]	   
+      dto.last_ip=row[8]	   
       rows << dto
     end
     return rows
@@ -430,4 +456,102 @@ class StatisticsDao
     end
     return rows
   end
+end
+
+
+class KeyStatistics
+  attr_accessor :id, :key_id,:total_finishspeech_requests,:total_tokens_recieved
+    
+  def id=(value)  # The setter method for @id
+    @id =  value
+  end
+    
+  def key_id=(value)  # The setter method for @key_id
+    @key_id =  value
+  end
+  
+  def total_finishspeech_requests=(value)  # The setter method for @uptime
+    @total_finishspeech_requests =  value
+  end
+    
+  def total_tokens_recieved=(value)  # The setter method for @uptime
+    @total_tokens_recieved =  value
+  end
+    
+end
+
+class KeyStatisticsDao
+
+  include Singleton
+	
+  def initialize()	
+      
+  end
+    
+  def connect_to_db(my)
+    @my = my
+  end
+    
+  def insert(dto)
+    sql = "INSERT INTO `key_stats` (key_id,total_finishspeech_requests,total_tokens_recieved) VALUES (? , 0 , 0) "
+    st = @my.prepare(sql)
+    st.execute(dto.id)    
+    st.close         
+  end
+  
+  
+  def get_key_stats(dto)
+    sql = "SELECT * FROM `key_stats` WHERE key_id=?"
+    st = @my.prepare(sql)
+    st.execute(dto.id)
+    result = fetchResults(st)
+    st.close        
+    return result[0]
+  end
+        
+  def save_key_stats(dto)    
+    sql = "UPDATE `key_stats` SET total_finishspeech_requests=?,total_tokens_recieved=?  WHERE id=?"
+    st = @my.prepare(sql)
+    st.execute(dto.total_finishspeech_requests,dto.total_tokens_recieved,dto.id)   
+    st.close    
+  end
+    
+  def delete_keystats()   
+    sql = "DELETE FROM key_stats WHERE key_id  IN (SELECT id FROM `keys` WHERE expired='True')"
+    st = @my.prepare(sql)
+    st.execute()   
+    st.close        
+  end
+  
+  def fetchResults(stmt)
+    rows = []
+    while row = stmt.fetch do
+      dto = KeyStatistics.new
+      dto.id = row[0]
+      dto.key_id= row[1]      
+      dto.total_finishspeech_requests=row[2]              
+      dto.total_tokens_recieved=row[3]      
+      rows << dto  
+    end
+    return rows
+  end
+end
+
+
+class ActivationToken
+  attr_accessor :id,:aceid,:data
+    
+  def id=(value)  # The setter method for @id
+    @id =  value
+  end
+    
+  def aceid=(value)  # The setter method for @refid
+    @aceid =  value
+  end
+  
+  def data=(value)  # The setter method for @data
+    @data =  value
+  end
+    
+    
 end

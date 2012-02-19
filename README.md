@@ -35,6 +35,40 @@ Solution 1: Change IP/Network
 Solution 2: Use other iPhone4s DATA
 
 
+Version 0.9.8.3-expr 
+---------------------
+
+* Improvemnts upon activation Token
+
+* Added ip and last login logging for clients 
+
+* Fixed email notification 
+
+* Fixed detection of validation data due to apple not replying back with validation expired
+
+* Added default sensitivity to 5 invalid requests without apple response! You can change that and read more info in config.yml
+
+**Info about the Validation System**
+
+* Go to (http://quartzcoding.blogspot.com/2012/02/siri-validation-data-and-access-token.html)
+
+
+** UPDATE HOW TO **
+
+* In the `Three-Little_Pigs` Folder do 
+
+    gem uninstall siriproxy
+    
+    git pull
+
+    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
+
+    rake install && siriproxy bundle
+
+
+-Done
+
+
 Version 0.9.8.2-expr (This is a beta release! More work is needed)
 ----------------------------------------------------------------
 
