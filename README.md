@@ -38,7 +38,7 @@ Solution 2: Use other iPhone4s DATA
 Version 0.9.8.3-expr 
 ---------------------
 
-* Improvemnts upon activation Token
+* Improvements upon activation Token
 
 * Added ip and last login logging for clients 
 
@@ -48,7 +48,7 @@ Version 0.9.8.3-expr
 
 * Added default sensitivity to 5 invalid requests without apple response! You can change that and read more info in config.yml
 
-**Info about the Validation System**
+**Info about the Validation and access token System**
 
 * Go to (http://quartzcoding.blogspot.com/2012/02/siri-validation-data-and-access-token.html)
 
