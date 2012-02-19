@@ -77,7 +77,7 @@ Version 0.9.8.2-expr (This is a beta release! More work is needed)
 
 * Added 4S exploit tnx for helping @xnlzee, Matthew Lau and @786IC0NIC
 
-** UPDATE HOW TO **
+**UPDATE HOW TO**
 
 * In the `Three-Little_Pigs` Folder do 
 
@@ -90,7 +90,7 @@ Version 0.9.8.2-expr (This is a beta release! More work is needed)
 
 -Done
 
-** The Exploit WARNING!!!! YOU DO THIS ON YOUR OWN RISK. **
+**The Exploit WARNING!!!! YOU DO THIS ON YOUR OWN RISK**
 
 * More on 
 
