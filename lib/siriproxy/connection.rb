@@ -272,7 +272,7 @@ class SiriProxy::Connection < EventMachine::Connection
 		elsif line.match(/^User-Agent:/)   
       #if its and iphone4s
       self.clientport, self.clientip = Socket.unpack_sockaddr_in(get_peername) 
-			if line.match(/iPhone4,1;/)
+			if line.match(/iPhone5,1;/)
         puts "[RollEyes - Siri*-*Proxy]" 
         puts "[Info - SiriProxy] iPhone 4S connected from IP #{self.clientip}"        
         puts "[RollEyes - Siri*-*Proxy]" 
@@ -678,7 +678,7 @@ class SiriProxy::Connection < EventMachine::Connection
              
               puts object["properties"]["abSources"][i]["properties"]["accountIdentifier"] if $LOG_LEVEL > 2
               @client.appleAccountid=object["properties"]["abSources"][i]["properties"]["accountIdentifier"]
-               
+               i=@absources_count # hehe lets see if this fixes some errors
             end
             
           end
