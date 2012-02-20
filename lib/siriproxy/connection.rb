@@ -137,10 +137,9 @@ class SiriProxy::Connection < EventMachine::Connection
           #or if the client is not valid then protection gets on the way          
           @userassistant=Assistant.new
           @userassistant.assistantid=@loadedassistant
-          @userassistant.speechid=@loadedspeechid
-          @userassistant.last_ip=@clientip
+          @userassistant.speechid=@loadedspeechid          
           @userassistant=$assistantDao.check_duplicate(@userassistant)  #check if there is a registerd assistant
-          
+          @userassistant.last_ip=@clientip
           if  @userassistant!=nil #If there is one then
             
             puts "[Authentication - SiriProxy] Registered Assistant Found "
