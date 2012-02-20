@@ -138,8 +138,8 @@ class SiriProxy::Connection < EventMachine::Connection
           @userassistant=Assistant.new
           @userassistant.assistantid=@loadedassistant
           @userassistant.speechid=@loadedspeechid
-          @userassistant.last_ip=@clientip
           @userassistant=$assistantDao.check_duplicate(@userassistant)  #check if there is a registerd assistant
+          @userassistant.last_ip=@clientip # this way the last_ip will be set when a duplicate-entry is found! 
           
           if  @userassistant!=nil #If there is one then
             
