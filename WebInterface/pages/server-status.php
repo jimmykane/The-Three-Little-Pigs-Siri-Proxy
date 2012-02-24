@@ -16,7 +16,7 @@ $statistics = new Statistics();
 $keys = getkeys();
 $config = getconfig();
 $stats = getstats();
-$server_running = $statistics->checkServer("173.0.57.230:443");
+$server_running = $statistics->checkServer($websiteProperty->getProperty("hostname_or_ip") . ':443');
 
 //error_reporting(0);
 ?>
@@ -194,16 +194,20 @@ if(count($keys[0]) > 0) {
 <?php
 
 	$keyTables = array();
-	
-	foreach($keys[0] as $key) {
-		$keyTables[] = $key;
+
+	if(count($keys[0]) > 0) {
+		foreach($keys[0] as $key) {
+			$keyTables[] = $key;
+		}
 	}
-    foreach ($keys[1] as $key) {
-		$keyTables[] = $key;
+	if(count($keys[1]) > 0) {
+	    foreach ($keys[1] as $key) {
+			$keyTables[] = $key;
+		}
 	}
 	
 	 ?>
-    <table id="keys">
+    <table id="keys" width="100%">
         <tr>
             <th><acronym class="toolTip" title="Just a follow number for the list.">#</acronym></th>
             <th><acronym class="toolTip" title="The validation data hash is an undecryptable MD5 hash from the validation session data. This is used as unique identifier and can never be the same, it's put in a 32-bit long MD5 hash to protect the data from being stolen. The validation session data is used to identify an iPhone 4S to the Apple servers, to get a connection with the Siri servers.">Validation data hash</acronym></th>
@@ -213,7 +217,7 @@ if(count($keys[0]) > 0) {
         </tr>
         <?php
 		if($keys[2] == false) {
-			echo '<td colspan="4"><p class="notification red">There are no keys available right now, feed the piggies!</p></td>';
+			echo '<td colspan="5"><p class="notification red" style="padding: 0 5px; margin: 5px;">There are no keys available right now, feed the piggies!</p></td>';
 		}
 		else {
 			
