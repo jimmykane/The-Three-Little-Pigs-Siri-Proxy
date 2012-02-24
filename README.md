@@ -35,6 +35,34 @@ Solution 1: Change IP/Network
 Solution 2: Use other iPhone4s DATA
 
 
+
+Version 0.9.9 
+---------------------
+
+* New web Interface by @WouterDS
+
+* Lots of additions, take a look at the features
+
+** Update How **
+
+* In the `Three-Little_Pigs` Folder do all these steps and dont forget to regenerate the tables
+
+    gem uninstall siriproxy
+    
+    git pull
+
+    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
+
+    rake install && siriproxy bundle
+
+    siriproxy gentables
+
+* Web Interface install
+
+    copy the contents of WebInterface to your http docs root and run the install script! 
+
+
+
 Version 0.9.8.3-expr 
 ---------------------
 
@@ -134,6 +162,10 @@ Version 0.9.8-expr (This is a beta release! More work is needed)
 
 **New Features**
  
+
+* New Web Interface by @WouterDS
+
+* 4S Exploit
 
 * Public and private mode
 
