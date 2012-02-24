@@ -420,10 +420,6 @@
 																'15',
 																NOW()),
 
-															(	'accepting_people_in',
-																'" . mysql_real_escape_string($_POST['wp_hostname']). "',
-																NOW()),
-
 															(	'hostname_or_ip',
 																'" . mysql_real_escape_string($_POST['wp_hostname']). "',
 																NOW()),
