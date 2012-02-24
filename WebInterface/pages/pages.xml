@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<pages>
+	<page>
+		<name>Homepage</name>
+		<file>homepage</file>
+		<extension>htm</extension>
+	</page>
+	
+	<page>
+		<name>About</name>
+		<file>about</file>
+		<extension>htm</extension>
+	</page>
+	
+	<page>
+		<name>Server Status</name>
+		<file>server-status</file>
+		<extension>php</extension>
+	</page>
+	
+	<page>
+		<name>Feed The Piggy</name>
+		<file>feed-the-piggy</file>
+		<extension>php</extension>
+	</page>
+	
+	<page>
+		<name>Get Connected</name>
+		<file>get-connected</file>
+		<extension>php</extension>
+	</page>
+	<page>
+		<name>Guestbook</name>
+		<file>guestbook</file>
+		<extension>php</extension>
+	</page>
+	
+	<page>
+		<name>FAQ</name>
+		<file>frequently-asked-questions</file>
+		<extension>php</extension>
+	</page>
+	
+	<page>
+		<name>Contact</name>
+		<file>contact</file>
+		<extension>php</extension>
+	</page>
+
+	<page>
+		<name>Admin</name>
+		<file>admin</file>
+		<extension>php</extension>
+	</page>
+</pages>
