@@ -4,11 +4,17 @@ The Three Little Pigs - Siri Proxy | Web Interface
 About
 -----
 Project: The Three Little Pigs - Siri Proxy | Web Interface
+
 Project start date: 21-01-2012
+
 Author: Wouter De Schuyter
+
 Website: www.wouterds.be
+
 E: info[@]wouterds[.]be
+
 T: www.twitter.com/wouterds
+
 Last update: 22-02-2012
 
 This is the webinterface which is for the public to get info & stats but also for the administrators to control things.
