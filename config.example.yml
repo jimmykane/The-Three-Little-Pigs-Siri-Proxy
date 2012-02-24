@@ -3,15 +3,21 @@ port: 443
 #Log level 2 to see whats going on
 log_level: 2
 
-#HOT! THis will force the 4S to regenerate new Validation data every time give Do not use lowe than 15 seconds
-#default response from apple is 90000. Change this to what you please! 12 is a good value
-regenerate_interval: 90000 
-
 #This is your Database config:
 db_host: 'localhost'
 db_user: 'root'
 db_pass: 'pass'
 db_database: 'siri'
+
+#Programm options
+#1. Auto Key Ban -> When a key cannot create more assistants then it is marked as banned,
+# and wont be used for creating assistants in apple db. This doesnt imply that the key is banned though :-)
+# Just a precation measure
+# Default = ON , Recommended='ON' 
+# Also if this is set to on there is a happy_hour_countdown that when is reached sets the keys unbanned again
+# Defalut 6 hours = 21600 sec
+happy_hour_countdown: 21600
+enable_auto_key_ban: 'ON'
 
 
 #Validation Sesitivity. This is the value that will force the key to be expired due to apple not responding to invalid keys
@@ -24,12 +30,20 @@ db_database: 'siri'
 expiration_sesitivity: 5
 
 
+#HOT! THis will force the 4S to regenerate new Validation data every time give Do not use lowe than 15 seconds
+#default response from apple is 90000.Change this to what you please! 12 is a good value
+regenerate_interval: 90000
 
 #For Generating Certs for iPhones. Has 2 hosts, so that you can use guzzoni on a 4S, 
 #and your server also using the same instance.
 ca_name: 'SiriProxyCA'
 server1: 'guzzoni.apple.com'
 server2: 'your.siri.proxy.server.com'
+
+#Private or public server. The difference is that public automaticaly sets new clients as valid and private as invalid
+# thus denying access
+private_server: 'ON'
+
 
 #For your email configuration. Edit to your email address and set send_email to 'ON'. 
 #Also plase notice that you have to configure sendmail for you pc if its required

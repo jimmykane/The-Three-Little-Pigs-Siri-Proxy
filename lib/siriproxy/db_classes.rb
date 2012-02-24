@@ -80,7 +80,7 @@ end
 
 class Key  
 
-  attr_accessor :id, :assistantid,:speechid,:speechid,:expired,:sessionValidation,:keyload,:date_added,:availablekeys
+  attr_accessor :id, :assistantid,:speechid,:speechid,:expired,:sessionValidation,:keyload,:date_added,:availablekeys,:banned
 	
 	def id=(value)  # The setter method for @id
 		@id =  value
@@ -101,7 +101,9 @@ class Key
 	def expired=(value)  # The setter method for @expired
 		@expired =  value
 	end
-
+  def banned=(value)  # The setter method for @banned
+		@banned =  value
+	end
 	def keyload=(value)  # The setter method for @load
 		@keyload =  value
 	end
@@ -139,16 +141,16 @@ class KeyDao
 	end
 
 	def insert(dto)
-		sql = "INSERT INTO `keys` (assistantid,speechid,sessionValidation,expired,date_added ) VALUES ( ? ,  ?  , ? , ?,NOW())"
+		sql = "INSERT INTO `keys` (assistantid,speechid,sessionValidation,banned,expired,date_added ) VALUES ( ? ,  ?  , ? , ? , ? ,NOW())"
 		st = @my.prepare(sql)		
-		st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.expired)
+		st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired)
 		st.close
 	end
 
 	def update(dto)
-		sql = "UPDATE `keys` SET assistantid = ?,speechid= ? ,sessionValidation=?,expired=?,keyload=? WHERE id = ?"
+		sql = "UPDATE `keys` SET assistantid = ?,speechid= ? ,sessionValidation=?,banned=?,expired=?,keyload=? WHERE id = ?"
 		st = @my.prepare(sql)
-		st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.expired,dto.keyload,dto.id)
+		st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.keyload,dto.id)
 		st.close
 	end
   
@@ -181,22 +183,52 @@ class KeyDao
 		st.execute(dto.id)
 		st.close		
 	end
+  
   def expire_24h_hour_keys()				
-		sql = "UPDATE `keys` SET expired='TRUE'  WHERE date_added < NOW() -  INTERVAL 24 HOUR "
+		sql = "UPDATE `keys` SET expired='TRUE'  WHERE date_added < NOW() -  INTERVAL 30 HOUR"
 		st = @my.prepare(sql)
 		st.execute()
     result = st.affected_rows
  		st.close
     return result		
+		
 	end
+  
+  def key_banned(dto)				
+		sql = "UPDATE `keys` SET banned='True' WHERE id = ?"
+		st = @my.prepare(sql)
+		st.execute(dto.id)
+		st.close		
+	end
+
+  def unban_keys()
+    sql = "UPDATE `keys` SET banned='False' WHERE expired='False'"
+		st = @my.prepare(sql)
+		st.execute()
+		st.close		
+  end
+  def ban_keys()
+    sql = "UPDATE `keys` SET banned='True' WHERE expired='False'"
+		st = @my.prepare(sql)
+		st.execute()
+		st.close		
+  end
   def listkeys()
 		sql = "SELECT * FROM `keys` WHERE expired!='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
 		st = @my.prepare(sql)
 		st.execute()
 		result = fetchResults(st)
  		st.close
-    return result
-		
+    return result		
+	end
+  
+  def list_keys_for_new_assistant()
+		sql = "SELECT * FROM `keys` WHERE expired!='True' AND banned!='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
+		st = @my.prepare(sql)
+		st.execute()
+		result = fetchResults(st)
+ 		st.close
+    return result		
 	end
   
   def findoverloaded()    
@@ -219,6 +251,17 @@ class KeyDao
 		
 	end
 
+  def next_available_for_new_assistant() #we will need the outer join here
+		sql = "SELECT K.*, Count(1) FROM `keys` K
+ LEFT OUTER JOIN `assistants` A ON A.key_id = K.id  WHERE K.expired='FALSE'   AND K.banned='False'  AND K.keyload<(SELECT max_keyload FROM `config` WHERE id=1)
+GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
+		st = @my.prepare(sql)
+		st.execute()
+		result = fetchResults(st)    
+ 		st.close
+    return result[0]		
+	end
+  
 	def check_duplicate(dto)
 		sql = "SELECT * FROM `keys` WHERE sessionValidation=?"
 		st = @my.prepare(sql)
@@ -239,8 +282,9 @@ class KeyDao
 			dto.assistantid= row[1]
 			dto.speechid=row[2]
 			dto.sessionValidation=row[3]
-			dto.expired=row[4]
-      dto.keyload=row[5]
+      dto.banned=row[4]
+			dto.expired=row[5]
+      dto.keyload=row[6]
 			rows << dto
 		end
 
@@ -249,12 +293,15 @@ class KeyDao
 end
 
 class Assistant
-  attr_accessor :id, :key_id,:assistantid,:speechid,:date_created
+  attr_accessor :id, :key_id,:client_apple_account_id,:assistantid,:speechid,:devicetype,:date_created,:last_login,:last_ip
   def id=(value)  # The setter method for @id
     @id =  value
   end
   def key_id=(value)  # The setter method for @key_id
     @key_id =  value
+  end
+  def client_apple_account_id=(value)  # The setter method for @key_id
+    @client_apple_account_id =  value
   end
   def assistantid=(value)  # The setter method for @assistantid
     @assistantid =  value
@@ -262,9 +309,19 @@ class Assistant
   def speechid=(value)  # The setter method for @speechid
     @speechid =  value
   end
+  def devicetype=(value)  # The setter method for @speechid
+    @devicetype =  value
+  end
   def date_created=(value)  # The setter method for @date_created
     @date_created =  value
   end
+  def last_login=(value)  # The setter method for @last_login
+    @last_login =  value
+  end
+  def last_ip=(value)  # The setter method for @last_ip
+    @last_ip =  value
+  end
+  
 end
 
 class AssistantDao
@@ -298,28 +355,108 @@ class AssistantDao
   end
     
   def createassistant(dto)
-    sql = "INSERT INTO `assistants` (key_id,assistantid,speechid,date_added) VALUES ( ? , ? , ? , NOW()))"
+    sql = "INSERT INTO `assistants` (key_id,client_apple_account_id,assistantid,speechid,device_type,date_created,last_login,last_ip) VALUES ( ? ,? , ? , ? , ? ,NOW(), NOW() , ? )"
     st = @my.prepare(sql)
-    st.execute(dto.key_id,dto.assistantid,dto.speechid)   
+    st.execute(dto.key_id,dto.client_apple_account_id,dto.assistantid,dto.speechid,dto.devicetype,dto.last_ip)   
     st.close    
   end
     
+  def updateassistant(dto)
+    sql = "UPDATE `assistants` SET last_login=NOW(), last_ip=? WHERE id=?"
+    st = @my.prepare(sql)
+    st.execute(dto.last_ip,dto.id)   
+    st.close    
+  end
+  
+  def delete_expired_assistants    
+    sql = "DELETE FROM `assistants` WHERE date_created < NOW() -  INTERVAL 14 DAY"
+    st = @my.prepare(sql)
+    st.execute()   
+    st.close        
+  end
+  
   def fetchResults(stmt)
     rows = []
     while row = stmt.fetch do
       dto = Assistant.new
       dto.id = row[0]
       dto.key_id= row[1]
-      dto.assistantid=row[2]
-      dto.speechid=row[3]		
-      dto.date_added=row[4]	      
+      dto.client_apple_account_id=row[2]
+      dto.assistantid=row[3]
+      dto.speechid=row[4]		
+      dto.devicetype=row[5]
+      dto.date_created=row[6]	   
+      dto.last_login=row[7]	   
+      dto.last_ip=row[8]	   
       rows << dto
     end
     return rows
   end
 
+end  
+#added stats fixes crash with interval
+class Statistics
+  attr_accessor :id, :elapsed,:uptime,:happy_hour_elapsed
+    
+  def id=(value)  # The setter method for @id
+    @id =  value
+  end
+    
+  def elapsed=(value)  # The setter method for @elapsedkeycheck
+    @elapsed =  value
+  end
+  
+  def happy_hour_elapsed=(value)  # The setter method for @uptime
+    @happy_hour_elapsed =  value
+  end
+    
+  def uptime=(value)  # The setter method for @uptime
+    @uptime =  value
+  end
+    
 end
 
+class StatisticsDao
+
+  include Singleton
+	
+  def initialize()	
+      
+  end
+    
+  def connect_to_db(my)
+    @my = my
+  end
+    
+  def getstats()
+    sql = "SELECT * FROM `stats` WHERE id=1"
+    st = @my.prepare(sql)
+    st.execute()
+    result = fetchResults(st)
+    st.close        
+    return result[0]
+  end
+        
+  def savestats(dto)    
+    sql = "UPDATE `stats` SET elapsed_key_check_interval=?,up_time=?,happy_hour_elapsed=? WHERE id=1"
+    st = @my.prepare(sql)
+    st.execute(dto.elapsed,dto.uptime,dto.happy_hour_elapsed)   
+    st.close    
+  end
+    
+  def fetchResults(stmt)
+    rows = []
+    while row = stmt.fetch do
+      dto = Statistics.new
+      dto.id = row[0]
+      dto.elapsed= row[1]      
+      dto.uptime=row[2]              
+      dto.happy_hour_elapsed=row[3]      
+      rows << dto  
+    end
+    return rows
+  end
+end
 
 
 class KeyStatistics
@@ -398,4 +535,23 @@ class KeyStatisticsDao
     end
     return rows
   end
+end
+
+
+class ActivationToken
+  attr_accessor :id,:aceid,:data
+    
+  def id=(value)  # The setter method for @id
+    @id =  value
+  end
+    
+  def aceid=(value)  # The setter method for @refid
+    @aceid =  value
+  end
+  
+  def data=(value)  # The setter method for @data
+    @data =  value
+  end
+    
+    
 end
