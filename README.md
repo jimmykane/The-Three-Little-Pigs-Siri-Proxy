@@ -35,49 +35,79 @@ Solution 1: Change IP/Network
 Solution 2: Use other iPhone4s DATA
 
 
-Version 0.9bd
--------------
 
-* Fixed email Notifications
+Version 0.9.9 
+---------------------
 
-Version 0.9bc
--------------
+* New web Interface by @WouterDS
+
+* Lots of additions, take a look at the features
+
+** Update How **
+
+* In the `Three-Little_Pigs` Folder do all these steps and dont forget to regenerate the tables
+
+    gem uninstall siriproxy
+    
+    git pull
+
+    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
+
+    rake install && siriproxy bundle
+
+    siriproxy gentables
+
+* Web Interface install
+
+    copy the contents of WebInterface to your http docs root and run the install script! 
+
+
+
+Version 0.9.8.3-expr 
+---------------------
+
+* Improvements upon activation Token
+
+* Added ip and last login logging for clients 
+
+* Fixed email notification 
 
 * Fixed detection of validation data due to apple not replying back with validation expired
 
 * Added default sensitivity to 5 invalid requests without apple response! You can change that and read more info in config.yml
 
-**Info about the Validation System**
+**Info about the Validation and access token System**
 
 * Go to (http://quartzcoding.blogspot.com/2012/02/siri-validation-data-and-access-token.html)
 
 
-** UPDATE HOW TO **
+**UPDATE HOW TO**
 
 * In the `Three-Little_Pigs` Folder do 
 
-    gem uninstall siriproxy and press yes for all
-
+    gem uninstall siriproxy
+    
     git pull
 
-    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml` . Edit it to your needs
+    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
 
-    rake install && siriproxy bundle    
+    rake install && siriproxy bundle
 
-    siriproxy gennewtables
 
 -Done
 
 
-Version 0.9bb
--------------
+Version 0.9.8.2-expr (This is a beta release! More work is needed)
+----------------------------------------------------------------
+
 
 * Added Temporary fix for Expiration of Validation Data! Now keys in database will be checked every 10 minutes and any key found existing in database longer than 24 hours is set to expired! Working on a better fix.
 
 * Added 4S exploit tnx for helping @xnlzee, Matthew Lau and @786IC0NIC
 
+**UPDATE HOW TO**
 
-** UPDATE HOW TO **
+* Backup your keys and tables that you need!
 
 * In the `Three-Little_Pigs` Folder do 
 
@@ -85,15 +115,15 @@ Version 0.9bb
 
     copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
 
-    rake install && siriproxy bundle    
+    rake install && siriproxy bundle
+    
+    siriproxy gentables 
 
 -Done
 
+**The Exploit WARNING!!!! YOU DO THIS ON YOUR OWN RISK**
 
-
-** The Exploit WARNING!!!! YOU DO THIS ON YOUR OWN RISK. **
-
-* More on (http://quartzcoding.blogspot.com/2012/02/siri-protocol-exploit-for-multiple-key.html)
+* More on 
 
 * Steps 
 
@@ -112,6 +142,65 @@ Version 0.9bb
     7. Repeat as many times you want! 
 
     To restore just delete again assistant.plist
+
+
+
+Version 0.9.8-expr (This is a beta release! More work is needed)
+----------------------------------------------------------------
+
+* Please keep in mind that you need new clients to delete the`assistnat.plist` in `/var/mobile/Library/com.apple.assistant.plist` or chnage Spire host 
+
+* Also they must have iCloud enabled on their phones!!! -> This on what clients are unique!!!!
+
+* Always reboot after that!!!
+
+* You can also run the server with the following command for less verbose output in the terminal and error logging
+
+     ./siriproxy-restarter 2> error2.log | grep -E 'Processing|NEW Client|OLD Client|RollEyes|Assistant ID|nickname|Happy hour'
+
+
+
+**New Features**
+ 
+
+* New Web Interface by @WouterDS
+
+* 4S Exploit
+
+* Public and private mode
+
+* Authorization :-) -> Requires the client to have an apple account! (97% have!!!) Read here on how to use (http://quartzcoding.blogspot.com/2012/02/three-little-pigs-authentication-system.html)
+
+* Ban Detection. Detects witch keys cannot create more assistants and sets them as banned. Read what this is here (http://quartzcoding.blogspot.com/2012/02/three-little-pigs-authentication-system.html)
+
+* Improved grabber. Now the connection limit wont apply on the 4S devices. Max active connections reached? No problem! :-) 
+
+* Improved Connection dropping
+
+* Now stores counters in database so even after a crash the keyload dropdown works
+
+* Happy hour. When this timers is reached then sets the keys as unbanned in order for new people to connect. Mostly useful by public servers.
+
+* Many many many bug fixes, almost everything reported in github!!!
+
+
+**Updating from previous versions**
+
+* Just download the experimental branch into a new folder using
+
+    `git clone -b experimental https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy`
+
+* Copy the new config to `~/.siriproxy/` and edit it to your needs
+
+* Do a rake install and a bundle again
+
+    `rake install && siriproxy bundle`
+
+* Regenerate all tables (Warning this will erase everything in the Database so make sure you backup your keys and settings)
+
+    `siriproxy gentables`
+
+
 
 Version 0.9ba
 -------------
@@ -137,7 +226,7 @@ Version 0.9ba
 
 
 Version 0.9am
------------
+-------------
 
 * Added in example plugin custom commands to display server stats. Be sure to have it enabled in your `~/.siriproxy/config.yml` 
 
@@ -173,7 +262,7 @@ Version 0.9am
 
 
 Version 0.8b
------------
+------------
 
 * Fixed several bugs, added email notifications, key protection and much more
 
@@ -196,6 +285,20 @@ There is no need to do anything more (create db etc) than these steps
 
 Features
 --------
+
+* Authentication 
+
+* Ban protection
+
+* Improved statistics
+
+* User device logging
+
+* User logging
+
+* Improved connection limits 
+
+* Improved Grabber
 
 * Plugins api and config capable (NEW)
 
@@ -234,8 +337,9 @@ Set-up Instructions
 
 **Tutorial for Ubuntu is now here**
 
-Thanks to am3yrus we have a tutorial for ubuntu lovers: [http://am3yrus.over-blog.com](http://am3yrus.over-blog.com)
+Thanks to am3yrus we have a tutorial for ubuntu lovers: [http://www.am3yrus.com/](http://www.am3yrus.com/)
 
+Also the above site holds different setup instructions.
 If you go for the above tutorial then there is no need to follow any instructions below. 
 
 
@@ -694,6 +798,8 @@ Acknowledgements
 **Credits, greetings and big thanks to all the following.. RESPECT**
 
 Mr. Nirodimos for helping with the iphone4s 
+
+  @Appdium For explaining the Siri protocol and cracking it!
 
   @plamoni ([http://twitter.com/plamoni])
 
