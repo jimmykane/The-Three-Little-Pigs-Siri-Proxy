@@ -365,7 +365,9 @@
 										  `happy_hour_elapsed` int(255) unsigned NOT NULL,
 										  PRIMARY KEY (`id`)
 										) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
+                                                                                
+                                                                                INSERT INTO `stats` VALUES ('1', '0', '0','0');
+                                                                                
 										-- ----------------------------
 										--  Table structure for `website_properties`
 										-- ----------------------------
