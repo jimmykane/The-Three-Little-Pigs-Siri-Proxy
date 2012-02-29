@@ -17,7 +17,7 @@ db_database: 'siri'
 # Also if this is set to on there is a happy_hour_countdown that when is reached sets the keys unbanned again
 # Defalut 6 hours = 21600 sec
 happy_hour_countdown: 21600
-enable_auto_key_ban: 'ON'
+enable_auto_key_ban: 'OFF'
 
 
 #Validation Sesitivity. This is the value that will force the key to be expired due to apple not responding to invalid keys
@@ -49,6 +49,7 @@ private_server: 'ON'
 #Also plase notice that you have to configure sendmail for you pc if its required
 #It is possible that this email will be delivered to your spam/junk folder.
 #html formated message is default
+#If you want to add multiple email addresses then just seperate them here with commas
 send_email: 'OFF' 
 email_from: 'TheThreeLittlePigs@pigs.com'
 email_to: 'youremail'
