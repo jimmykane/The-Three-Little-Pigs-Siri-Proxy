@@ -99,7 +99,7 @@ class SiriProxy
    
         puts "Server is Up and Running"
         @timer=5 # set the timer value
-        @timer2=300 # The expirer
+        @timer2=60 # The expirer
         @timer3=900 # the expirer of old assistnats
         #
         #Temp fix and guard to apple not replying command failed
