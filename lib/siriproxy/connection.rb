@@ -141,9 +141,9 @@ class SiriProxy::Connection < EventMachine::Connection
           @userassistant.speechid=@loadedspeechid  
           @userassistant.last_ip=@clientip 
           @userassistant=$assistantDao.check_duplicate(@userassistant)  #check if there is a registerd assistant
-          @userassistant.last_ip=@clientip
+          
           if  @userassistant!=nil #If there is one then
-            
+            @userassistant.last_ip=@clientip
             puts "[Authentication - SiriProxy] Registered Assistant Found "
             @user=$clientsDao.find_by_assistant(@userassistant) #find the user with that assistant
             pp @user
@@ -764,6 +764,7 @@ class SiriProxy::Connection < EventMachine::Connection
           @assistant.last_ip=@clientip
           if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
             puts "[Info - SiriProxy] Duplicate Assistand ID. Assistant NOT saved"
+            $assistantDao.updateassistant(@userassistant)
           else
             $assistantDao.createassistant(@assistant)
             puts "[Info - SiriProxy] Inserted Assistant ID #{@assistant.assistantid} for client #{@client}"  
