@@ -131,13 +131,18 @@ class SiriProxy
           $statistics.elapsed+=@timer
           $statistics.uptime+=@timer 
           $statistics.happy_hour_elapsed+=@timer 
+          #if there is autokeyban to off there is no need for happy hour
+          if $APP_CONFIG.enable_auto_key_ban=='OFF' or $APP_CONFIG.enable_auto_key_ban=='OFF'
+            $statistics.happy_hour_elapsed=0
+          end
           
-          #Happy hour enabler
+          #Happy hour enabler only if autokeyban is on 
           if $statistics.happy_hour_elapsed > $APP_CONFIG.happy_hour_countdown and ($APP_CONFIG.enable_auto_key_ban=='ON' or $APP_CONFIG.enable_auto_key_ban=='on') and @unbanned==false
             $keyDao.unban_keys
            @unbanned=true 
             puts "[Happy hour - SiriProxy] Unbanning Keys and Doors are open"
           end
+          #only when autokeyban is on
           if $statistics.happy_hour_elapsed > ($APP_CONFIG.happy_hour_countdown + 300) and ($APP_CONFIG.enable_auto_key_ban=='ON' or $APP_CONFIG.enable_auto_key_ban=='on') and @unbanned==true
             $keyDao.ban_keys
             puts "[Happy hour - SiriProxy] Banning Keys and Doors are Closed"
