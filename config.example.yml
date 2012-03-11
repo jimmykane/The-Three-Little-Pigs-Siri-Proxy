@@ -16,7 +16,7 @@ db_database: 'siri'
 # Default = ON , Recommended='ON' 
 # Also if this is set to on there is a happy_hour_countdown that when is reached sets the keys unbanned again
 # Defalut 6 hours = 21600 sec
-happy_hour_countdown: 21600
+happy_hour_countdown: 60
 enable_auto_key_ban: 'OFF'
 
 
@@ -42,7 +42,7 @@ server2: 'your.siri.proxy.server.com'
 
 #Private or public server. The difference is that public automaticaly sets new clients as valid and private as invalid
 # thus denying access
-private_server: 'ON'
+private_server: 'OFF'
 
 
 #For your email configuration. Edit to your email address and set send_email to 'ON'. 
