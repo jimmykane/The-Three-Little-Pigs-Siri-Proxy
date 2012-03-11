@@ -6,7 +6,7 @@ require 'cora'
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
 
-  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid,:devicetype,:activation_token_recieved,:activation_token,:assistant_found,:connectionfromguzzoni,:commandFailed,:finishspeech
+  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid,:devicetype,:activation_token_recieved,:activation_token,:assistant_found,:connectionfromguzzoni,:commandFailed,:finishspeech,:GetSessionCertificateResponse
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
     self.other_connection.last_ref_id = ref_id if other_connection.last_ref_id != ref_id
@@ -38,6 +38,7 @@ class SiriProxy::Connection < EventMachine::Connection
     @connectionfromguzzoni=false
     @commandFailed=false
     @finishspeech=false
+    @GetSessionCertificateResponse=false #send only by apple or server
     puts "[Info - SiriProxy] Created a connection!" 
     
     #self.pending_connect_timeout=5
@@ -140,7 +141,7 @@ class SiriProxy::Connection < EventMachine::Connection
           @userassistant.speechid=@loadedspeechid  
           @userassistant.last_ip=@clientip 
           @userassistant=$assistantDao.check_duplicate(@userassistant)  #check if there is a registerd assistant
-          
+          @userassistant.last_ip=@clientip
           if  @userassistant!=nil #If there is one then
             
             puts "[Authentication - SiriProxy] Registered Assistant Found "
@@ -571,6 +572,11 @@ class SiriProxy::Connection < EventMachine::Connection
       if object["class"]=="CreateSessionInfoResponse" and object["properties"]["validityDuration"]!=nil and  self.other_connection.is_4S==true and $APP_CONFIG.regenerate_interval!=nil
         object["properties"]["validityDuration"]=$APP_CONFIG.regenerate_interval #this timer can be customized
         puts "[Exploit - SiriProxy] Command send to iPhone4s to regenerate multiple keys every [#{$APP_CONFIG.regenerate_interval}] seconds !!!"
+      end
+      
+      #Lets record if Guzzoni sent the respose to create session
+      if object["class"]=="GetSessionCertificateResponse"
+        @GetSessionCertificateResponse=true
       end
       
       #let record how many activation token get per key
