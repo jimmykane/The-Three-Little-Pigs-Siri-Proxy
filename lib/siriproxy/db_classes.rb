@@ -185,7 +185,7 @@ class KeyDao
 	end
   
   def expire_24h_hour_keys()				
-		sql = "UPDATE `keys` SET expired='TRUE'  WHERE date_added < NOW() -  INTERVAL 22 HOUR"
+		sql = "UPDATE `keys` SET expired='TRUE'  WHERE date_added < NOW() -  INTERVAL 20 HOUR"
 		st = @my.prepare(sql)
 		st.execute()
     result = st.affected_rows
