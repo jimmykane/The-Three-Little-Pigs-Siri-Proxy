@@ -764,6 +764,7 @@ class SiriProxy::Connection < EventMachine::Connection
           @assistant.last_ip=@clientip
           if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
             puts "[Info - SiriProxy] Duplicate Assistand ID. Assistant NOT saved"
+            @assistant.last_ip=@clientip
             $assistantDao.updateassistant(@userassistant)
           else
             $assistantDao.createassistant(@assistant)
