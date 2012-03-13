@@ -118,10 +118,10 @@ class SiriProxy
          
         #Delete old assistants. If i am not mistaken each assistant is valid for only 7 days.
         #Delete 14 days assistants for database cleaning 
-        EventMachine::PeriodicTimer.new(@timer3){
-            puts "[Expirer - SiriProxy] DELETING past 14 DAYS Assistants"
-           $assistantDao.delete_expired_assistants
-         } 
+#        EventMachine::PeriodicTimer.new(@timer3){
+#            puts "[Expirer - SiriProxy] DELETING past 14 DAYS Assistants"
+#           $assistantDao.delete_expired_assistants
+#         } 
         
         
         
