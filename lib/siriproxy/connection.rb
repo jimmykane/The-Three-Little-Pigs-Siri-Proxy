@@ -279,6 +279,12 @@ class SiriProxy::Connection < EventMachine::Connection
         puts "[RollEyes - Siri*-*Proxy]" 
 				self.is_4S = true
         @devicetype="iPhone4S"
+      elsif line.match(/iPad3,1;/)
+        puts "[RollEyes - Siri*-*Proxy]" 
+        puts "[Info - SiriProxy] iPad 3 connected from IP #{self.clientip}"        
+        puts "[RollEyes - Siri*-*Proxy]" 
+				self.is_4S = true
+        @devicetype="iPad 3"
       else # now seperates anything else exept 4s
         #we can close connections here .... and we can count them here       
         puts "[Info - Siriproxy] Curent connections [#{$conf.active_connections}]"
@@ -542,7 +548,7 @@ class SiriProxy::Connection < EventMachine::Connection
     
     #this comes as an reply from spire to set access token
     if(object["class"] == "CommandIgnored")
-			puts "[Info - SiriProxy] Maybe a Bug or just ignoring the Authentication Token"
+			puts "[Info - SiriProxy] Just ignoring the Authentication Token"
       if self.other_connection.activation_token_recieved==true and self.other_connection.activation_token.aceid==object["refId"]
         puts "[Info - SiriProxy] Letting the activation command ignored pass throught"
       else  
