@@ -291,7 +291,7 @@ def checkHaveiPad3Data(object)
           
           if (@available_keys) > 0
                 
-            puts "[Key - SiriProxy] Keys available for Public  [#{@available_keys}]"
+            puts "[Key - SiriProxy] Keys available for Public and Other than load and create assistant [#{@available_keys}]"
             @key=$keyDao.next_available_4S() 
             puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data" 
             puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
