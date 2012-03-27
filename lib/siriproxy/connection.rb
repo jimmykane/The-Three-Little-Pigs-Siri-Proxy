@@ -144,7 +144,7 @@ def checkHaveiPad3Data(object)
         @assistant_found=false
         @key=Key.new     
         @available_keys=$keyDao.list_4S_keys_for_new_assistant().count
-        if (@available_keys) > 0
+        if (@available_keys) > 0 and $keyDao.next_available_4S_for_new_assistant()!=nil 
           puts "[Key - SiriProxy] Keys available for Creation of Assistants [#{@available_keys}]"
           @key=$keyDao.next_available_4S_for_new_assistant()
           puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data" 
