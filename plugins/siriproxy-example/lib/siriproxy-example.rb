@@ -30,7 +30,7 @@ class SiriProxy::Plugin::Example < SiriProxy::Plugin
     
   #Essential for server status
   listen_for /how many keys/i do
-    @keysavailable=$keyDao.listkeys().count
+    @keysavailable=$keyDao.list4Skeys().count
     if @keysavailable==1
       say "There is one key available on the server" #say something to the user!    
       request_completed #always complete your request! Otherwise the phone will "spin" at the user!
