@@ -12,7 +12,7 @@ end
 
 class SiriProxy::CommandLine
   BANNER = <<-EOS
-    Siri Proxy is a proxy server for Apple's Siri "assistant." The idea is to allow non Siri Capable Devices to connect.Welcome to The Three Little Pigs.
+    Siri Proxy is a proxy server for Apple's Siri "assistant." The idea is to allow non Siri Capable Devices to connect. Welcome to The Three Little Pigs.
     
     See: https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy
     
@@ -122,7 +122,7 @@ class SiriProxy::CommandLine
     end
 
     dbh.query("DROP TABLE IF EXISTS `keys`;")
-    puts "Table keys Droped"
+    puts "Table keys Dropped"
 
     dbh.query("CREATE TABLE `keys` (
   `id` int(100) unsigned NOT NULL AUTO_INCREMENT,
@@ -133,13 +133,14 @@ class SiriProxy::CommandLine
   `expired` enum('False','True') NOT NULL DEFAULT 'False',
   `keyload` int(255) unsigned NOT NULL DEFAULT '0',
   `date_added` datetime NOT NULL,
+  `iPad3` enum('False','True') NOT NULL DEFAULT 'False',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")  
     puts "Created Table keys"
 
 
     dbh.query("DROP TABLE IF EXISTS `config`;")
-    puts "Table config Droped"
+    puts "Table config Dropped"
 
 
     dbh.query("CREATE TABLE `config` (
@@ -158,7 +159,7 @@ class SiriProxy::CommandLine
         puts "Added Default setting in Table config"
         
     dbh.query("DROP TABLE IF EXISTS `assistants`;")
-    puts "Table Assistants Droped"   
+    puts "Table Assistants Dropped"   
     dbh.query("CREATE TABLE `assistants` (
   `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
   `key_id` int(255) unsigned NOT NULL,
@@ -175,7 +176,7 @@ class SiriProxy::CommandLine
     
     
     dbh.query("DROP TABLE IF EXISTS `stats`;")
-    puts "Table Statistics Droped"   
+    puts "Table Statistics Dropped"   
     dbh.query("CREATE TABLE `stats` (
   `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
   `elapsed_key_check_interval` int(255) NOT NULL,
@@ -190,7 +191,7 @@ class SiriProxy::CommandLine
     
     
      dbh.query("DROP TABLE IF EXISTS `clients`;")
-     puts "Table Clients Droped"  
+     puts "Table Clients Dropped"  
  dbh.query("CREATE TABLE `clients` (
   `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
   `fname` mediumtext,
@@ -208,7 +209,7 @@ class SiriProxy::CommandLine
          puts "Table Clients Populated"   
     
      dbh.query("DROP TABLE IF EXISTS `key_stats`;")
-     puts "Table Key_stats Droped"  
+     puts "Table Key_stats Dropped"  
  dbh.query("CREATE TABLE `key_stats` (
   `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
   `key_id` int(255) unsigned NOT NULL,
@@ -216,7 +217,7 @@ class SiriProxy::CommandLine
   `total_tokens_recieved` int(255) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
-     puts "Table KeyStats Created"   
+     puts "Table Key_stats Created"   
    
     
     

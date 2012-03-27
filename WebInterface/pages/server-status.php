@@ -33,8 +33,10 @@ $server_running = $statistics->checkServer($websiteProperty->getProperty("hostna
 		$keyFactor = 0;
 if(count($keys[0]) > 0) {	
 	foreach($keys[0] as $key) {
-		if($key['keyload'] < $config['max_keyload']) {
-			$keyFactor++;
+		if($key['iPad3'] == 'False') {
+			if($key['keyload'] < $config['max_keyload']) {
+				$keyFactor++;
+			}
 		}
 	}
 }		
@@ -173,7 +175,7 @@ if(count($keys[0]) > 0) {
 <?php if(count($keys[0]) == 0) { ?>
 <p class="notification yellow" style="margin-top: 0;">All the keys are expired, <a href="?page=feed-the-piggy">feed the piggy</a> to add <?php echo $config['max_connections'] ?> more connections!</p>
 <?php } elseif($keyFactor == 0) { ?>
-<p class="notification yellow" style="margin-top: 0;">All the keys are <b>overloaded</b>. This means the keys are getting a lot of load and are paused to prevent a ban. Please <a href="?page=feed-the-piggy">feed the piggy</a> to add <?php echo $config['max_connections'] ?> more connections!</p>
+<p class="notification yellow" style="margin-top: 0;">Either all the keys are <b>overloaded</b> or are <b>iPad 3</b> keys. This either means the 4S keys are getting a lot of load and are paused to prevent a ban or you need to donate new 4S keys. Please <a href="?page=feed-the-piggy">feed the piggy</a> to add <?php echo $config['max_connections'] ?> more connections!</p>
 <?php
 } elseif($config['active_connections'] >= ($config['max_connections'] * $keyFactor)) { ?>
 <p class="notification yellow" style="margin-top: 0;">The maximum connection count is reached. This means all new connections will get refused by the server. <a href="?page=feed-the-piggy">Feed the piggy</a> another key to add <?php echo $config['max_connections'] ?> more connections!</p>
@@ -213,11 +215,12 @@ if(count($keys[0]) > 0) {
             <th><acronym class="toolTip" title="The validation data hash is an undecryptable MD5 hash from the validation session data. This is used as unique identifier and can never be the same, it's put in a 32-bit long MD5 hash to protect the data from being stolen. The validation session data is used to identify an iPhone 4S to the Apple servers, to get a connection with the Siri servers.">Validation data hash</acronym></th>
             <th><acronym class="toolTip" title="How many assistants a key has generated. This is where Apple bans keys. If too many assistants are generated in short time Apple will stop generating assistants. Keys with <b>0</b> are just donated or probably banned and can't generate a new assistant but they can still be used to process speech packets.">Assistants</acronym></th>
             <th><acronym class="toolTip" title="The current load on each key. The more packets a key processes the hotter it's getting. Once it has reached the max keyload it's paused for a short time to let it cool down.">Keyload</acronym></th>
+            <th><acronym class="toolTip" title="Which device donated the key, an iPhone 4S or iPad3.">Device</acronym></th>
             <th><acronym class="toolTip" title="The date and time when the key was donated.">Date added</acronym></th>
         </tr>
         <?php
 		if($keys[2] == false) {
-			echo '<td colspan="5"><p class="notification red" style="padding: 0 5px; margin: 5px;">There are no keys available right now, feed the piggies!</p></td>';
+			echo '<td colspan="6"><p class="notification red" style="padding: 0 5px; margin: 5px;">There are no keys available right now, feed the piggies!</p></td>';
 		}
 		else {
 			
@@ -287,6 +290,14 @@ if(count($keys[0]) > 0) {
 						}
 						?>
 					</td>
+          <td width="50px">
+            <?php if($key['iPad3'] == 'True') {
+                                                    echo 'iPad 3';
+                                                }
+                                                else {
+                                                    echo 'iPhone 4S';
+                                                } ?>
+          </td>
 					<td width="145px">
 						<?php echo $key['date_added'] ?>
 					</td>
@@ -297,7 +308,7 @@ if(count($keys[0]) > 0) {
 					break;
 				}
 			} 
-			echo '<tr><td colspan="5" class="pagination">';
+			echo '<tr><td colspan="6" class="pagination">';
 			if($pid > 1) {
 				echo '<a href="?page=' . $_GET['page'] . '&amp;page-id=' . 1 . '#keys">&lt;&lt;</a>';
 				echo '<a href="?page=' . $_GET['page'] . '&amp;page-id=' . ($pid - 1) . '#keys">&lt;</a>';

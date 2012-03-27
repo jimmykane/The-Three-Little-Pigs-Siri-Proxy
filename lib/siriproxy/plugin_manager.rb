@@ -25,11 +25,17 @@ class SiriProxy::PluginManager < Cora
         @plugins << plugin
       end
     end
-    log "Plugins laoded: #{@plugins}"
+    log "Plugins loaded: #{@plugins}"
   end
 
   def process_filters(object, direction) 
     object_class = object.class #This way, if we change the object class we won't need to modify this code.
+
+    if object['class'] == 'SetRequestOrigin'
+      properties = object['properties']
+      set_location(properties['latitude'], properties['longitude'], properties)
+    end
+
     plugins.each do |plugin|
       #log "Processing filters on #{plugin} for '#{object["class"]}'"
       new_obj = plugin.process_filters(object, direction)
