@@ -138,13 +138,16 @@ def checkHaveiPad3Data(object)
   #this method validation data now is the one that defines the keyload. 
   #This way KeyLoad gets the meaning of request. Its updated via request of assistantload/create
   def get_validationData(object)  
-    begin      
+    begin     
+      
       if object["class"]=="CreateAssistant" # now separates initial request to Loadassistant and Create Assistant
         @createassistant=true 
         @assistant_found=false
         @key=Key.new     
         @available_keys=$keyDao.list_4S_keys_for_new_assistant().count
+        
         if (@available_keys) > 0 and $keyDao.next_available_4S_for_new_assistant()!=nil 
+          
           puts "[Key - SiriProxy] Keys available for Creation of Assistants [#{@available_keys}]"
           @key=$keyDao.next_available_4S_for_new_assistant()
           puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data" 
@@ -155,24 +158,24 @@ def checkHaveiPad3Data(object)
           puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
           self.sessionValidationData= @key.sessionValidation	
           self.validationData_avail = true       
-          #hmmmmm
-        else 
-          puts "[Key - SiriProxy] No keys available in database Closing connections"
           
+        else 
+          
+          puts "[Key - SiriProxy] No keys available in database Closing connections"          
           self.validationData_avail = false
           self.close_connection() #close connections
           self.other_connection.close_connection() #close other
+          return false
           
         end
-      else 
-        @createassistant=false
-        @assistant_found=true
-        #grab assistant
-        if object["class"]=="LoadAssistant" and object["properties"]["assistantId"] !=nil and object["properties"]["speechId"] !=nil
+        
+      elsif object["class"]=="LoadAssistant" and object["properties"]["assistantId"] !=nil and object["properties"]["speechId"] !=nil
+        
+          @createassistant=false
+          @assistant_found=true
+          #grab assistant
           @loadedassistant=object["properties"]["assistantId"]
-          @loadedspeechid=object["properties"]["speechId"]
-          puts @loadedassistant
-          puts @loadedspeechid
+          @loadedspeechid=object["properties"]["speechId"]         
         
           #Lets put some auth here!!!
           #if the assistant that the client is trying to load is not registered (was not created on this server)
@@ -184,10 +187,11 @@ def checkHaveiPad3Data(object)
           @userassistant=$assistantDao.check_duplicate(@userassistant)  #check if there is a registerd assistant
           
           if  @userassistant!=nil #If there is one then
+            
             @userassistant.last_ip=@clientip
             puts "[Authentification - SiriProxy] Registered Assistant Found "
-            @user=$clientsDao.find_by_assistant(@userassistant) #find the user with that assistant
-            pp @user
+            @user=$clientsDao.find_by_assistant(@userassistant) #find the user with that assistant            
+            
             if @user==nil #Incase this user doesnt exist!!!!!!! Bug or not complete transaction
                 
               puts "[Authentification - SiriProxy] No client for Assistant [#{@loadedassistant}]  Found :-("
@@ -197,6 +201,7 @@ def checkHaveiPad3Data(object)
               return false
                 
             elsif @user.valid=='False' 
+              
               $assistantDao.updateassistant(@userassistant) # to update with last login and ip
               puts "[Authentification - SiriProxy] Access Denied!! -> Client name:[#{@user.fname}] nickname[#{@user.nickname}] appleid[#{@user.appleAccountid}] Connected "
               self.validationData_avail = false
@@ -205,8 +210,10 @@ def checkHaveiPad3Data(object)
               return false
                 
             elsif @user.valid=='True' #if its valid!!!
+              
               @key=Key.new
               @available_keys=$keyDao.list4Skeys().count      
+              
               if (@available_keys) > 0
                 puts "[Key - SiriProxy] Keys available for Registered Only clients [#{@available_keys}]"
                 @key=$keyDao.next_available_4S() 
@@ -218,19 +225,24 @@ def checkHaveiPad3Data(object)
                 puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
                 self.sessionValidationData= @key.sessionValidation	
                 self.validationData_avail = true  
-                #hmmmmm
+                
               else 
+                
                 puts "[Key - SiriProxy] No 4S keys available in database Closing connections"
                 self.validationData_avail = false
                 self.close_connection() #close connections
                 self.other_connection.close_connection() #close other
+                return false
+                
               end
                 
               $assistantDao.updateassistant(@userassistant)
               puts "[Authentification - SiriProxy] Access Granted! -> Client name:[#{@user.fname}] nickname[#{@user.nickname}] appleid[#{@user.appleAccountid}] Connected "
+              
             end
             
           else #if no assistant registed found 
+            
             if $APP_CONFIG.private_server=="ON" or  $APP_CONFIG.private_server=="on"
               
               puts "[Authentification - SiriProxy] Assistant [#{@loadedassistant}] is not registered. Banning Connection"
@@ -240,9 +252,12 @@ def checkHaveiPad3Data(object)
               return false
             
             else # if its a public server 
+              
               @key=Key.new
               @available_keys=$keyDao.list4Skeys().count      
+              
               if (@available_keys) > 0
+                
                 puts "[Key - SiriProxy] Keys available for Public  [#{@available_keys}]"
                 @key=$keyDao.next_available_4S() 
                 puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data" 
@@ -253,27 +268,52 @@ def checkHaveiPad3Data(object)
                 puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
                 self.sessionValidationData= @key.sessionValidation	
                 self.validationData_avail = true  
-                #hmmmmm
+                
               else 
+                
                 puts "[Key - SiriProxy] No keys available in database Closing connections"
                 self.validationData_avail = false
                 self.close_connection() #close connections
                 self.other_connection.close_connection() #close other
+                return false
+                
               end
-            end
+              
+            end            
             
           end
-          
        
           
-        else          
-          puts "[Key - SiriProxy] No keys available in database Closing connections"
-          self.validationData_avail = false
-          self.close_connection() #close connections
-          self.other_connection.close_connection() #close other
-        end
-        
-      end
+        else  #here now goes anything except these 2 objects let's let them pass the validation        
+          
+          @key=Key.new
+          @available_keys=$keyDao.list4Skeys().count      
+          
+          if (@available_keys) > 0
+                
+            puts "[Key - SiriProxy] Keys available for Public  [#{@available_keys}]"
+            @key=$keyDao.next_available_4S() 
+            puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data" 
+            puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
+            @oldkeyload=@key.keyload          
+            @key.keyload=@key.keyload+10  
+            $keyDao.setkeyload(@key) 
+            puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
+            self.sessionValidationData= @key.sessionValidation	
+            self.validationData_avail = true  
+                
+          else 
+               
+            puts "[Key - SiriProxy] No keys available in database Closing connections"
+            self.validationData_avail = false
+            self.close_connection() #close connections
+            self.other_connection.close_connection() #close other
+            return false
+                
+          end
+          
+        end       
+      
       #rescue SystemCallError,NoMethodError
     rescue SystemCallError
       puts "[ERROR - SiriProxy] Error opening the sessionValidationData  file. Connect an iPhone4S first or create them manually!"
@@ -780,9 +820,8 @@ def checkHaveiPad3Data(object)
           puts 'Debug Step one of creating assistants' if $LOG_LEVEL > 2
           puts 'Client is 'if $LOG_LEVEL > 2
           pp @client if $LOG_LEVEL > 2
-          @oldclient=$clientsDao.check_duplicate(@client)
-          puts 'oldclient is '
-          pp @oldclient
+          @oldclient=$clientsDao.check_duplicate(@client)          
+          
           if @oldclient==nil                   
             $clientsDao.insert(@client)
             puts "[Client - SiriProxy] NEW Client [#{@client.appleAccountid}] and Valid=[#{@client.valid}] added To database"
