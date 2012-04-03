@@ -270,6 +270,9 @@ class SiriProxy::CommandLine
       opts.on('-l', '--log LOG_LEVEL', '[server]   The level of debug information displayed (higher is more)') do |log_level|
         $APP_CONFIG.log_level = log_level
       end
+      opts.on('-u', '--user USER',     '[server]   The user to run as after launch') do |user|
+        $APP_CONFIG.user = user
+      end
       opts.on('-b', '--branch BRANCH', '[update]   Choose the branch to update from (default: master)') do |branch|
         @branch = branch
       end
