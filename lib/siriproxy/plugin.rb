@@ -16,9 +16,9 @@ class SiriProxy::Plugin < Cora::Plugin
 
     if(options[:target] == :iphone)
       self.manager.guzzoni_conn.inject_object_to_output_stream(object)
-  	elsif(options[:target] == :guzzoni)
-  	  self.manager.iphone_conn.inject_object_to_output_stream(object)
-  	end
+    elsif(options[:target] == :guzzoni)
+      self.manager.iphone_conn.inject_object_to_output_stream(object)
+    end
   end
 
   def last_ref_id
