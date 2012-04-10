@@ -190,9 +190,16 @@ class KeyDao
 		st.execute(dto.id)
 		st.close		
 	end
+
+	def validation_valid(dto)				
+		sql = "UPDATE `keys` SET expired='False' WHERE id = ?"
+		st = @my.prepare(sql)
+		st.execute(dto.id)
+		st.close		
+	end
   
-  def expire_24h_hour_keys()				
-		sql = "UPDATE `keys` SET expired='TRUE'  WHERE date_added < NOW() -  INTERVAL 20 HOUR"
+  def expire_hour_keys()				
+		sql = "UPDATE `keys` SET expired='TRUE'  WHERE date_added < NOW() -  INTERVAL #{$APP_CONFIG.hours_till_key_expires} HOUR"
 		st = @my.prepare(sql)
 		st.execute()
     result = st.affected_rows

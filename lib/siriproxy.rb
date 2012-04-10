@@ -82,9 +82,18 @@ $keyDao.connect_to_db($my_db)
     else
       puts '[Info - SiriProxy] Private Server [OFF]!'
     end
-    #Set default to revent errors.
+    #Set default to prevent errors.
+    if $APP_CONFIG.hours_till_key_expires==nil
+      puts '[Info - SiriProxy] hours_till_key_expires not set in config.yml. Using default: 20'
+      $APP_CONFIG.hours_till_key_expires = 20
+    end
+    if $APP_CONFIG.try_iPad3==nil
+      puts '[Info - SiriProxy] try_iPad3 not set in config.yml. Will not try using iPad3 Keys'
+      $APP_CONFIG.try_iPad3 = false
+    end
+
     if $APP_CONFIG.happy_hour_countdown==nil
-      puts '[Info - SiriProxy] Happy Hour Countdown not set in config.yml. Using default'
+      puts '[Info - SiriProxy] happy_hour_countdown not set in config.yml. Using default: 21600'
       $APP_CONFIG.happy_hour_countdown = 21600
     end
     #Start The EventMacine
@@ -104,8 +113,8 @@ $keyDao.connect_to_db($my_db)
         #
         #Temp fix and guard to apple not replying command failed
          EventMachine::PeriodicTimer.new(@timer2){
-            puts "[Expirer - SiriProxy] Expiring past 20 hour Keys"
-           @totalkeysexpired=$keyDao.expire_24h_hour_keys
+            puts "[Expirer - SiriProxy] Expiring past #{$APP_CONFIG.hours_till_key_expires} hour Keys"
+           @totalkeysexpired=$keyDao.expire_hour_keys
            puts @totalkeysexpired
            for i in (0...@totalkeysexpired)
                sendemail()

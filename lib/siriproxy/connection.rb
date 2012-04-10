@@ -82,6 +82,14 @@ class SiriProxy::Connection < EventMachine::Connection
       key4s.iPad3='False'
       if $keyDao.check_duplicate(key4s)
         puts "[Info - SiriProxy] Duplicate Validation Data. Key NOT saved"
+          #Reset The Key, so it will be vallid if it was marked expired by mistake
+#          @key=key4s
+#          @keystats=$keystatisticsDao.get_key_stats(@key)
+#          $keyDao.validation_valid(@key)              
+#          @keystats.total_finishspeech_requests=0
+#          @keystats.total_tokens_recieved=0
+#          $keystatisticsDao.save_key_stats(@keystats)
+        
       else
         $keyDao.insert(key4s)
         puts "[Info - SiriProxy] Keys written to Database"        
@@ -227,13 +235,25 @@ def checkHaveiPad3Data(object)
                 self.validationData_avail = true  
                 
               else 
-                
-                puts "[Key - SiriProxy] No 4S keys available in database Closing connections"
-                self.validationData_avail = false
-                self.close_connection() #close connections
-                self.other_connection.close_connection() #close other
-                return false
-                
+                @available_keys=$keyDao.listiPad3keys().count
+                if $APP_CONFIG.try_iPad3==true and (@available_keys) > 0
+                  puts "[Key - SiriProxy] iPad 3 Keys available for Registered Only clients [#{@available_keys}]"
+                  @key=$keyDao.next_available_iPad3() 
+                  puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data" 
+                  puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
+                  @oldkeyload=@key.keyload          
+                  @key.keyload=@key.keyload+10  
+                  $keyDao.setkeyload(@key) 
+                  puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
+                  self.sessionValidationData= @key.sessionValidation	
+                  self.validationData_avail = true
+                else
+                  puts "[Key - SiriProxy] No 4S keys available in database Closing connections"
+                  self.validationData_avail = false
+                  self.close_connection() #close connections
+                  self.other_connection.close_connection() #close other
+                  return false
+                end
               end
                 
               $assistantDao.updateassistant(@userassistant)
@@ -270,13 +290,25 @@ def checkHaveiPad3Data(object)
                 self.validationData_avail = true  
                 
               else 
-                
-                puts "[Key - SiriProxy] No keys available in database Closing connections"
-                self.validationData_avail = false
-                self.close_connection() #close connections
-                self.other_connection.close_connection() #close other
-                return false
-                
+                @available_keys=$keyDao.listiPad3keys().count
+                if $APP_CONFIG.try_iPad3==true and (@available_keys) > 0
+                  puts "[Key - SiriProxy] iPad 3 Keys available clients [#{@available_keys}]"
+                  @key=$keyDao.next_available_iPad3() 
+                  puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data" 
+                  puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
+                  @oldkeyload=@key.keyload          
+                  @key.keyload=@key.keyload+10  
+                  $keyDao.setkeyload(@key) 
+                  puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
+                  self.sessionValidationData= @key.sessionValidation	
+                  self.validationData_avail = true
+                else
+                  puts "[Key - SiriProxy] No 4S keys available in database Closing connections"
+                  self.validationData_avail = false
+                  self.close_connection() #close connections
+                  self.other_connection.close_connection() #close other
+                  return false
+                end
               end
               
             end            
@@ -303,13 +335,25 @@ def checkHaveiPad3Data(object)
             self.validationData_avail = true  
                 
           else 
-               
-            puts "[Key - SiriProxy] No keys available in database Closing connections"
-            self.validationData_avail = false
-            self.close_connection() #close connections
-            self.other_connection.close_connection() #close other
-            return false
-                
+            @available_keys=$keyDao.listiPad3keys().count
+            if $APP_CONFIG.try_iPad3==true and (@available_keys) > 0
+              puts "[Key - SiriProxy] iPad 3 Keys available clients [#{@available_keys}]"
+              @key=$keyDao.next_available_iPad3() 
+              puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data" 
+              puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
+              @oldkeyload=@key.keyload          
+              @key.keyload=@key.keyload+10  
+              $keyDao.setkeyload(@key) 
+              puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]" 
+              self.sessionValidationData= @key.sessionValidation	
+              self.validationData_avail = true
+            else
+              puts "[Key - SiriProxy] No 4S or iPad3 keys available in database Closing connections"
+              self.validationData_avail = false
+              self.close_connection() #close connections
+              self.other_connection.close_connection() #close other
+              return false
+            end
           end
           
         end       
@@ -679,12 +723,11 @@ def checkHaveiPad3Data(object)
     
     if object["properties"] != nil  
       
-      #OMG !!!! This is what i needed! Now the 4s creates new keys every 30 secods
       if object["class"]=="CreateSessionInfoResponse" and object["properties"]["validityDuration"]!=nil and  self.other_connection.is_4S==true and $APP_CONFIG.regenerate_interval!=nil
         object["properties"]["validityDuration"]=$APP_CONFIG.regenerate_interval #this timer can be customized
         puts "[Exploit - SiriProxy] Command send to iPhone4s to regenerate multiple keys every [#{$APP_CONFIG.regenerate_interval}] seconds !!!"
       end
-      #OMG !!!! This is what i needed! Now the iPad3 creates new keys every 30 secods
+
       if object["class"]=="CreateSessionInfoResponse" and object["properties"]["validityDuration"]!=nil and  self.other_connection.is_iPad3==true and $APP_CONFIG.regenerate_interval!=nil
         object["properties"]["validityDuration"]=$APP_CONFIG.regenerate_interval #this timer can be customized
         puts "[Exploit - SiriProxy] Command send to iPad3 to regenerate multiple keys every [#{$APP_CONFIG.regenerate_interval}] seconds !!!"
@@ -713,44 +756,47 @@ def checkHaveiPad3Data(object)
         $keystatisticsDao.save_key_stats(@keystats)
         pp @keystats
       end
+
      
-      #Lets record how many Finish speech requests are made without the activation token and not by creating witch may not include the token if max assistants are reached
+      #Lets record how many Finish speech requests are made without the activation token and not by creating witch may not include the token if max assistants are reached 
       if object["class"]=="FinishSpeech" and self.name=="iPhone" and  self.other_connection.activation_token_recieved==false and @key!=nil and self.validationData_avail==true and  @createassistant==false and @finishspeech==false
-        
-        if  $APP_CONFIG.expiration_sesitivity!=nil and $APP_CONFIG.expiration_sesitivity > 0
-       
-          @expiration_sesitivity=$APP_CONFIG.expiration_sesitivity
-        else
-          @expiration_sesitivity=5 #default value
-        end
-        #if the device has a wrong assistant.plist then it will make constant finish speech and will break this code.
-        #lets fix that 
-        @finishspeech=true
-        @keystats=$keystatisticsDao.get_key_stats(@key)
-        if @keystats==nil
-          $keystatisticsDao.insert(@key) 
-          @keystats=$keystatisticsDao.get_key_stats(@key)
-          @keystats.total_finishspeech_requests+=1
-          $keystatisticsDao.save_key_stats(@keystats)
-          puts '[Info - SiriProxy] Recorded FinishSpeech'
-          pp @keystats
-        elsif  @keystats.total_finishspeech_requests > @expiration_sesitivity #consider a dynamic number instead of 15 
-          #here comes the ceck!          
-          if @keystats.total_tokens_recieved==0
-            $keyDao.validation_expired(@key) #probalby expired              
-            puts '[Key - SiriProxy] Probably the validation expired! '
-            sendemail()
+
+        if  $APP_CONFIG.expiration_sesitivity!=0
+          if  $APP_CONFIG.expiration_sesitivity!=nil and $APP_CONFIG.expiration_sesitivity > 0
+
+            @expiration_sesitivity=$APP_CONFIG.expiration_sesitivity
           else
-            #reset them if no anomaly detected such as  expiration
-            @keystats.total_finishspeech_requests=0
-            @keystats.total_tokens_recieved=0
+            @expiration_sesitivity=5 #default value
+          end
+          #if the device has a wrong assistant.plist then it will make constant finish speech and will break this code.
+          #lets fix that
+          @finishspeech=true
+          @keystats=$keystatisticsDao.get_key_stats(@key)
+          if @keystats==nil
+            $keystatisticsDao.insert(@key)
+            @keystats=$keystatisticsDao.get_key_stats(@key)
+            @keystats.total_finishspeech_requests+=1
             $keystatisticsDao.save_key_stats(@keystats)
-          end  
-        else
-          @keystats.total_finishspeech_requests+=1
-          $keystatisticsDao.save_key_stats(@keystats)
-          puts '[Info - SiriProxy] Recorded FinishSpeech'
-        end        
+            puts '[Info - SiriProxy] Recorded FinishSpeech'
+            pp @keystats
+          elsif  @keystats.total_finishspeech_requests > @expiration_sesitivity #consider a dynamic number instead of 15
+            #here comes the ceck!
+            if @keystats.total_tokens_recieved==0
+              $keyDao.validation_expired(@key) #probalby expired
+              puts '[Key - SiriProxy] Probably the validation expired! '
+              sendemail()
+            else
+              #reset them if no anomaly detected such as  expiration
+              @keystats.total_finishspeech_requests=0
+              @keystats.total_tokens_recieved=0
+              $keystatisticsDao.save_key_stats(@keystats)
+            end
+          else
+            @keystats.total_finishspeech_requests+=1
+            $keystatisticsDao.save_key_stats(@keystats)
+            puts '[Info - SiriProxy] Recorded FinishSpeech'
+          end
+        end
       end
       
       
@@ -1022,10 +1068,9 @@ def checkHaveiPad3Data(object)
     speech = SiriProxy::Interpret.speech_recognized(object)
     if speech != nil
       inject_object_to_output_stream(object)
-      block_rest_of_session if plugin_manager.process(speech) 
+      block_rest_of_session if plugin_manager.process(speech)
       return nil
     end
-    
     
     #object = new_obj if ((new_obj = SiriProxy::Interpret.unknown_intent(object, self, plugin_manager.method(:unknown_command))) != false)    
     #object = new_obj if ((new_obj = SiriProxy::Interpret.speech_recognized(object, self, plugin_manager.method(:speech_recognized))) != false)
