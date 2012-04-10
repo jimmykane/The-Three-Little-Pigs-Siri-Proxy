@@ -24,15 +24,22 @@ enable_auto_key_ban: 'OFF'
 #The pholoshopy behind this is that when some Finish speech requests are made and apple doesnt reply back then the server marks the keys as invalid
 #default value 5
 #default value for small servers 5
+#Value of 0 will disable this function
 #recommended for medium sized server 10-15
 #recomended for large servers like paradox 30
 
 expiration_sesitivity: 5
 
+# This allows you to set how long after a key is added until it expires. If you have the regerate_interval set to 3600, 
+# then 24 will be an awesome value to use. If this Value is not set, it will default to 20
+hours_till_key_expires: 24
 
 #HOT! THis will force the 4S to regenerate new Validation data every time give Do not use lowe than 15 seconds
-#default response from apple is 90000.Change this to what you please! 12 is a good value
-regenerate_interval: 90000
+#default response from apple is 90000. Change this to what you please! 3600 (1 Hour) is a good value
+regenerate_interval: 3600 
+
+#The try_iPad3 option will let the server use iPad3 keys if there are no 4S keys avaliable. Only works for dictation. 
+try_iPad3: true
 
 #For Generating Certs for iPhones. Has 2 hosts, so that you can use guzzoni on a 4S, 
 #and your server also using the same instance.

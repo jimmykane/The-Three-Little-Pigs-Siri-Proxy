@@ -28,12 +28,55 @@ So you got a server and you are afraid if apple will ban your device? Lets get t
 
 4. Also keep in mind that there is a limit on how many assistants you can create per key per day. I am not sure but 30 is an average. Please correct me if I am mistaken. There will be a new release soon where there will be a limit on that and hopefully this issue will be resolved.
 
-To the pont: You got a 4S, you get commandFailed and/or cannot create assistantid? 
+To the point: You got a 4S, you get commandFailed and/or cannot create assistantid? 
 
 Solution 1: Change IP/Network
 
-Solution 2: Use other iPhone4s DATA
+Solution 2: Delete the /var/mobile/Library/Preferences/com.apple.assistant.plist on the phone (jailbreak req)
 
+Solution 3: Use other iPhone4s DATA
+
+
+
+
+
+
+Version 0.9.12 
+---------------------
+
+* Now saves iPhone 4S and the New iPad (AKA iPad 3) keys, and keeps track separately
+
+* New options in config.yml.  
+
+  `expiration_sesitivity: 0` will now disable expiring of keys due to no response from finish speech (Some clients have invalid assistants that kill them). 
+
+  `hours_till_key_expires: 24` - Put how long you want the keys to last before they expire. Default is 20 if this option isn't in there. 
+
+  `try_iPad3: true` - If there are no 4S keys, it will use iPad3 keys. NOTE: iPad 3 keys only work for dictation. 
+
+
+
+** Update How **
+
+* Install phpMyAdmin (google how), and backup your keys, clients, config, etc.
+
+* In the `Three-Little_Pigs` Folder do all these steps and don't forget to regenerate the tables
+
+    gem uninstall siriproxy
+    
+    git pull
+
+    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
+
+    rake install && siriproxy bundle
+
+    siriproxy gentables
+
+* Web Interface install
+
+    copy the contents of WebInterface to your http docs root and run the install script! 
+
+* Restore the stuff you backed up. 
 
 
 Version 0.9.9 
@@ -141,7 +184,7 @@ Version 0.9.8.2-expr (This is a beta release! More work is needed)
 
     7. Repeat as many times you want! 
 
-    To restore just delete again assistant.plist
+    To restore just delete com.apple.assistant.plist again.
 
 
 

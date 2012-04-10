@@ -7,12 +7,12 @@ require 'ostruct'
 # @todo want to make SiriProxy::Commandline without having to
 # require 'siriproxy'. Im sure theres a better way.
 class SiriProxy
-    
+
 end
 
 class SiriProxy::CommandLine
   BANNER = <<-EOS
-    Siri Proxy is a proxy server for Apple's Siri "assistant." The idea is to allow non Siri Capable Devices to connect. Welcome to The Three Little Pigs.
+  Siri Proxy is a proxy server for Apple's Siri "assistant." The idea is to allow non Siri Capable Devices to connect. Welcome to The Three Little Pigs.
     
     See: https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy
     
@@ -228,105 +228,105 @@ class SiriProxy::CommandLine
   def update(directory=nil)
     if(directory)
       puts "=== Installing from '#{directory}' ==="
-      puts `cd #{directory} && rake install`
-      puts "=== Bundling ===" if $?.exitstatus == 0
-      puts `siriproxy bundle` if $?.exitstatus == 0
-      puts "=== SUCCESS ===" if $?.exitstatus == 0
-    
-      exit $?.exitstatus
-    else
-      branch_opt = @branch ? "-b #{@branch}" : ""
-      @branch = "master" if @branch == nil
-      puts "=== Installing latest code from git://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy.git [#{@branch}] ==="
-    
-      tmp_dir = "/tmp/SiriProxy.install." + (rand 9999).to_s.rjust(4, "0")
-    
-      `mkdir -p #{tmp_dir}`
-      puts `git clone #{branch_opt} git://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy.git #{tmp_dir}`  if $?.exitstatus == 0
-      puts "=== Performing Rake Install ===" if $?.exitstatus == 0
-      puts `cd #{tmp_dir} && rake install`  if $?.exitstatus == 0
-      puts "=== Bundling ===" if $?.exitstatus == 0
-      puts `siriproxy bundle`  if $?.exitstatus == 0
-      puts "=== Cleaning Up ===" and puts `rm -rf #{tmp_dir}` if $?.exitstatus == 0
-      puts "=== SUCCESS ===" if $?.exitstatus == 0
-    
-      exit $?.exitstatus
-    end 
+  puts `cd #{directory} && rake install`
+  puts "=== Bundling ===" if $?.exitstatus == 0
+  puts `siriproxy bundle` if $?.exitstatus == 0
+  puts "=== SUCCESS ===" if $?.exitstatus == 0
+
+  exit $?.exitstatus
+  else
+    branch_opt = @branch ? "-b #{@branch}" : ""
+    @branch = "master" if @branch == nil
+    puts "=== Installing latest code from git://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy.git [#{@branch}] ==="
+
+    tmp_dir = "/tmp/SiriProxy.install." + (rand 9999).to_s.rjust(4, "0")
+
+    `mkdir -p #{tmp_dir}`
+    puts `git clone #{branch_opt} git://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy.git #{tmp_dir}`  if $?.exitstatus == 0
+    puts "=== Performing Rake Install ===" if $?.exitstatus == 0
+    puts `cd #{tmp_dir} && rake install`  if $?.exitstatus == 0
+    puts "=== Bundling ===" if $?.exitstatus == 0
+    puts `siriproxy bundle`  if $?.exitstatus == 0
+    puts "=== Cleaning Up ===" and puts `rm -rf #{tmp_dir}` if $?.exitstatus == 0
+    puts "=== SUCCESS ===" if $?.exitstatus == 0
+
+    exit $?.exitstatus
   end
-    
-  def usage
-    puts "\n#{@option_parser}\n"
-  end
-    
-  private
-    
-  def parse_options
-    $APP_CONFIG = OpenStruct.new(YAML.load_file(File.expand_path('~/.siriproxy/config.yml')))
-    @branch = nil
-    @option_parser = OptionParser.new do |opts|
-      opts.on('-p', '--port PORT',     '[server]   port number for server (central or node)') do |port_num|
-        $APP_CONFIG.port = port_num
-      end
-      opts.on('-l', '--log LOG_LEVEL', '[server]   The level of debug information displayed (higher is more)') do |log_level|
-        $APP_CONFIG.log_level = log_level
-      end
-      opts.on('-u', '--user USER',     '[server]   The user to run as after launch') do |user|
-        $APP_CONFIG.user = user
-      end
-      opts.on('-b', '--branch BRANCH', '[update]   Choose the branch to update from (default: master)') do |branch|
-        @branch = branch
-      end
-      opts.on('-n', '--name CA_NAME',  '[gencerts] Define a common name for the CA (default: "SiriProxyCA")') do |ca_name|
-        $APP_CONFIG.ca_name = ca_name
-      end 
-      opts.on('-serv1', '--name SERVER1',  '[gencerts] Define a Server 1 for the CA (default: "guzzoni.apple.com")') do |server1|
-        $APP_CONFIG.server1 = server1
-      end 
-      opts.on('-serv2', '--name CA_NAME',  '[gencerts] Define a Server 2 for the CA (default: "your.siri.proxy.server.com")') do |server2|
-        $APP_CONFIG.server2 = server2
-      end 
-      opts.on('-host', '--db_host Hostname',  '[server] Define a host name for mysql (default: "localhost")') do |db_host|
-        $APP_CONFIG.db_host = db_host
-      end 
-      opts.on('-U', '--db_user username',  '[server] Define a user name for mysql (default: "root")') do |db_user|
-        $APP_CONFIG.db_user = db_user
-      end 
-      opts.on('-P', '--db_pass password',  '[server] Define a password for mysql (default: "password")') do |db_pass|
-        $APP_CONFIG.db_pass = db_pass
-      end 
-      opts.on('-D', '--db_database database',  '[server] Define the database for mysql (default: "siri")') do |db_database|
-        $APP_CONFIG.db_database = db_database
-      end 
-      opts.on_tail('-v', '--version',  '           show version') do
-        require "siriproxy/version"
-        puts "SiriProxy version #{SiriProxy::VERSION}"
-        exit
-      end
+end
+
+def usage
+  puts "\n#{@option_parser}\n"
+end
+
+private
+
+def parse_options
+  $APP_CONFIG = OpenStruct.new(YAML.load_file(File.expand_path('~/.siriproxy/config.yml')))
+  @branch = nil
+  @option_parser = OptionParser.new do |opts|
+    opts.on('-p', '--port PORT',     '[server]   port number for server (central or node)') do |port_num|
+      $APP_CONFIG.port = port_num
     end
-    @option_parser.banner = BANNER
-    @option_parser.parse!(ARGV)
+    opts.on('-l', '--log LOG_LEVEL', '[server]   The level of debug information displayed (higher is more)') do |log_level|
+      $APP_CONFIG.log_level = log_level
+    end
+    opts.on('-u', '--user USER',     '[server]   The user to run as after launch') do |user|
+      $APP_CONFIG.user = user
+    end
+    opts.on('-b', '--branch BRANCH', '[update]   Choose the branch to update from (default: master)') do |branch|
+      @branch = branch
+    end
+    opts.on('-n', '--name CA_NAME',  '[gencerts] Define a common name for the CA (default: "SiriProxyCA")') do |ca_name|
+      $APP_CONFIG.ca_name = ca_name
+    end
+    opts.on('-serv1', '--name SERVER1',  '[gencerts] Define a Server 1 for the CA (default: "guzzoni.apple.com")') do |server1|
+      $APP_CONFIG.server1 = server1
+    end
+    opts.on('-serv2', '--name CA_NAME',  '[gencerts] Define a Server 2 for the CA (default: "your.siri.proxy.server.com")') do |server2|
+      $APP_CONFIG.server2 = server2
+    end
+    opts.on('-host', '--db_host Hostname',  '[server] Define a host name for mysql (default: "localhost")') do |db_host|
+      $APP_CONFIG.db_host = db_host
+    end
+    opts.on('-U', '--db_user username',  '[server] Define a user name for mysql (default: "root")') do |db_user|
+      $APP_CONFIG.db_user = db_user
+    end
+    opts.on('-P', '--db_pass password',  '[server] Define a password for mysql (default: "password")') do |db_pass|
+      $APP_CONFIG.db_pass = db_pass
+    end
+    opts.on('-D', '--db_database database',  '[server] Define the database for mysql (default: "siri")') do |db_database|
+      $APP_CONFIG.db_database = db_database
+    end
+    opts.on_tail('-v', '--version',  '           show version') do
+      require "siriproxy/version"
+      puts "SiriProxy version #{SiriProxy::VERSION}"
+      exit
+    end
   end
-    
-  def setup_bundler_path
-    require 'pathname'
-    ENV['BUNDLE_GEMFILE'] ||= File.expand_path("../../../Gemfile",
-      Pathname.new(__FILE__).realpath)
-  end
-    
-  def load_code
-    setup_bundler_path
-    
-    require 'bundler'
-    require 'bundler/setup'
-    
-    require 'siriproxy'
-    require 'siriproxy/connection'
-    require 'siriproxy/connection/iphone'
-    require 'siriproxy/connection/guzzoni'
-    require 'siriproxy/plugin'
-    require 'siriproxy/plugin_manager'
-    require 'siriproxy/db_classes'
-    require 'siriproxy/db_connection'
-    require 'siriproxy/db_classes_client'
-  end
+  @option_parser.banner = BANNER
+  @option_parser.parse!(ARGV)
+end
+
+def setup_bundler_path
+  require 'pathname'
+  ENV['BUNDLE_GEMFILE'] ||= File.expand_path("../../../Gemfile",
+                                             Pathname.new(__FILE__).realpath)
+end
+
+def load_code
+  setup_bundler_path
+
+  require 'bundler'
+  require 'bundler/setup'
+
+  require 'siriproxy'
+  require 'siriproxy/connection'
+  require 'siriproxy/connection/iphone'
+  require 'siriproxy/connection/guzzoni'
+  require 'siriproxy/plugin'
+  require 'siriproxy/plugin_manager'
+  require 'siriproxy/db_classes'
+  require 'siriproxy/db_connection'
+  require 'siriproxy/db_classes_client'
+end
 end

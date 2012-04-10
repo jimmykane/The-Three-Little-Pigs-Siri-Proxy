@@ -3,7 +3,7 @@
 #####
 class SiriProxy::Connection::Iphone < SiriProxy::Connection
   def initialize
-    $conf.active_connections = EM.connection_count          
+    $conf.active_connections = EM.connection_count
     puts "Create server for iPhone connection"
     super
     self.name = "iPhone"
@@ -12,8 +12,8 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
   def post_init   #removed code from here to allow a 4s to connect!
     super
     start_tls(:cert_chain_file  => File.expand_path("~/.siriproxy/server.passless.crt"),
-      :private_key_file => File.expand_path("~/.siriproxy/server.passless.key"),
-      :verify_peer      => false)
+              :private_key_file => File.expand_path("~/.siriproxy/server.passless.key"),
+              :verify_peer      => false)
   end
 
   def ssl_handshake_completed
@@ -28,8 +28,8 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
       self.close_connection
     end
   end
-  
-  def received_object(object)   
+
+  def received_object(object)
     return plugin_manager.process_filters(object, :from_iphone)
     #plugin_manager.object_from_client(object, self)
   end
