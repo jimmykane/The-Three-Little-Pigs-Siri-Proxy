@@ -97,22 +97,23 @@
    ?>
     <table width="100%">
         <tr>
-            <th>ID</th>
             <th>First Name</th>
             <th>Nickname</th>
+            <th>Device</th>
             <th>Valid</th>
             <th>Date Added</th>
         </tr>
 		<?php
 	
 	
-	$sql = "SELECT nickname, fname, date_added, valid, id FROM clients ORDER BY id DESC " . $max;
+	$sql = "SELECT nickname, fname, date_added, valid, id FROM clients GROUP BY apple_account_id ORDER BY fname ASC";
+        $sql1 = "SELECT device_type FROM assistants GROUP BY client_apple_account_id";
     $dataQuery = mysql_query($sql) or die(mysql_error());
+    $dataQuery1 = mysql_query($sql1) or die(mysql_error());
 	
 	
-	while($data = mysql_fetch_assoc($dataQuery)) {
+	while($data = mysql_fetch_assoc($dataQuery) and $data1 = mysql_fetch_assoc($dataQuery1)) {
 		echo '<tr>';
-		echo '<td>' . $data['id'] . '</td>';
 		echo '<td>';
 		if($data['fname'] == "NA") {
 			echo '<p class="notification red minimal">n/a</p>';
@@ -129,6 +130,7 @@
 			echo $data['nickname'];
 		}
 		echo '</td>';
+                echo '<td>' . $data1['device_type'] . '</td>';
 		echo '<td>';
 		echo '<p class="notification ';
 		if($data['valid'] == 'True') {
