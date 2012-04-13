@@ -112,7 +112,9 @@
 
 		public function getClientsLike($like) {
 			$query = mysql_query("SELECT * FROM clients WHERE nickname LIKE '%" . mysql_real_escape_string($like) .
-			"%' OR fname LIKE '%" . mysql_real_escape_string($like) . "%' ORDER BY date_added DESC");
+			"%' OR fname LIKE '%" . mysql_real_escape_string($like) . "%' GROUP BY apple_account_id ORDER BY date_added DESC");
+			$query1 = mysql_query("SELECT * FROM assistants WHERE nickname LIKE '%" . mysql_real_escape_string($like) .
+			"%' OR fname LIKE '%" . mysql_real_escape_string($like) . "%' GROUP BY client_apple_account_id ORDER BY date_added DESC");
 			if($query) {
 				if(mysql_num_rows($query) == 0) {
 					return false;
@@ -120,6 +122,21 @@
 				else {
 					$return = array();
 					while($data = mysql_fetch_assoc($query)) {
+						$return[] = $data;
+					}
+					return $return;
+				}
+			}
+			else {
+				return false;
+			}
+			if($query1) {
+				if(mysql_num_rows($query1) == 0) {
+					return false;
+				}
+				else {
+					$return = array();
+					while($data = mysql_fetch_assoc($query1)) {
 						$return[] = $data;
 					}
 					return $return;
