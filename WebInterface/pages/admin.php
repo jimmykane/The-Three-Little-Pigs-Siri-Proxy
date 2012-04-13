@@ -1078,6 +1078,7 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
             <th>ID</th>
             <th>First Name</th>
             <th>Nickname</th>
+            <th>Device</th>
             <th>Valid</th>
             <th>Date Added</th>
             <th>Invert Status</th>
@@ -1126,6 +1127,7 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
 				echo $data['nickname'];
 			}
 			echo '</td>';
+			echo '<td>' . $data['device_type'] . '</td>';
 			echo '<td width="50px">';
 			echo '<p class="notification ';
 			if($data['valid'] == 'True') {
@@ -1236,6 +1238,7 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
             <th>ID</th>
             <th>First Name</th>
             <th>Nickname</th>
+            <th>Device</th>
             <th>Valid</th>
             <th>Date Added</th>
             <th>Delete</th>
@@ -1283,6 +1286,7 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
 				echo $data['nickname'];
 			}
 			echo '</td>';
+                        echo '<td>' . $data['device_type'] . '</td>';
 			echo '<td width="50px">';
 			echo '<p class="notification ';
 			if($data['valid'] == 'True') {
