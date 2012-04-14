@@ -91,16 +91,20 @@
 		}
 
 		public function getClients($count, $startRecord) {
-			$query = mysql_query("SELECT * FROM clients GROUP BY apple_account_id LIMIT " . mysql_real_escape_string($startRecord) . "," . mysql_real_escape_string($count));
-			$query1 = mysql_query("SELECT device_type FROM assistants GROUP BY client_apple_account_id LIMIT " . mysql_real_escape_string($startRecord) . "," . mysql_real_escape_string($count));
+			$query = mysql_query("SELECT * FROM clients ORDER BY id ASC LIMIT " . mysql_real_escape_string($startRecord) . "," . mysql_real_escape_string($count));
 			if($query) {
 				if(mysql_num_rows($query) == 0) {
 					return false;
 				}
 				else {
 					$return = array();
-					while($data = mysql_fetch_assoc($query) and $data1 = mysql_fetch_assoc($query1)) {
-						$return[] = $data + $data1;
+					$deviceArray = array();
+					while($data = mysql_fetch_assoc($query)) {
+			$query1 = mysql_query("SELECT device_type FROM assistants WHERE client_apple_account_id = '" . $data['apple_account_id'] . "' GROUP BY client_apple_account_id");
+                                            while($data1 = mysql_fetch_assoc($query1)) {
+                                                    $deviceArray = $data1;
+                                                }
+						$return[] = $data + $deviceArray;
 					}
 					return $return;
 				}
@@ -112,7 +116,7 @@
 
 		public function getClientsLike($like) {
 			$query = mysql_query("SELECT * FROM clients WHERE nickname LIKE '%" . mysql_real_escape_string($like) .
-			"%' OR fname LIKE '%" . mysql_real_escape_string($like) . "%'");
+			"%' OR fname LIKE '%" . mysql_real_escape_string($like) . "%' ORDER BY id ASC");
 			if($query) {
 				if(mysql_num_rows($query) == 0) {
 					return false;

@@ -106,8 +106,8 @@
 		<?php
 	
 	
-	$sql = "SELECT nickname, fname, date_added, valid, id FROM clients GROUP BY apple_account_id ORDER BY fname ASC";
-        $sql1 = "SELECT device_type FROM assistants GROUP BY client_apple_account_id";
+	$sql = "SELECT nickname, fname, date_added, valid, id FROM clients ORDER BY apple_account_id ASC";
+        $sql1 = "SELECT device_type FROM assistants GROUP BY client_apple_account_id ORDER BY client_apple_account_id ASC";
     $dataQuery = mysql_query($sql) or die(mysql_error());
     $dataQuery1 = mysql_query($sql1) or die(mysql_error());
 	
