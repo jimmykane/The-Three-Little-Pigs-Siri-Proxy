@@ -91,16 +91,20 @@
 		}
 
 		public function getClients($count, $startRecord) {
-			$query = mysql_query("SELECT * FROM clients ORDER BY date_added DESC LIMIT " . mysql_real_escape_string($startRecord) . ",
-			" . mysql_real_escape_string($count));
+			$query = mysql_query("SELECT * FROM clients ORDER BY id ASC LIMIT " . mysql_real_escape_string($startRecord) . "," . mysql_real_escape_string($count));
 			if($query) {
 				if(mysql_num_rows($query) == 0) {
 					return false;
 				}
 				else {
 					$return = array();
+					$deviceArray = array();
 					while($data = mysql_fetch_assoc($query)) {
-						$return[] = $data;
+			$query1 = mysql_query("SELECT device_type, last_login, last_ip FROM assistants WHERE client_apple_account_id = '" . $data['apple_account_id'] . "' AND date_created > NOW() - INTERVAL 8 DAY GROUP BY client_apple_account_id");
+                                            while($data1 = mysql_fetch_assoc($query1)) {
+                                                    $deviceArray = $data1;
+                                                }
+						$return[] = $data + $deviceArray;
 					}
 					return $return;
 				}
@@ -112,32 +116,20 @@
 
 		public function getClientsLike($like) {
 			$query = mysql_query("SELECT * FROM clients WHERE nickname LIKE '%" . mysql_real_escape_string($like) .
-			"%' OR fname LIKE '%" . mysql_real_escape_string($like) . "%' GROUP BY apple_account_id ORDER BY date_added DESC");
-			$query1 = mysql_query("SELECT * FROM assistants WHERE nickname LIKE '%" . mysql_real_escape_string($like) .
-			"%' OR fname LIKE '%" . mysql_real_escape_string($like) . "%' GROUP BY client_apple_account_id ORDER BY date_added DESC");
+			"%' OR fname LIKE '%" . mysql_real_escape_string($like) . "%' ORDER BY id ASC");
 			if($query) {
 				if(mysql_num_rows($query) == 0) {
 					return false;
 				}
 				else {
 					$return = array();
+					$deviceArray = array();
 					while($data = mysql_fetch_assoc($query)) {
-						$return[] = $data;
-					}
-					return $return;
-				}
-			}
-			else {
-				return false;
-			}
-			if($query1) {
-				if(mysql_num_rows($query1) == 0) {
-					return false;
-				}
-				else {
-					$return = array();
-					while($data = mysql_fetch_assoc($query1)) {
-						$return[] = $data;
+			$query1 = mysql_query("SELECT device_type, last_login, last_ip FROM assistants WHERE client_apple_account_id = '" . $data['apple_account_id'] . "' AND date_created > NOW() - INTERVAL 8 DAY GROUP BY client_apple_account_id");
+                                            while($data1 = mysql_fetch_assoc($query1)) {
+                                                    $deviceArray = $data1;
+                                                }
+						$return[] = $data + $deviceArray;
 					}
 					return $return;
 				}
