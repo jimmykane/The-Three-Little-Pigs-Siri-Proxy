@@ -100,7 +100,7 @@
 					$return = array();
 					$deviceArray = array();
 					while($data = mysql_fetch_assoc($query)) {
-			$query1 = mysql_query("SELECT device_type FROM assistants WHERE client_apple_account_id = '" . $data['apple_account_id'] . "' GROUP BY client_apple_account_id");
+			$query1 = mysql_query("SELECT device_type, last_login, last_ip FROM assistants WHERE client_apple_account_id = '" . $data['apple_account_id'] . "' AND date_created > NOW() - INTERVAL 8 DAY GROUP BY client_apple_account_id");
                                             while($data1 = mysql_fetch_assoc($query1)) {
                                                     $deviceArray = $data1;
                                                 }
@@ -125,7 +125,7 @@
 					$return = array();
 					$deviceArray = array();
 					while($data = mysql_fetch_assoc($query)) {
-			$query1 = mysql_query("SELECT device_type FROM assistants WHERE client_apple_account_id = '" . $data['apple_account_id'] . "' GROUP BY client_apple_account_id");
+			$query1 = mysql_query("SELECT device_type, last_login, last_ip FROM assistants WHERE client_apple_account_id = '" . $data['apple_account_id'] . "' AND date_created > NOW() - INTERVAL 8 DAY GROUP BY client_apple_account_id");
                                             while($data1 = mysql_fetch_assoc($query1)) {
                                                     $deviceArray = $data1;
                                                 }
