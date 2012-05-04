@@ -51,6 +51,10 @@ server2: 'your.siri.proxy.server.com'
 # thus denying access
 private_server: 'OFF'
 
+#To make a Public server - less public, where the client needs to be in database, make clients_must_be_in_database true. 
+#Note: The client will have to delete their com.apple.assistant.plist before they use your server.
+clients_must_be_in_database: false
+
 
 #For your email configuration. Edit to your email address and set send_email to 'ON'. 
 #Also plase notice that you have to configure sendmail for you pc if its required

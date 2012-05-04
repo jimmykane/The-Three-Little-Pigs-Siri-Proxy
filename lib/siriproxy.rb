@@ -70,17 +70,18 @@ class SiriProxy
     $clientsDao.connect_to_db($my_db)
 
     #Print email config
-    if $APP_CONFIG.send_email=='ON' or $APP_CONFIG.send_email=='on'
+    if $APP_CONFIG.send_email.to_s.upcase == 'ON'
       puts '[Info - SiriProxy] Email notifications are [ON]!'
     else
       puts '[Info - SiriProxy] Email notifications are [OFF]!'
     end
 
     #Print the server if its publc or not
-    if $APP_CONFIG.private_server=="ON" or $APP_CONFIG.private_server=="on"
-      puts '[Info - SiriProxy] Private Server [ON]!'
+    if $APP_CONFIG.private_server.to_s.upcase == "ON"
+      puts '[Info - SiriProxy] This is a Private Server!'
     else
-      puts '[Info - SiriProxy] Private Server [OFF]!'
+      puts '[Info - SiriProxy] This is a PUBLIC Server!' if $APP_CONFIG.clients_must_be_in_database != true
+      puts '[Info - SiriProxy] This is a PUBLIC Server with only clients in Database!' if $APP_CONFIG.clients_must_be_in_database == true 
     end
     #Set default to prevent errors.
     if $APP_CONFIG.hours_till_key_expires==nil
@@ -140,19 +141,19 @@ class SiriProxy
           $statistics.elapsed+=@timer
           $statistics.uptime+=@timer
           $statistics.happy_hour_elapsed+=@timer
-          #if there is autokeyban to off there is no need for happy hour
-          if $APP_CONFIG.enable_auto_key_ban=='OFF' or $APP_CONFIG.enable_auto_key_ban=='OFF'
+          #if the autokeyban is not "ON" there is no need for happy hour
+          if $APP_CONFIG.enable_auto_key_ban.to_s.upcase != 'ON' 
             $statistics.happy_hour_elapsed=0
           end
 
           #Happy hour enabler only if autokeyban is on
-          if $statistics.happy_hour_elapsed > $APP_CONFIG.happy_hour_countdown and ($APP_CONFIG.enable_auto_key_ban=='ON' or $APP_CONFIG.enable_auto_key_ban=='on') and @unbanned==false
+          if $statistics.happy_hour_elapsed > $APP_CONFIG.happy_hour_countdown and $APP_CONFIG.enable_auto_key_ban.to_s.upcase == 'ON' and @unbanned==false 
             $keyDao.unban_keys
             @unbanned=true
             puts "[Happy hour - SiriProxy] Unbanning Keys and Doors are open"
           end
           #only when autokeyban is on
-          if $statistics.happy_hour_elapsed > ($APP_CONFIG.happy_hour_countdown + 300) and ($APP_CONFIG.enable_auto_key_ban=='ON' or $APP_CONFIG.enable_auto_key_ban=='on') and @unbanned==true
+          if $statistics.happy_hour_elapsed > ($APP_CONFIG.happy_hour_countdown + 300) and $APP_CONFIG.enable_auto_key_ban.to_s.upcase == 'ON' and @unbanned==true
             $keyDao.ban_keys
             puts "[Happy hour - SiriProxy] Banning Keys and Doors are Closed"
             $statistics.happy_hour_elapsed=0
@@ -178,7 +179,11 @@ class SiriProxy
           $confDao.update($conf)
           ### Per Key based connections
           @max_connections=$conf.max_connections
-          @availablekeys=$keyDao.list4Skeys().count
+          if $APP_CONFIG.try_iPad3==true
+            @availablekeys=($keyDao.list4Skeys().count + $keyDao.listiPad3keys().count)
+          else
+            @availablekeys=$keyDao.list4Skeys().count
+          end
           if @availablekeys==0 #this is not needed anymore!
             @max_connections=700#max mem
           elsif @availablekeys>0

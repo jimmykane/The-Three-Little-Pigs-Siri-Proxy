@@ -38,6 +38,24 @@ Solution 3: Use other iPhone4s DATA
 
 
 
+Version 0.9.13 
+---------------------
+* iPhone 4S now is added to client table. That phone will most likely need the __com.apple.assistant.plist__ in order to get it in the database. 
+
+* Fixes and tweeks. 
+
+    Better iPad 3 key tracking. Will be counted in max connections if *try_iPad3* is enabled.
+
+    When you ask "How many keys are avalible" it will tell you how many of each are avalible.
+
+* New option in config.yml
+
+  `clients_must_be_in_database` When set to "true", this will only allow a device that is in the users database to connect on a public server… Making it semi-private. The client will most likely have to delete their `com.apple.assistant.plist` in order to use the server. This setting doesn't apply to 4S's.
+  
+ ** Update How **
+ 
+ From Version 0.9.12, a `siriproxy update` will work fine, and if you want to add the new option in your config.yml, you can, but it will work just fine without it. If you are upgrading from an earlier version, follow the instructions in the Version 0.9.12.
+
 
 
 

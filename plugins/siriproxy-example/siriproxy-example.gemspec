@@ -3,8 +3,8 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "siriproxy-example"
-  s.version     = "0.0.1" 
-  s.authors     = ["plamoni"]
+  s.version     = "0.9.13" 
+  s.authors     = ["plamoni, jimmykane, thpryrchn"]
   s.email       = [""]
   s.homepage    = ""
   s.summary     = %q{An Example Siri Proxy Plugin}
