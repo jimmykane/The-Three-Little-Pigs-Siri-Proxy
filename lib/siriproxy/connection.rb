@@ -528,6 +528,15 @@ class SiriProxy::Connection < EventMachine::Connection
           line["iPad/iPad2,3"] = "iPhone/iPhone4,1"
           puts "[Info - SiriProxy] Changed header to iphone4s "
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+        elsif line.match(/iPad2,4;/)
+          self.is_4S = false
+          self.is_iPad3 = false
+          @devicetype="iPad2 32nm Wifi Only"
+          puts "[Info - SiriProxy] iPad2 32nm Wifi Only connected from IP #{self.clientip}"
+          puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+          line["iPad/iPad2,4"] = "iPhone/iPhone4,1"
+          puts "[Info - SiriProxy] Changed header to iphone4s "
+          puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
         elsif line.match(/iPad1,1;/)
           self.is_4S = false
           self.is_iPad3 = false
