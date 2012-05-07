@@ -83,6 +83,7 @@ class SiriProxy::Connection < EventMachine::Connection
       key4s.banned='False'
       key4s.expired='False'
       key4s.iPad3='False'
+      self.validationData_avail = true
       if $keyDao.check_duplicate(key4s)
         puts "[Info - SiriProxy] Duplicate Validation Data. Key NOT saved"
       else
@@ -124,7 +125,9 @@ class SiriProxy::Connection < EventMachine::Connection
           @user=$clientsDao.find_by_assistant(@userassistant) #find the user with that assistant
           if @user==nil #Incase this user doesnt exist!!!!!!! Bug or not complete transaction
             puts "[Authentification - SiriProxy] No client for Assistant [#{@loadedassistant}]  Found :-("
-          else
+          elsif @user.valid=='False' # Shouldn't ever be invalid on a 4S
+            @user.valid='True'
+          elsif @user.valid=='True' #if its valid!!!
             $assistantDao.updateassistant(@userassistant)
             puts "[Authentification - SiriProxy] Access Granted! -> Client name:[#{@user.fname}] nickname[#{@user.nickname}] appleid[#{@user.appleAccountid}] Connected "
           end
@@ -440,7 +443,7 @@ class SiriProxy::Connection < EventMachine::Connection
         puts "[RollEyes - Siri*-*Proxy]"
         self.is_4S = true
         self.is_iPad3 = false
-        @devicetype="iPhone4S"
+        @devicetype="iPhone 4S"
       elsif line.match(/iPad3,1;/)
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPad 3 Wi-Fi only connected from IP #{self.clientip}"
@@ -846,7 +849,7 @@ class SiriProxy::Connection < EventMachine::Connection
 
 
       #Lets capture the unique ids for every appleid
-      if object["class"]=="SetAssistantData" and self.validationData_avail==true #check this against validation  for the 4s
+      if object["class"]=="SetAssistantData"  #check this against validation  for the 4s
         #this changes by language change also. Please consider re code
         pp object if $LOG_LEVEL > 2
         #work to be done here
@@ -963,7 +966,8 @@ class SiriProxy::Connection < EventMachine::Connection
             @assistant.assistantid=@loadedassistant
             @assistant.speechid=@loadedspeechid
             @assistant.client_apple_account_id=@client.appleAccountid
-            @assistant.key_id=@key.id #suspicius
+            @assistant.key_id=@key.id if self.is_4S==false
+            @assistant.key_id=0 if self.is_4S==true
             @assistant.devicetype=@devicetype
             @assistant.last_ip=@clientip
             if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
@@ -1034,13 +1038,14 @@ class SiriProxy::Connection < EventMachine::Connection
             #Lets record the assistants, and verify users
             #will not get in here if the private is on and user is not valid
             #Also i know that the users are already checked but the double check comes only due to that i didnt have time to clean this up
-            if  object["class"]=="AssistantCreated" and self.other_connection.key != nil   and self.other_connection.client!=nil and self.other_connection.createassistant==true
+            if  object["class"]=="AssistantCreated" and self.other_connection.client!=nil and self.other_connection.createassistant==true
               puts "[Info - SiriProxy] Creating new Assistant..."
               pp object
               @assistant=Assistant.new
               @assistant.assistantid=object["properties"]["assistantId"]
               @assistant.speechid=object["properties"]["speechId"]
-              @assistant.key_id=self.other_connection.key.id
+              @assistant.key_id=self.other_connection.key.id if self.is_4S==false and self.other_connection.key != nil
+              @assistant.key_id=0 if self.is_4S==true or and self.other_connection.key == nil
               @assistant.devicetype=self.other_connection.devicetype
               @assistant.last_ip=self.other_connection.clientip
               pp self.other_connection.client if $LOG_LEVEL > 2
