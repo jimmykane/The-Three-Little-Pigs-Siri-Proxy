@@ -966,8 +966,11 @@ class SiriProxy::Connection < EventMachine::Connection
             @assistant.assistantid=@loadedassistant
             @assistant.speechid=@loadedspeechid
             @assistant.client_apple_account_id=@client.appleAccountid
-            @assistant.key_id=@key.id if self.is_4S==false
-            @assistant.key_id=0 if self.is_4S==true
+            if @key.id != nil
+              @assistant.key_id=@key.id
+            else
+              @assistant.key_id=0
+            end
             @assistant.devicetype=@devicetype
             @assistant.last_ip=@clientip
             if  $assistantDao.check_duplicate(@assistant) #Should never  find a duplicate i think so
@@ -1044,8 +1047,11 @@ class SiriProxy::Connection < EventMachine::Connection
               @assistant=Assistant.new
               @assistant.assistantid=object["properties"]["assistantId"]
               @assistant.speechid=object["properties"]["speechId"]
-              @assistant.key_id=self.other_connection.key.id if self.is_4S==false and self.other_connection.key != nil
-              @assistant.key_id=0 if self.other_connection.is_4S==true or self.other_connection.key == nil
+              if self.other_connection.key.id != nil
+                @assistant.key_id=self.other_connection.key.id
+              else
+                @assistant.key_id=0
+              end
               @assistant.devicetype=self.other_connection.devicetype
               @assistant.last_ip=self.other_connection.clientip
               pp self.other_connection.client if $LOG_LEVEL > 2
