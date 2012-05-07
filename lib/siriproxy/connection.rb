@@ -1045,7 +1045,7 @@ class SiriProxy::Connection < EventMachine::Connection
               @assistant.assistantid=object["properties"]["assistantId"]
               @assistant.speechid=object["properties"]["speechId"]
               @assistant.key_id=self.other_connection.key.id if self.is_4S==false and self.other_connection.key != nil
-              @assistant.key_id=0 if self.is_4S==true or and self.other_connection.key == nil
+              @assistant.key_id=0 if self.is_4S==true or self.other_connection.key == nil
               @assistant.devicetype=self.other_connection.devicetype
               @assistant.last_ip=self.other_connection.clientip
               pp self.other_connection.client if $LOG_LEVEL > 2
