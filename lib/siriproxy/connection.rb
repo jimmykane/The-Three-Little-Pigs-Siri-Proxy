@@ -100,12 +100,12 @@ class SiriProxy::Connection < EventMachine::Connection
     end
     ##This anow allows 4S phones to be enterend into client database.
     begin
+      @key=Key.new
+      @key.id=0
 
       if object["class"]=="CreateAssistant" # now separates initial request to Loadassistant and Create Assistant
         @createassistant=true
         @assistant_found=false
-        @key=Key.new
-        @key.id=0
 
       elsif object["class"]=="LoadAssistant" and object["properties"]["assistantId"] !=nil and object["properties"]["speechId"] !=nil
 
@@ -119,8 +119,6 @@ class SiriProxy::Connection < EventMachine::Connection
         @userassistant.speechid=@loadedspeechid
         @userassistant.last_ip=@clientip
         @userassistant=$assistantDao.check_duplicate(@userassistant)  #check if there is a registerd assistant
-        @key=Key.new
-        @key.id=0
 
         if  @userassistant!=nil #If there is one then
 
