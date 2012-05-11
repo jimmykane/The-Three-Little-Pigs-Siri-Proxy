@@ -304,7 +304,7 @@ class SiriProxy::Connection < EventMachine::Connection
 
         else #if no assistant registed found
 
-          if $APP_CONFIG.private_server.to_s.upcase=="ON" or $APP_CONFIG.clients_must_be_in_database==true
+          if ($APP_CONFIG.private_server.to_s.upcase=="ON" or $APP_CONFIG.clients_must_be_in_database==true) and self.is_4S!=true
 
             puts "[Authentification - SiriProxy] Assistant [#{@loadedassistant}] is not registered. Banning Connection"
             self.validationData_avail = false
