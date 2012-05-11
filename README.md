@@ -32,7 +32,7 @@ To the point: You got a 4S, you get commandFailed and/or cannot create assistant
 
 Solution 1: Change IP/Network
 
-Solution 2: Delete the /var/mobile/Library/Preferences/com.apple.assistant.plist on the phone (jailbreak req)
+Solution 2: Delete the /var/mobile/Library/Preferences/com.apple.assistant.plist on the phone (jailbreak req). You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
 
 Solution 3: Use other iPhone4s DATA
 
@@ -40,7 +40,7 @@ Solution 3: Use other iPhone4s DATA
 
 Version 0.9.13 
 ---------------------
-* iPhone 4S now is added to client table. That phone will most likely need the __com.apple.assistant.plist__ in order to get it in the database. 
+* iPhone 4S now is added to client table. That phone will most likely need the __com.apple.assistant.plist__ in order to get it in the database. You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
 
 * Fixes and tweeks. 
 
@@ -192,7 +192,7 @@ Version 0.9.8.2-expr (This is a beta release! More work is needed)
 
     1. Go to config.yml and set regenarate_interval to how many seconds you want the iPhone4S generate new Validation Data good value is 15 seconds
 
-    2. Delete /var/mobile/Library/Preferences/com.apple.assistant.plist
+    2. Delete /var/mobile/Library/Preferences/com.apple.assistant.plist. You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
 
     4. Respring!!!
 
@@ -202,7 +202,7 @@ Version 0.9.8.2-expr (This is a beta release! More work is needed)
 
     7. Repeat as many times you want! 
 
-    To restore just delete com.apple.assistant.plist again.
+    To restore just delete com.apple.assistant.plist again. You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
 
 
 
@@ -830,7 +830,9 @@ If you are using ubuntu please consider that many Ubuntu installations run the n
 	sudo killall named -> to stopped stupid named service (another dns server)
 	sudo /et/init,d/dnsmasq start -> to restart dnsserver
 
+**My Siri isn't working on my device, but it does connect to my Siriproxy, and I have 4S keyes**
 
+Try Deleting your com.apple.assistant.plist. You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
 
 **Gem is not installing?**
 
