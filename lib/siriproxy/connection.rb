@@ -446,21 +446,21 @@ class SiriProxy::Connection < EventMachine::Connection
         self.is_4S = true
         self.is_iPad3 = false
         @devicetype="iPhone 4S"
-      elsif line.match(/iPad3,1;/)
+      elsif line.match(/iPad3,1;/) and $APP_CONFIG.try_iPad3==true
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPad 3 Wi-Fi only connected from IP #{self.clientip}"
         puts "[RollEyes - Siri*-*Proxy]"
         self.is_4S = false
         self.is_iPad3 = true
         @devicetype="iPad 3 Wi-Fi only"
-      elsif line.match(/iPad3,2;/)
+      elsif line.match(/iPad3,2;/) and $APP_CONFIG.try_iPad3==true
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPad 3 CDMA connected from IP #{self.clientip}"
         puts "[RollEyes - Siri*-*Proxy]"
         self.is_4S = false
         self.is_iPad3 = true
         @devicetype="iPad 3 CDMA"
-      elsif line.match(/iPad3,3;/)
+      elsif line.match(/iPad3,3;/) and $APP_CONFIG.try_iPad3==true
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPad 3 GSM connected from IP #{self.clientip}"
         puts "[RollEyes - Siri*-*Proxy]"
@@ -549,6 +549,33 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] iPad 1st generation connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line["iPad/iPad1,1"] = "iPhone/iPhone4,1"
+          puts "[Info - SiriProxy] Changed header to iphone4s "
+          puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+        elsif line.match(/iPad3,1;/) and $APP_CONFIG.try_iPad3==true
+          self.is_4S = false
+          self.is_iPad3 = false
+          @devicetype="iPad 3 Wi-Fi only"
+          puts "[Info - SiriProxy] iPad 3 Wi-Fi only connected from IP #{self.clientip}"
+          puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+          line["iPad/iPad3,1"] = "iPhone/iPhone4,1"
+          puts "[Info - SiriProxy] Changed header to iphone4s "
+          puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+        elsif line.match(/iPad3,2;/) and $APP_CONFIG.try_iPad3==true
+          self.is_4S = false
+          self.is_iPad3 = false
+          @devicetype="iPad 3 CDMA"
+          puts "[Info - SiriProxy] iPad 3 CDMA connected from IP #{self.clientip}"
+          puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+          line["iPad/iPad3,2"] = "iPhone/iPhone4,1"
+          puts "[Info - SiriProxy] Changed header to iphone4s "
+          puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+        elsif line.match(/iPad3,3;/) and $APP_CONFIG.try_iPad3==true
+          self.is_4S = false
+          self.is_iPad3 = false
+          @devicetype="iPad 3 GSM"
+          puts "[Info - SiriProxy] iPad 3 GSM connected from IP #{self.clientip}"
+          puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+          line["iPad/iPad3,3"] = "iPhone/iPhone4,1"
           puts "[Info - SiriProxy] Changed header to iphone4s "
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
         elsif line.match(/iPod4,1;/)
