@@ -38,6 +38,10 @@ Solution 3: Use other iPhone4s DATA
 
 
 
+__if you Jailbrake an iPhone 4S. Just add http://cydia.myrepospace.com/thpryrchn/ to your cydia Sources, and install `Spire 4S` on your 4S. Then you can point it to your server just like you do with any other iPhone 4. This will work on all iOS 5 versions. Also works if you install a Siri GUI that does not include Spire.. It only adds the spire settings, and will not install siri on devices without siri.__
+
+
+
 Version 0.9.13 
 ---------------------
 * iPhone 4S now is added to client table. That phone will most likely need the __com.apple.assistant.plist__ in order to get it in the database. You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
@@ -407,7 +411,7 @@ If you go for the above tutorial then there is no need to follow any instruction
 
 **Set up DNS**
 
-* __Not needed if you Jailbrake an iPhone 4S. Just install Spire on your 4S. Then you can point it to your server just like you do with any other iPhone 4.__
+* __Not needed if you Jailbrake an iPhone 4S. Just add http://cydia.myrepospace.com/thpryrchn/ to your cydia Sources, and install `Spire 4S` on your 4S. Then you can point it to your server just like you do with any other iPhone 4.__
 
 Before you can use SiriProxy, you must set up a DNS server on your network to forward requests for guzzoni.apple.com to the computer running the proxy (make sure that computer is not using your DNS server!). I recommend dnsmasq for this purpose. It's easy to get running and can easily handle this sort of behavior. ([http://www.youtube.com/watch?v=a9gO4L0U59s](http://www.youtube.com/watch?v=a9gO4L0U59s))
 Also if you dont have static ip you can use this dns python server. ([https://github.com/jimmykane/Roque-Dns-Server])
