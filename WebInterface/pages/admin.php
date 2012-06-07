@@ -507,7 +507,7 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
                     <?php
 						if($_SERVER['REQUEST_METHOD'] == "POST") {
 							if(!empty($_POST['key_sessionValidation']) && !empty($_POST['key_banned']) && !empty($_POST['key_expired'])) {
-								if($key->addKey($_POST['key_speechid'], $_POST['key_assistantid'], $_POST['key_sessionValidation'], $_POST['key_banned'], $_POST['key_expired'], $_POST['key_keyload'])) {
+								if($key->addKey($_POST['key_speechid'], $_POST['key_assistantid'], $_POST['key_sessionValidation'], $_POST['key_banned'], $_POST['key_expired'], $_POST['key_keyload'], ''')) {
 									echo '<p class="notification green">You have successfully added a new 4S key.</p>';
 									$log->addLog($_SESSION['loggedIn']['id'], "Added a new 4S key.");
 									$hideform = true;
