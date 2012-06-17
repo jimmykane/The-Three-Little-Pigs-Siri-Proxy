@@ -152,6 +152,8 @@ organizationalUnitName		= Organizational Unit Name (eg, section)
     0.commonName_max = 64
     1.commonName = Common Name (eg, YOUR name)
     1.commonName_max = 64
+    2.commonName = Common Name (eg, YOUR name)
+    2.commonName_max = 64
 emailAddress			= Email Address
 emailAddress_max		= 64
 

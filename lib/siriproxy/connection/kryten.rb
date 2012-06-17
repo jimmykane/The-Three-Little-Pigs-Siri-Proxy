@@ -1,10 +1,10 @@
 #####
-# This is the connection to the Guzzoni (the Siri server backend for iOS 5)
+# This is the connection to the Kryten (the Siri server backend for iOS 6)
 #####
-class SiriProxy::Connection::Guzzoni < SiriProxy::Connection
+class SiriProxy::Connection::Kryten < SiriProxy::Connection
   def initialize
     super
-    self.name = "Guzzoni"
+    self.name = "Kryten"
   end
   
   def connection_completed
