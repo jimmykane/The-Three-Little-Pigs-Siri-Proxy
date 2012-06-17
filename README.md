@@ -28,12 +28,77 @@ So you got a server and you are afraid if apple will ban your device? Lets get t
 
 4. Also keep in mind that there is a limit on how many assistants you can create per key per day. I am not sure but 30 is an average. Please correct me if I am mistaken. There will be a new release soon where there will be a limit on that and hopefully this issue will be resolved.
 
-To the pont: You got a 4S, you get commandFailed and/or cannot create assistantid? 
+To the point: You got a 4S, you get commandFailed and/or cannot create assistantid? 
 
 Solution 1: Change IP/Network
 
-Solution 2: Use other iPhone4s DATA
+Solution 2: Delete the /var/mobile/Library/Preferences/com.apple.assistant.plist on the phone (jailbreak req). You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
 
+Solution 3: Use other iPhone4s DATA
+
+
+
+__if you Jailbrake an iPhone 4S. Just add http://cydia.myrepospace.com/thpryrchn/ to your cydia Sources, and install `Spire 4S` on your 4S. Then you can point it to your server just like you do with any other iPhone 4. This will work on all iOS 5 versions. Also works if you install a Siri GUI that does not include Spire.. It only adds the spire settings, and will not install siri on devices without siri.__
+
+
+
+Version 0.9.13 
+---------------------
+* iPhone 4S now is added to client table. That phone will most likely need the __com.apple.assistant.plist__ in order to get it in the database. You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
+
+* Fixes and tweeks. 
+
+    Better iPad 3 key tracking. Will be counted in max connections if *try_iPad3* is enabled.
+
+    When you ask "How many keys are avalible" it will tell you how many of each are avalible.
+
+* New option in config.yml
+
+  `clients_must_be_in_database` When set to "true", this will only allow a device that is in the users database to connect on a public server… Making it semi-private. The client will most likely have to delete their `com.apple.assistant.plist` in order to use the server. This setting doesn't apply to 4S's.
+  
+ ** Update How **
+ 
+ From Version 0.9.12, a `siriproxy update` will work fine, and if you want to add the new option in your config.yml, you can, but it will work just fine without it. If you are upgrading from an earlier version, follow the instructions in the Version 0.9.12.
+
+
+
+
+Version 0.9.12 
+---------------------
+
+* Now saves iPhone 4S and the New iPad (AKA iPad 3) keys, and keeps track separately
+
+* New options in config.yml.  
+
+  `expiration_sesitivity: 0` will now disable expiring of keys due to no response from finish speech (Some clients have invalid assistants that kill them). 
+
+  `hours_till_key_expires: 24` - Put how long you want the keys to last before they expire. Default is 20 if this option isn't in there. 
+
+  `try_iPad3: true` - If there are no 4S keys, it will use iPad3 keys. NOTE: iPad 3 keys only work for dictation. 
+
+
+
+** Update How **
+
+* Install phpMyAdmin (google how), and backup your keys, clients, config, etc.
+
+* In the `Three-Little_Pigs` Folder do all these steps and don't forget to regenerate the tables
+
+    gem uninstall siriproxy
+    
+    git pull
+
+    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
+
+    rake install && siriproxy bundle
+
+    siriproxy gentables
+
+* Web Interface install
+
+    copy the contents of WebInterface to your http docs root and run the install script! 
+
+* Restore the stuff you backed up. 
 
 
 Version 0.9.9 
@@ -131,7 +196,7 @@ Version 0.9.8.2-expr (This is a beta release! More work is needed)
 
     1. Go to config.yml and set regenarate_interval to how many seconds you want the iPhone4S generate new Validation Data good value is 15 seconds
 
-    2. Delete /var/mobile/Library/Preferences/com.apple.assistant.plist
+    2. Delete /var/mobile/Library/Preferences/com.apple.assistant.plist. You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
 
     4. Respring!!!
 
@@ -141,7 +206,7 @@ Version 0.9.8.2-expr (This is a beta release! More work is needed)
 
     7. Repeat as many times you want! 
 
-    To restore just delete again assistant.plist
+    To restore just delete com.apple.assistant.plist again. You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
 
 
 
@@ -346,7 +411,7 @@ If you go for the above tutorial then there is no need to follow any instruction
 
 **Set up DNS**
 
-* __Not needed if you Jailbrake an iPhone 4S. Just install Spire on your 4S. Then you can point it to your server just like you do with any other iPhone 4.__
+* __Not needed if you Jailbrake an iPhone 4S. Just add http://cydia.myrepospace.com/thpryrchn/ to your cydia Sources, and install `Spire 4S` on your 4S. Then you can point it to your server just like you do with any other iPhone 4.__
 
 Before you can use SiriProxy, you must set up a DNS server on your network to forward requests for guzzoni.apple.com to the computer running the proxy (make sure that computer is not using your DNS server!). I recommend dnsmasq for this purpose. It's easy to get running and can easily handle this sort of behavior. ([http://www.youtube.com/watch?v=a9gO4L0U59s](http://www.youtube.com/watch?v=a9gO4L0U59s))
 Also if you dont have static ip you can use this dns python server. ([https://github.com/jimmykane/Roque-Dns-Server])
@@ -769,7 +834,9 @@ If you are using ubuntu please consider that many Ubuntu installations run the n
 	sudo killall named -> to stopped stupid named service (another dns server)
 	sudo /et/init,d/dnsmasq start -> to restart dnsserver
 
+**My Siri isn't working on my device, but it does connect to my Siriproxy, and I have 4S keyes**
 
+Try Deleting your com.apple.assistant.plist. You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
 
 **Gem is not installing?**
 

@@ -507,7 +507,7 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
                     <?php
 						if($_SERVER['REQUEST_METHOD'] == "POST") {
 							if(!empty($_POST['key_sessionValidation']) && !empty($_POST['key_banned']) && !empty($_POST['key_expired'])) {
-								if($key->addKey($_POST['key_speechid'], $_POST['key_assistantid'], $_POST['key_sessionValidation'], $_POST['key_banned'], $_POST['key_expired'], $_POST['key_keyload'])) {
+								if($key->addKey($_POST['key_speechid'], $_POST['key_assistantid'], $_POST['key_sessionValidation'], $_POST['key_banned'], $_POST['key_expired'], $_POST['key_keyload'], '')) {
 									echo '<p class="notification green">You have successfully added a new 4S key.</p>';
 									$log->addLog($_SESSION['loggedIn']['id'], "Added a new 4S key.");
 									$hideform = true;
@@ -1078,7 +1078,10 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
             <th>ID</th>
             <th>First Name</th>
             <th>Nickname</th>
+            <th>Device</th>
             <th>Valid</th>
+            <th>Last Login</th>
+            <th>Last IP</th>
             <th>Date Added</th>
             <th>Invert Status</th>
             <th>Edit</th>
@@ -1126,6 +1129,7 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
 				echo $data['nickname'];
 			}
 			echo '</td>';
+			echo '<td>' . $data['device_type'] . '</td>';
 			echo '<td width="50px">';
 			echo '<p class="notification ';
 			if($data['valid'] == 'True') {
@@ -1136,6 +1140,8 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
 			}
 			echo ' minimal">' . $data['valid'];
 			echo '</td>';
+			echo '<td width="150px">' . $data['last_login'] . '</td>';
+			echo '<td width="150px">' . $data['last_ip'] . '</td>';
 			echo '<td width="150px">' . $data['date_added'] . '</td>';
 									echo '<td style="text-align: center;" width="100px"><a class="image" href="?page=' . $_GET['page'] . '&amp;action=' . $_GET['action'] . '&amp;do=' . $_GET['do'] . '&amp;invert=' . $data['id'] . '">';
 									echo '<img src="design/img/refresh.png" alt="invert" /></a></td>';
@@ -1144,7 +1150,7 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
 			echo '</tr>';
 		}
 	echo '
-	<tr><td colspan="7"><form class="styled" action="?page=' . $_GET['page'] . '&amp;action=' . $_GET['action'] . '&amp;do=' . $_GET['do'] . '" method="post"><label style="width: 180px;">First name or nickname</label>
+	<tr><td colspan="10"><form class="styled" action="?page=' . $_GET['page'] . '&amp;action=' . $_GET['action'] . '&amp;do=' . $_GET['do'] . '" method="post"><label style="width: 180px;">First name or nickname</label>
    				<input type="text" name="search" style="width: 200px;" />
                 <input type="submit" value="Search" style="margin-left: 25px;"/></form></td></tr>
 	</table>';
@@ -1236,7 +1242,10 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
             <th>ID</th>
             <th>First Name</th>
             <th>Nickname</th>
+            <th>Device</th>
             <th>Valid</th>
+            <th>Last Login</th>
+            <th>Last IP</th>
             <th>Date Added</th>
             <th>Delete</th>
         </tr>';
@@ -1283,6 +1292,7 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
 				echo $data['nickname'];
 			}
 			echo '</td>';
+                        echo '<td>' . $data['device_type'] . '</td>';
 			echo '<td width="50px">';
 			echo '<p class="notification ';
 			if($data['valid'] == 'True') {
@@ -1293,13 +1303,15 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
 			}
 			echo ' minimal">' . $data['valid'];
 			echo '</td>';
+			echo '<td width="150px">' . $data['last_login'] . '</td>';
+			echo '<td width="150px">' . $data['last_ip'] . '</td>';
 			echo '<td width="150px">' . $data['date_added'] . '</td>';
 									echo '<td style="text-align: center;" width="50px"><a class="image" href="?page=' . $_GET['page'] . '&amp;action=' . $_GET['action'] . '&amp;do=' . $_GET['do'] . '&amp;delete=' . $data['id'] . '">';
 									echo '<img src="design/img/delete.png" alt="delete" /></a></td>';
 			echo '</tr>';
 		}
 	echo '
-	<tr><td colspan="7"><form class="styled" action="?page=' . $_GET['page'] . '&amp;action=' . $_GET['action'] . '&amp;do=' . $_GET['do'] . '" method="post"><label style="width: 180px;">First name or nickname</label>
+	<tr><td colspan="9"><form class="styled" action="?page=' . $_GET['page'] . '&amp;action=' . $_GET['action'] . '&amp;do=' . $_GET['do'] . '" method="post"><label style="width: 180px;">First name or nickname</label>
    				<input type="text" name="search" style="width: 200px;" />
                 <input type="submit" value="Search" style="margin-left: 25px;"/></form></td></tr>
 	</table>';

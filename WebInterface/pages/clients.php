@@ -97,22 +97,32 @@
    ?>
     <table width="100%">
         <tr>
-            <th>ID</th>
             <th>First Name</th>
             <th>Nickname</th>
+            <th>Device</th>
             <th>Valid</th>
+            <th>Last Used</th>
+            <th>Last IP</th>
             <th>Date Added</th>
         </tr>
 		<?php
 	
+	$pid = $_GET['page-id'];
 	
-	$sql = "SELECT nickname, fname, date_added, valid, id FROM clients ORDER BY id DESC " . $max;
-    $dataQuery = mysql_query($sql) or die(mysql_error());
+	if(empty($pid)) { $pid = 1; }
 	
+	if($pid < 1) { 
+		$pid = 1;
+	}
+	elseif($pid > $lastPage) {
+		$pid = $lastPage;
+	}
+        $client = new Client();
+        $client1 = new Client();
+        $dataArr = $client->getClients($websiteProperty->getProperty('max_client_entries_per_page'),($pid - 1) * $websiteProperty->getProperty('max_client_entries_per_page'));	
 	
-	while($data = mysql_fetch_assoc($dataQuery)) {
+	foreach($dataArr as $data) {
 		echo '<tr>';
-		echo '<td>' . $data['id'] . '</td>';
 		echo '<td>';
 		if($data['fname'] == "NA") {
 			echo '<p class="notification red minimal">n/a</p>';
@@ -129,6 +139,7 @@
 			echo $data['nickname'];
 		}
 		echo '</td>';
+                echo '<td>' . $data['device_type'] . '</td>';
 		echo '<td>';
 		echo '<p class="notification ';
 		if($data['valid'] == 'True') {
@@ -139,6 +150,8 @@
 		}
 		echo ' minimal">' . $data['valid'];
 		echo '</td>';
+		echo '<td>' . $data['last_login'] . '</td>';
+		echo '<td>' . $data['last_ip'] . '</td>';
 		echo '<td>' . $data['date_added'] . '</td>';
 		echo '</tr>';
 	}
@@ -208,27 +221,22 @@
 		<h2 id="search">Check if you're on the list</h2>
         <?php
 		
-			if($_SERVER['REQUEST_METHOD'] == "POST") {
-				$search = $_POST['search'];
-				
-				if(strlen($search) == 0) {
+                if($_SERVER['REQUEST_METHOD'] == "POST") {
+                    $search = $_POST['search'];
+                    if(strlen($search) == 0) {
 					echo '<p class="notification red">Please enter a name or nickname.</p>';
 				}
 				else {
-					$sql = "SELECT * FROM clients WHERE nickname LIKE '%" . mysql_real_escape_string($search) . "%' OR fname LIKE '%" . mysql_real_escape_string($search) . "%'"; 
-					$query = mysql_query($sql);
-					if($query) {
-						if(mysql_num_rows($query) > 0) {
+                    $dataArr1 = $client1->getClientsLike($search);
+                    if($dataArr1) {
+						if($dataArr1 > 0) {
 							echo '<p class="notification green">We have found one or more results, you can see them in the list below.</p>';
 							$resultsFound = true;
 							
 						}
-						else {
-							echo '<p class="notification red">We couldn\'t find this nickname or first name in the database.<br />Make sure you didn\'t made spelling mistakes.<p>';
-						}
 					}
 					else {
-						echo '<p class="notification red">Query error: ' . mysql_error() . '</p>';
+                                            echo '<p class="notification red">We couldn\'t find this nickname or first name in the database.<br />Make sure you didn\'t made spelling mistakes.<p>';
 					}
 				}
 			}
@@ -243,56 +251,62 @@
         
 							
 			<?php
-			
-			if($resultsFound) {				?>
-    <table width="100%">
-        <tr>
-            <th>ID</th>
-            <th>First Name</th>
-            <th>Nickname</th>
-            <th>Valid</th>
-            <th>Date Added</th>
-        </tr>
-		<?php
-	
-	
-	
-	while($data = mysql_fetch_assoc($query)) {
-		echo '<tr>';
-		echo '<td>' . $data['id'] . '</td>';
-		echo '<td>';
-		if($data['fname'] == "NA") {
-			echo '<p class="notification red minimal">n/a</p>';
-		}
-		else {
-			echo $data['fname'];
-		}
-		echo '</td>';
-		echo '<td>';
-		if($data['nickname'] == "NA") {
-			echo '<p class="notification red minimal">n/a</p>';
-		}
-		else {
-			echo $data['nickname'];
-		}
-		echo '</td>';
-		echo '<td>';
-		echo '<p class="notification ';
-		if($data['valid'] == 'True') {
-			echo 'green';
-		}
-		else {
-			echo 'red';
-		}
-		echo ' minimal">' . $data['valid'];
-		echo '</td>';
-		echo '<td>' . $data['date_added'] . '</td>';
-		echo '</tr>';
-	}
-	
-	?>
-	</table>
-    <?php
+if($resultsFound) {			
+                        echo '
+                            <table width="100%">
+                            <tr>
+                                <th>ID</th>
+                                <th>First Name</th>
+                                <th>Nickname</th>
+                                <th>Device</th>
+                                <th>Valid</th>
+                                <th>Last Login</th>
+                                <th>Last IP</th>
+                                <th>Date Added</th>
+                            </tr>';
+                    if($dataArr1 !== false) {
+                        foreach($dataArr1 as $data) {
+			echo '<tr>';
+			echo '<td>' . $data['id'] . '</td>';
+			echo '<td>';
+			if($data['fname'] == "NA") {
+				echo '<p class="notification red minimal">n/a</p>';
 			}
-			
+			else {
+				echo $data['fname'];
+			}
+			echo '</td>';
+			echo '<td>';
+			if($data['nickname'] == "NA") {
+				echo '<p class="notification red minimal">n/a</p>';
+			}
+			else {
+				echo $data['nickname'];
+			}
+			echo '</td>';
+			echo '<td>' . $data['device_type'] . '</td>';
+			echo '<td width="50px">';
+			echo '<p class="notification ';
+			if($data['valid'] == 'True') {
+				echo 'green';
+			}
+			else {
+				echo 'red';
+			}
+                            echo ' minimal">' . $data['valid'];
+                            echo '</td>';
+                            echo '<td>' . $data['last_login'] . '</td>';
+                            echo '<td>' . $data['last_ip'] . '</td>';
+                            echo '<td>' . $data['date_added'] . '</td>';
+                            echo '</tr>';
+			}
+                        }
+                        elseif ($dataArr1 == false) {
+                            echo '<p class="notification red">We couldn\'t find this nickname or first name in the database.<br />Make sure you didn\'t made spelling mistakes.<p>';
+			}
+			else {
+                            echo '<p class="notification red">Query error: ' . mysql_error() . '</p>';
+			}
+                        echo '</table>';
+                        }
 			?>
