@@ -17,13 +17,13 @@ end
 
 class SiriObject
   attr_accessor :klass, :group, :properties
-  
+
   def initialize(klass, group)
     @klass = klass
     @group = group
     @properties = {}
   end
-  
+
   #watch out for circular references!
   def to_hash
     hash = {
@@ -31,10 +31,10 @@ class SiriObject
       "group" => self.group,
       "properties" => {}
     }
-    
+
     (hash["refId"] = ref_id) rescue nil
     (hash["aceId"] = ace_id) rescue nil
-    
+
     properties.each_key { |key|
       if properties[key].class == Array
         hash["properties"][key] = []
@@ -46,11 +46,11 @@ class SiriObject
 
     hash
   end
-  
+
   def make_root(ref_id=nil, ace_id=nil)
     self.extend(SiriRootObject)
-  
-    self.ref_id = (ref_id || random_ref_id) 
+
+    self.ref_id = (ref_id || random_ref_id)
     self.ace_id = (ace_id || random_ace_id)
   end
 end
@@ -59,7 +59,7 @@ def add_property_to_class(klass, prop)
   klass.send(:define_method, (prop.to_s + "=").to_sym) { |value|
     self.properties[prop.to_s] = value
   }
-  
+
   klass.send(:define_method, prop.to_s.to_sym) {
     self.properties[prop.to_s]
   }
@@ -67,11 +67,11 @@ end
 
 module SiriRootObject
   attr_accessor :ref_id, :ace_id
-  
+
   def random_ref_id
     UUIDTools::UUID.random_create.to_s.upcase
   end
-  
+
   def random_ace_id
     UUIDTools::UUID.random_create.to_s
   end
@@ -181,11 +181,11 @@ class SiriConfirmationOptions < SiriObject
     self.denyCommands = denyCommands
     self.confirmCommands = confirmCommands
 
-    self.denyText = denyText 
-    self.cancelLabel = cancelLabel 
-    self.submitLabel = submitLabel 
-    self.confirmText = confirmText 
-    self.cancelTrigger = cancelTrigger 
+    self.denyText = denyText
+    self.cancelLabel = cancelLabel
+    self.submitLabel = submitLabel
+    self.confirmText = confirmText
+    self.cancelTrigger = cancelTrigger
   end
 end
 add_property_to_class(SiriConfirmationOptions, :submitCommands)
@@ -326,6 +326,3 @@ add_property_to_class(SiriSetRequestOrigin, :longitude)
 add_property_to_class(SiriSetRequestOrigin, :verticalAccuracy)
 add_property_to_class(SiriSetRequestOrigin, :direction)
 add_property_to_class(SiriSetRequestOrigin, :age)
-
-
-

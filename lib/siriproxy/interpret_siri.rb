@@ -12,7 +12,7 @@
 #####
 class SiriProxy::Interpret
   class << self
-    #Checks if the object is Guzzoni responding that it can't 
+    #Checks if the object is Apple responding that it can't 
     #determine the intent of the query
     #processor(object, connection, unknown_text)
     def unknown_intent(object, connection, processor) 
@@ -27,7 +27,7 @@ class SiriProxy::Interpret
       return false
     end
     
-    #Checks if the object is Guzzoni responding that it recognized
+    #Checks if the object is Apple responding that it recognized
     #speech. Sends "best interpretation" phrase to processor
     #processor(object, connection, phrase)
     def speech_recognized(object)

@@ -32,20 +32,20 @@
 	
 	/* Required files (config, connection, functions, classes etc..) 
 	******************************************************************/
-	require_once("inc/Log.class.php");
-	require_once("inc/Ban.class.php");
-	require_once("inc/Faq.class.php");
-	require_once("inc/Key.class.php");
-	require_once("inc/config.inc.php");
-	require_once("inc/Admin.class.php");
-	require_once("inc/Client.class.php");
-	require_once("inc/Layout.class.php");
-	require_once("inc/functions.inc.php");
-	require_once("inc/connection.inc.php");
-	require_once("inc/Statistics.class.php");
-	require_once("inc/PageManager.class.php");
-	require_once("inc/Announcement.class.php");
-	require_once("inc/WebsiteProperty.class.php");
+	include_once("inc/Log.class.php");
+	include_once("inc/Ban.class.php");
+	include_once("inc/Faq.class.php");
+	include_once("inc/Key.class.php");
+	include_once("inc/config.inc.php");
+	include_once("inc/Admin.class.php");
+	include_once("inc/Client.class.php");
+	include_once("inc/Layout.class.php");
+	include_once("inc/functions.inc.php");
+	include_once("inc/connection.inc.php");
+	include_once("inc/Statistics.class.php");
+	include_once("inc/PageManager.class.php");
+	include_once("inc/Announcement.class.php");
+	include_once("inc/WebsiteProperty.class.php");
 	
 	/* Build content
 	******************************************************************/

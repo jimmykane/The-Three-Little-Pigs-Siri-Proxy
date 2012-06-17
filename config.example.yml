@@ -16,39 +16,52 @@ db_database: 'siri'
 # Default = ON , Recommended='ON' 
 # Also if this is set to on there is a happy_hour_countdown that when is reached sets the keys unbanned again
 # Defalut 6 hours = 21600 sec
-happy_hour_countdown: 21600
-enable_auto_key_ban: 'ON'
+happy_hour_countdown: 60
+enable_auto_key_ban: 'OFF'
 
 
 #Validation Sesitivity. This is the value that will force the key to be expired due to apple not responding to invalid keys
 #The pholoshopy behind this is that when some Finish speech requests are made and apple doesnt reply back then the server marks the keys as invalid
 #default value 5
 #default value for small servers 5
+#Value of 0 will disable this function
 #recommended for medium sized server 10-15
 #recomended for large servers like paradox 30
 
 expiration_sesitivity: 5
 
+# This allows you to set how long after a key is added until it expires. If you have the regerate_interval set to 3600, 
+# then 24 will be an awesome value to use. If this Value is not set, it will default to 20
+hours_till_key_expires: 24
 
 #HOT! THis will force the 4S to regenerate new Validation data every time give Do not use lowe than 15 seconds
-#default response from apple is 90000.Change this to what you please! 12 is a good value
-regenerate_interval: 90000
+#default response from apple is 90000. Change this to what you please! 3600 (1 Hour) is a good value
+regenerate_interval: 3600 
+
+#The try_iPad3 option will let the server use iPad3 keys if there are no 4S keys avaliable. Only works for dictation. 
+try_iPad3: true
 
 #For Generating Certs for iPhones. Has 2 hosts, so that you can use guzzoni on a 4S, 
 #and your server also using the same instance.
 ca_name: 'SiriProxyCA'
 server1: 'guzzoni.apple.com'
-server2: 'your.siri.proxy.server.com'
+server2: 'kryten.apple.com'
+server3: 'your.siri.proxy.server.com'
 
 #Private or public server. The difference is that public automaticaly sets new clients as valid and private as invalid
 # thus denying access
-private_server: 'ON'
+private_server: 'OFF'
+
+#To make a Public server - less public, where the client needs to be in database, make clients_must_be_in_database true. 
+#Note: The client will have to delete their com.apple.assistant.plist before they use your server.
+clients_must_be_in_database: false
 
 
 #For your email configuration. Edit to your email address and set send_email to 'ON'. 
 #Also plase notice that you have to configure sendmail for you pc if its required
 #It is possible that this email will be delivered to your spam/junk folder.
 #html formated message is default
+#If you want to add multiple email addresses then just seperate them here with commas
 send_email: 'OFF' 
 email_from: 'TheThreeLittlePigs@pigs.com'
 email_to: 'youremail'

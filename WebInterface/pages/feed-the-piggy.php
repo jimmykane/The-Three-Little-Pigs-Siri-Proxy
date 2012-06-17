@@ -11,7 +11,7 @@
      * Last update: 22-02-2012
 	******************************************************************/
 
-	echo '<h1>Feed The Three Little Pigs</h1><h2>This procedure is only for an iPhone 4S</h2><p>Below is a guide how to feed the Piggy a 4S key</p><ol><li>Install this certificate on the iPhone 4S <a href="files/certs/cerftificate.pem">cerftificate.pem</a></li><li>If the above certificate doesn\'t install then download it to your PC/Mac/Linux, and mail it to yourself. </li><li>Go to Settings > Wifi, press the blue arrow and change the DNS field to <b>';
+	echo '<h1>Feed The Three Little Pigs</h1><h2>This procedure is only for an iPhone 4S</h2><p>Below is a guide how to feed the Piggy a 4S key</p><ol><li>Install this certificate on the iPhone 4S <a href="files/certs/certificate.pem">certificate.pem</a></li><li>If the above certificate doesn\'t install then download it to your PC/Mac/Linux, and mail it to yourself. </li><li>Go to Settings > Wifi, press the blue arrow and change the DNS field to <b>';
 
 	$websiteProperty = new WebsiteProperty();
 	echo gethostbyname($websiteProperty->getProperty('hostname_or_ip'));
