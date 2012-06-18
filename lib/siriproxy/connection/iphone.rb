@@ -20,7 +20,7 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
     super
     begin
       self.host = 'guzzoni.apple.com'
-      self.other_connection = EventMachine.connect(self.host, 443, SiriProxy::Connection::Guzzoni)
+      self.other_connection = EventMachine.connect('guzzoni.apple.com', 443, SiriProxy::Connection::Guzzoni)
       self.plugin_manager.apple_conn = self.other_connection
       other_connection.other_connection = self #hehe
       other_connection.plugin_manager = plugin_manager
@@ -28,7 +28,7 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
       puts "[Warning - Siriproxy] Could not connect to Guzzoni!!! "
       puts "[Warning - Siriproxy] Attempting connection to Kryten instead..."
       self.host = 'kryten.apple.com'
-      self.other_connection = EventMachine.connect(self.host, 443, SiriProxy::Connection::Kryten)
+      self.other_connection = EventMachine.connect('kryten.apple.com', 443, SiriProxy::Connection::Kryten)
       self.plugin_manager.apple_conn = self.other_connection
       other_connection.other_connection = self #hehe
       other_connection.plugin_manager = plugin_manager
