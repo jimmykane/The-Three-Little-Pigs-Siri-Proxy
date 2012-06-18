@@ -440,7 +440,12 @@ class SiriProxy::Connection < EventMachine::Connection
       ##############
       #A Device has connected!!!
       #Check for User Agent and replace correctly
-
+    elsif line.match(/^Host:/)
+      #if self.iOS < 6
+      #  line = "Host: guzzoni.apple.com"  #Keeps Apple from instantly knowing that this is a Proxy Server.
+      #else
+        line = "Host: kryten.apple.com"  #Keeps Apple from instantly knowing that this is a Proxy Server.
+      #end
     elsif line.match(/^User-Agent:/)
       #if its and iphone4s
       self.clientport, self.clientip = Socket.unpack_sockaddr_in(get_peername)
@@ -710,12 +715,6 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] Changed header to iphone4s "
           puts "[Info - SiriProxy] Final Header: " + line if $LOG_LEVEL > 2
         end
-      end
-    elsif line.match(/^Host:/)
-      if self.iOS < 6
-        line = "Host: guzzoni.apple.com"  #Keeps Apple from instantly knowing that this is a Proxy Server.
-      else
-        line = "Host: kryten.apple.com"  #Keeps Apple from instantly knowing that this is a Proxy Server.
       end
     end
 
