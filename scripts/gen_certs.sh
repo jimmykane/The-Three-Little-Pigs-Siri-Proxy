@@ -3,7 +3,7 @@
 commonName=$2
 server1=$3
 server2=$4
-server2=$5
+server3=$5
 
 if [ "${commonName}" == "" ]
 then
