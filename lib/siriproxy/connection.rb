@@ -6,7 +6,7 @@ require 'cora'
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
 
-  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S,:is_iPad3, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid,:devicetype,:activation_token_recieved,:activation_token,:assistant_found,:connectionfromapple,:commandFailed,:finishspeech,:GetSessionCertificateResponse,:iOS
+  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S,:is_iPad3, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid,:devicetype,:activation_token_recieved,:activation_token,:assistant_found,:connectionfromapple,:commandFailed,:finishspeech,:GetSessionCertificateResponse,:iOS,:host
 
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
@@ -32,6 +32,7 @@ class SiriProxy::Connection < EventMachine::Connection
     self.assistantId_avail = false		#assistantId available
     self.client=nil
     self.iOS=nil
+    self.host=nil
     @createassistant=false
     @loadedassistant=nil
     @loadedspeechid=nil
@@ -441,11 +442,11 @@ class SiriProxy::Connection < EventMachine::Connection
       #A Device has connected!!!
       #Check for User Agent and replace correctly
     elsif line.match(/^Host:/)
-      #if self.iOS < 6
-      #  line = "Host: guzzoni.apple.com"  #Keeps Apple from instantly knowing that this is a Proxy Server.
-      #else
+      if self.host = 'guzzoni.apple.com'
+        line = "Host: guzzoni.apple.com"  #Keeps Apple from instantly knowing that this is a Proxy Server.
+      elsif self.host = 'kryten.apple.com'
         line = "Host: kryten.apple.com"  #Keeps Apple from instantly knowing that this is a Proxy Server.
-      #end
+      end
     elsif line.match(/^User-Agent:/)
       #if its and iphone4s
       self.clientport, self.clientip = Socket.unpack_sockaddr_in(get_peername)
