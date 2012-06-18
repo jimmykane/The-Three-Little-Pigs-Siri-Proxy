@@ -19,16 +19,16 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
   def ssl_handshake_completed
     super
     begin
-      self.host = 'guzzoni.apple.com'
-      self.other_connection = EventMachine.connect('guzzoni.apple.com', 443, SiriProxy::Connection::Guzzoni)
+      self.host = 'kryten.apple.com'
+      self.other_connection = EventMachine.connect('kryten.apple.com', 443, SiriProxy::Connection::Kryten)
       self.plugin_manager.apple_conn = self.other_connection
       other_connection.other_connection = self #hehe
       other_connection.plugin_manager = plugin_manager
     rescue
-      puts "[Warning - Siriproxy] Could not connect to Guzzoni!!! "
-      puts "[Warning - Siriproxy] Attempting connection to Kryten instead..."
-      self.host = 'kryten.apple.com'
-      self.other_connection = EventMachine.connect('kryten.apple.com', 443, SiriProxy::Connection::Kryten)
+      puts "[Warning - Siriproxy] Could not connect to Kryten!!! "
+      puts "[Warning - Siriproxy] Attempting connection to Guzzoni instead..."
+      self.host = 'guzzoni.apple.com'
+      self.other_connection = EventMachine.connect('guzzoni.apple.com', 443, SiriProxy::Connection::Guzzoni)
       self.plugin_manager.apple_conn = self.other_connection
       other_connection.other_connection = self #hehe
       other_connection.plugin_manager = plugin_manager
