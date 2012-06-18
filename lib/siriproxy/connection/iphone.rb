@@ -19,12 +19,12 @@ class SiriProxy::Connection::Iphone < SiriProxy::Connection
   def ssl_handshake_completed
     super
     begin
-        if self.iOS < 6
-            self.other_connection = EventMachine.connect('guzzoni.apple.com', 443, SiriProxy::Connection::Guzzoni)
-        else
-            self.other_connection = EventMachine.connect('kryten.apple.com', 443, SiriProxy::Connection::Kryten)
-        end
-        self.plugin_manager.apple_conn = self.other_connection
+      #if self.iOS < 6
+      #    self.other_connection = EventMachine.connect('guzzoni.apple.com', 443, SiriProxy::Connection::Guzzoni)
+      #else
+          self.other_connection = EventMachine.connect('kryten.apple.com', 443, SiriProxy::Connection::Kryten)
+      #end
+      self.plugin_manager.apple_conn = self.other_connection
       other_connection.other_connection = self #hehe
       other_connection.plugin_manager = plugin_manager
     rescue
