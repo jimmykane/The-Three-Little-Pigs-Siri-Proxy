@@ -3,7 +3,7 @@ require 'singleton'
 require 'siriproxy/db_connection'
 class Client
 
-  attr_accessor :id, :fname,:nickname,:appleDBid,:appleAccountid,:valid,:date_added
+  attr_accessor :id, :fname,:nickname,:appleDBid,:appleAccountid,:devicetype,:deviceOS,:valid,:date_added,:last_login,:last_ip
 
   def id=(value)  # The setter method for @id
     @id =  value
@@ -24,12 +24,23 @@ class Client
   def appleAccountid=(value)  # The setter method for @load
     @appleAccountid =  value
   end
-
+  def devicetype=(value)  # The setter method for @devicetype
+    @devicetype =  value
+  end
+  def deviceOS=(value)  # The setter method for @deviceOS
+    @deviceOS =  value
+  end
   def valid=(value)  # The setter method for @valid
     @valid =  value
   end
   def date_added=(value)  # The setter method for @date_added
     @date_added =  value
+  end
+  def last_login=(value)  # The setter method for @last_login
+    @last_login =  value
+  end
+  def last_ip=(value)  # The setter method for @last_ip
+    @last_ip =  value
   end
 end
 
@@ -45,17 +56,17 @@ class ClientsDao
   end
 
   def insert(dto)
-    sql = "INSERT INTO `clients` (fname,nickname,apple_db_id,apple_account_id,valid,date_added ) VALUES ( ?  , ? , ? , ?, ?,NOW())"
+    sql = "INSERT INTO `clients` (fname,nickname,apple_db_id,apple_account_id,devicetype,deviceOS,valid,date_added,last_login,last_ip ) VALUES ( ?  , ? , ? , ? , ? , ? , ? ,NOW(),NOW(), ? )"
     st = @my.prepare(sql)
-    st.execute(dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.valid)
+    st.execute(dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.devicetype,dto.deviceOS,dto.valid,dto.last_ip)
     st.close
   end
 
   def update(dto)
     pp dto
-    sql = "UPDATE `clients` SET fname= ? ,nickname=?,apple_db_id=?,apple_account_id=?,valid=? WHERE id = ?"
+    sql = "UPDATE `clients` SET fname= ? ,nickname=?,apple_db_id=?,apple_account_id=?,valid=?,last_ip=? WHERE id = ?"
     st = @my.prepare(sql)
-    st.execute(dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.valid,dto.id)
+    st.execute(dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.valid,dto.last_ip,dto.id)
     st.close
   end
 
@@ -107,8 +118,12 @@ class ClientsDao
         dto.nickname=row[2]
         dto.appleDBid=row[3]
         dto.appleAccountid=row[4]
-        dto.valid=row[5]
-        dto.date_added=row[6]
+        dto.devicetype=row[5]
+        dto.deviceOS=row[6]
+        dto.valid=row[7]
+        dto.date_added=row[8]
+        dto.last_login=row[9]
+        dto.last_ip=row[10]
         rows << dto
       end
 
