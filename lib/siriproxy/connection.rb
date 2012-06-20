@@ -6,7 +6,7 @@ require 'cora'
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
 
-  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S,:is_iPad3, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid,:devicetype,:activation_token_recieved,:activation_token,:assistant_found,:connectionfromapple,:commandFailed,:finishspeech,:GetSessionCertificateResponse,:iOS,:host
+  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S,:is_iPad3, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid,:devicetype,:deviceOS,:activation_token_recieved,:activation_token,:assistant_found,:connectionfromapple,:commandFailed,:finishspeech,:GetSessionCertificateResponse,:iOS,:host
 
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
@@ -37,6 +37,7 @@ class SiriProxy::Connection < EventMachine::Connection
     @loadedassistant=nil
     @loadedspeechid=nil
     @devicetype=nil
+    @deviceOS=nil
     @activation_token_recieved=false
     @assistant_found=false
     @connectionfromapple=false
@@ -169,7 +170,13 @@ class SiriProxy::Connection < EventMachine::Connection
       end
       keyiPad3.banned='False'
       keyiPad3.expired='False'
-      keyiPad3.iPad3='True'
+      if self.iOS < 6.0
+        keyiPad3.iPad3='True'
+      elsif self.iOS == 6.0
+        keyiPad3.iPad3='Sorta'
+      else
+        keyiPad3.iPad3='True'
+      end
       if $keyDao.check_duplicate(keyiPad3)
         puts "[Info - SiriProxy] Duplicate Validation Data. Key NOT saved"
       else
@@ -1020,6 +1027,9 @@ class SiriProxy::Connection < EventMachine::Connection
                 @client.appleDBid=object["properties"]["meCards"][i]["properties"]["identifier"]
               else
                 @client.appleDBid="NA"
+                @client.devicetype=@devicetype
+                @client.deviceOS=self.iOS
+                @client.last_ip=@clientip
               end
             end
           end
@@ -1074,6 +1084,7 @@ class SiriProxy::Connection < EventMachine::Connection
             else
               @oldclient.fname=@client.fname
               @oldclient.nickname=@client.nickname #in case he changes this
+              @client.last_ip=@clientip
               $clientsDao.update(@oldclient)
               puts "[Client - SiriProxy] OLD Client changed settings [#{@oldclient.appleAccountid}]"
               if @oldclient.valid!='True' #make a perm ban

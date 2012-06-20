@@ -133,7 +133,7 @@ class SiriProxy::CommandLine
   `expired` enum('False','True') NOT NULL DEFAULT 'False',
   `keyload` int(255) unsigned NOT NULL DEFAULT '0',
   `date_added` datetime NOT NULL,
-  `iPad3` enum('False','True') NOT NULL DEFAULT 'False',
+  `iPad3` enum('False','True','Sorta') NOT NULL DEFAULT 'False',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")  
     puts "Created Table keys"
@@ -200,7 +200,11 @@ class SiriProxy::CommandLine
   `apple_db_id` longtext NOT NULL,
   `apple_account_id` longtext NOT NULL,
   `valid` enum('False','True') NOT NULL DEFAULT 'True',
+  `devicetype` mediumtext NOT NULL,
+  `deviceOS` text NOT NULL,
   `date_added` datetime NOT NULL,
+  `last_login` datetime NOT NULL,
+  `last_ip` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
      puts "Table Clients Created"   
