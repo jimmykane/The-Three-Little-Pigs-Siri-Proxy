@@ -291,7 +291,7 @@ if(count($keys[0]) > 0) {
 						?>
 					</td>
           <td width="50px">
-            <?php if($key['iPad3'] == 'True') {
+            <?php if($key['iPad3'] != 'False') {
                                                     echo 'iPad 3';
                                                 }
                                                 else {
