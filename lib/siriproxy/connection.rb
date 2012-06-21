@@ -711,8 +711,10 @@ class SiriProxy::Connection < EventMachine::Connection
         else
           #Everithing else like android devices, computer apps etc
           #Change unknown to iPhone to make sure everything works..
-          self.close_connection() #close connections
-          self.other_connection.close_connection() #close other
+          if $APP_CONFIG.allow_unknown_clients!=true
+            self.close_connection() #close connections
+            self.other_connection.close_connection() #close other
+          end
           puts "[Info - SiriProxy] Unknown Device Connected from IP #{self.clientip}"
           self.is_4S = false
           self.is_iPad3 = false

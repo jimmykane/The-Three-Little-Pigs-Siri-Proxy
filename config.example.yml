@@ -41,6 +41,11 @@ regenerate_interval: 3600
 #The try_iPad3 option will let the server use iPad3 keys if there are no 4S keys avaliable. Only works for dictation. 
 try_iPad3: true
 
+#With the allow_unknown_clients option, it allows Andriod devices, and any other siri ports to use the server. 
+#It is disabled by default, because it also allows DOS attacks 
+
+#allow_unknown_clients: true
+
 #For Generating Certs for iPhones. Has 2 hosts, so that you can use guzzoni on a 4S, 
 #and your server also using the same instance.
 ca_name: 'SiriProxyCA'
