@@ -209,7 +209,7 @@ class SiriProxy::CommandLine
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
      puts "Table Clients Created"   
     
-    dbh.query("INSERT INTO `clients` VALUES ('1', 'NA', 'NA', 'NA', 'NA', 'False', '0000-00-00 00:00:00');")
+    dbh.query("INSERT INTO `clients` VALUES ('1', 'NA', 'NA', 'NA', 'NA', 'False', 'NA', 'NA', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'NA');")
     
          puts "Table Clients Populated"   
     
