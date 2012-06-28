@@ -228,7 +228,7 @@ class SiriProxy::CommandLine
   def update(directory=nil)
     if(directory)
       puts "=== Installing from '#{directory}' ==="
-  puts `cd #{directory} && rake install`
+  puts `cd #{directory} && bundle install && rake install`
   puts "=== Bundling ===" if $?.exitstatus == 0
   puts `siriproxy bundle` if $?.exitstatus == 0
   puts "=== SUCCESS ===" if $?.exitstatus == 0
@@ -243,8 +243,8 @@ class SiriProxy::CommandLine
 
     `mkdir -p #{tmp_dir}`
     puts `git clone #{branch_opt} git://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy.git #{tmp_dir}`  if $?.exitstatus == 0
-    puts "=== Performing Rake Install ===" if $?.exitstatus == 0
-    puts `cd #{tmp_dir} && rake install`  if $?.exitstatus == 0
+    puts "=== Performing Install ===" if $?.exitstatus == 0
+    puts `cd #{tmp_dir} && bundle install && rake install`  if $?.exitstatus == 0
     puts "=== Bundling ===" if $?.exitstatus == 0
     puts `siriproxy bundle`  if $?.exitstatus == 0
     puts "=== Cleaning Up ===" and puts `rm -rf #{tmp_dir}` if $?.exitstatus == 0
