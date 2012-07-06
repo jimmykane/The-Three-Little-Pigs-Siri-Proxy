@@ -64,9 +64,9 @@ class ClientsDao
 
   def update(dto)
     pp dto
-    sql = "UPDATE `clients` SET fname= ? ,nickname=?,apple_db_id=?,apple_account_id=?,valid=?,last_ip=? WHERE id = ?"
+    sql = "UPDATE `clients` SET fname= ? ,nickname=?,apple_db_id=?,apple_account_id=?,devicetype=?,deviceOS=?,valid=?,last_login=NOW(),last_ip=? WHERE id = ?"
     st = @my.prepare(sql)
-    st.execute(dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.valid,dto.last_ip,dto.id)
+    st.execute(dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.devicetype,dto.deviceOS,dto.valid,dto.last_ip,dto.id)
     st.close
   end
 
@@ -78,7 +78,7 @@ class ClientsDao
   end
 
   def find_by_assistant(dto)
-    sql = "SELECT * FROM `clients` WHERE apple_account_id=? LIMIT 1" #put the limit on in case of colision
+    sql = "SELECT * FROM `clients` WHERE apple_account_id=? LIMIT 1" #put the limit on in case of collision
     st = @my.prepare(sql)
     st.execute(dto.client_apple_account_id)
     result = fetchResults(st)
@@ -86,10 +86,17 @@ class ClientsDao
     return result[0]
   end
 
-
+  def getCurrentClient(dto)
+		sql = "SELECT * FROM `clients` WHERE last_ip=? LIMIT 1" #put the limit on in case of collision
+		st = @my.prepare(sql)
+		st.execute(dto.last_ip)
+		result = fetchResults(st)
+ 		st.close
+    return result
+	end
 
   def listclients()
-    sql = "SELECT * FROM `clients` "
+    sql = "SELECT * FROM `clients`"
     st = @my.prepare(sql)
     st.execute()
     result = fetchResults(st)

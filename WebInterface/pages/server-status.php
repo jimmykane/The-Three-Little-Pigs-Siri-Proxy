@@ -19,6 +19,7 @@ $stats = getstats();
 $server_running = $statistics->checkServer($websiteProperty->getProperty("hostname_or_ip") . ':443');
 
 //error_reporting(0);
+header('Refresh: 45');
 ?>
 <h1>Server Status and Statistics</h1>
 

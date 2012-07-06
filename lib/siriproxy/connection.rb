@@ -1094,9 +1094,13 @@ class SiriProxy::Connection < EventMachine::Connection
                 return nil
               end
             else
-              @oldclient.fname=@client.fname
-              @oldclient.nickname=@client.nickname #in case he changes this
-              @client.last_ip=@clientip
+              @oldclient.fname=@client.fname #in case they ever change this
+              @oldclient.nickname=@client.nickname #in case they ever change this
+              @oldclient.appleDBid=@client.appleDBid
+              @oldclient.appleAccountid=@client.appleAccountid
+              @oldclient.devicetype=@client.devicetype #For users with multiple devices on same Apple Account
+              @oldclient.deviceOS=@client.deviceOS #For users with multiple devices on same Apple Account
+              @oldclient.last_ip=@clientip
               $clientsDao.update(@oldclient)
               puts "[Client - SiriProxy] OLD Client changed settings [#{@oldclient.appleAccountid}]"
               if @oldclient.valid!='True' #make a perm ban
@@ -1124,8 +1128,13 @@ class SiriProxy::Connection < EventMachine::Connection
               puts "[Client - SiriProxy] NEW Client changed settings [#{@client.appleAccountid}] With Assistantid [#{@loadedassistant}]"
 
             else
-              @oldclient.fname=@client.fname
-              @oldclient.nickname=@client.nickname #in case he changes this
+              @oldclient.fname=@client.fname #in case they ever change this
+              @oldclient.nickname=@client.nickname #in case they ever change this
+              @oldclient.appleDBid=@client.appleDBid
+              @oldclient.appleAccountid=@client.appleAccountid
+              @oldclient.devicetype=@client.devicetype #For users with multiple devices on same Apple Account
+              @oldclient.deviceOS=@client.deviceOS #For users with multiple devices on same Apple Account
+              @oldclient.last_ip=@clientip
               $clientsDao.update(@oldclient)
               puts "[Client - SiriProxy] OLD Client changed settings [#{@oldclient.appleAccountid}] With Assistantid [#{@loadedassistant}]"
               @client=@oldclient #hehe
@@ -1260,8 +1269,13 @@ class SiriProxy::Connection < EventMachine::Connection
                   puts "[Client - SiriProxy] NEW Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"
 
                 else
-                  @oldclient.fname=self.other_connection.client.fname
-                  @oldclient.nickname=self.other_connection.client.nickname #in case he changes this
+                  @oldclient.fname=@client.fname #in case they ever change this
+                  @oldclient.nickname=@client.nickname #in case they ever change this
+                  @oldclient.appleDBid=@client.appleDBid
+                  @oldclient.appleAccountid=@client.appleAccountid
+                  @oldclient.devicetype=@client.devicetype #For users with multiple devices on same Apple Account
+                  @oldclient.deviceOS=@client.deviceOS #For users with multiple devices on same Apple Account
+                  @oldclient.last_ip=@clientip
                   $clientsDao.update(@oldclient)
                   @assistant.client_apple_account_id=@oldclient.appleAccountid
                   $assistantDao.createassistant(@assistant)
