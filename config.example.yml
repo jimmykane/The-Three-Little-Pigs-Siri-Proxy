@@ -49,9 +49,8 @@ try_iPad3: true
 #For Generating Certs for iPhones. Has 2 hosts, so that you can use guzzoni on a 4S, 
 #and your server also using the same instance.
 ca_name: 'SiriProxyCA'
-server1: 'guzzoni.apple.com'
-server2: 'kryten.apple.com'
-server3: 'your.siri.proxy.server.com'
+server1: 'kryten.apple.com'
+server2: 'your.siri.proxy.server.com'
 
 #Private or public server. The difference is that public automaticaly sets new clients as valid and private as invalid
 # thus denying access

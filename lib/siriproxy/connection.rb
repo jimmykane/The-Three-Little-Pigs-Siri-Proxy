@@ -115,6 +115,23 @@ class SiriProxy::Connection < EventMachine::Connection
         @createassistant=false
         @assistant_found=true
         #grab assistant
+        if object["properties"]["activationToken"] != nil and self.other_connection.key!=nil and self.validationData_avail==true and self.name=="Kryten"
+          puts '[Info - SiriProxy] Recieved token'
+          pp object
+          @activation_token_recieved=true
+          @activation_token=ActivationToken.new
+          @activation_token.aceid=object["aceId"]
+          @activation_token.data=object["properties"]["activationToken"]
+          pp @activation_token if $LOG_LEVEL > 2
+          @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+          if @keystats==nil
+            $keystatisticsDao.insert(self.other_connection.key)
+            @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+          end
+          @keystats.total_tokens_recieved+=1
+          $keystatisticsDao.save_key_stats(@keystats)
+          pp @keystats
+        end
         @loadedassistant=object["properties"]["assistantId"]
         @loadedspeechid=object["properties"]["speechId"]
         @userassistant=Assistant.new
@@ -239,6 +256,23 @@ class SiriProxy::Connection < EventMachine::Connection
         @createassistant=false
         @assistant_found=true
         #grab assistant
+        if object["properties"]["activationToken"] != nil and self.other_connection.key!=nil and self.validationData_avail==true and self.name=="Kryten"
+          puts '[Info - SiriProxy] Recieved token'
+          pp object
+          @activation_token_recieved=true
+          @activation_token=ActivationToken.new
+          @activation_token.aceid=object["aceId"]
+          @activation_token.data=object["properties"]["activationToken"]
+          pp @activation_token if $LOG_LEVEL > 2
+          @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+          if @keystats==nil
+            $keystatisticsDao.insert(self.other_connection.key)
+            @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+          end
+          @keystats.total_tokens_recieved+=1
+          $keystatisticsDao.save_key_stats(@keystats)
+          pp @keystats
+        end
         @loadedassistant=object["properties"]["assistantId"]
         @loadedspeechid=object["properties"]["speechId"]
 
@@ -441,7 +475,7 @@ class SiriProxy::Connection < EventMachine::Connection
       puts "[Debug - #{self.name}] Found end of headers" if $LOG_LEVEL > 3
       set_binary_mode
       self.processed_headers = true
-      if self.name=="Guzzoni" or self.name=="Kryten"
+      if self.name=="Kryten"
         puts "   @connectionfromapple=true "
         @connectionfromapple=true
       end
@@ -449,11 +483,7 @@ class SiriProxy::Connection < EventMachine::Connection
       #A Device has connected!!!
       #Check for User Agent and replace correctly
     elsif line.match(/^Host:/)
-      if self.host = 'guzzoni.apple.com'
-        line = "Host: guzzoni.apple.com"  #Keeps Apple from instantly knowing that this is a Proxy Server.
-      elsif self.host = 'kryten.apple.com'
-        line = "Host: kryten.apple.com"  #Keeps Apple from instantly knowing that this is a Proxy Server.
-      end
+      line = "Host: kryten.apple.com"  #Keeps Apple from instantly knowing that this is a Proxy Server.
     elsif line.match(/^User-Agent:/)
       #if its and iphone4s
       self.clientport, self.clientip = Socket.unpack_sockaddr_in(get_peername)
@@ -940,26 +970,6 @@ class SiriProxy::Connection < EventMachine::Connection
         @GetSessionCertificateResponse=true
       end
 
-      #let record how many activation token get per key
-      if object["class"]=="SetActivationToken" and self.other_connection.key!=nil and self.validationData_avail==true and self.name=="Guzzoni" or object["class"]=="SetActivationToken" and self.other_connection.key!=nil and self.validationData_avail==true and self.name=="Kryten"
-        puts '[Info - SiriProxy] Recieved token'
-        pp object
-        @activation_token_recieved=true
-        @activation_token=ActivationToken.new
-        @activation_token.aceid=object["aceId"]
-        @activation_token.data=object["properties"]["activationToken"]
-        pp @activation_token if $LOG_LEVEL > 2
-        @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
-        if @keystats==nil
-          $keystatisticsDao.insert(self.other_connection.key)
-          @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
-        end
-        @keystats.total_tokens_recieved+=1
-        $keystatisticsDao.save_key_stats(@keystats)
-        pp @keystats
-      end
-
-
       #Lets record how many Finish speech requests are made without the activation token and not by creating witch may not include the token if max assistants are reached
       if object["class"]=="FinishSpeech" and self.name=="iPhone" and  self.other_connection.activation_token_recieved==false and @key!=nil and self.validationData_avail==true and  @createassistant==false and @finishspeech==false
 
@@ -1204,6 +1214,22 @@ class SiriProxy::Connection < EventMachine::Connection
             if  object["class"]=="AssistantCreated" and self.other_connection.client!=nil and self.other_connection.createassistant==true
               puts "[Info - SiriProxy] Creating new Assistant..."
               pp object
+              if object["properties"]["activationToken"] != nil and self.other_connection.key!=nil and self.validationData_avail==true and self.name=="Kryten"
+                puts '[Info - SiriProxy] Recieved token'
+                @activation_token_recieved=true
+                @activation_token=ActivationToken.new
+                @activation_token.aceid=object["aceId"]
+                @activation_token.data=object["properties"]["activationToken"]
+                pp @activation_token if $LOG_LEVEL > 2
+                @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+                if @keystats==nil
+                  $keystatisticsDao.insert(self.other_connection.key)
+                  @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+                end
+                @keystats.total_tokens_recieved+=1
+                $keystatisticsDao.save_key_stats(@keystats)
+                pp @keystats
+              end
               @assistant=Assistant.new
               @assistant.assistantid=object["properties"]["assistantId"]
               @assistant.speechid=object["properties"]["speechId"]
