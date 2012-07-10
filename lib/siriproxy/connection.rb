@@ -724,7 +724,7 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] Final Header: " + line if $LOG_LEVEL > 2
         elsif line.match(/iPod4,1;/)
           self.is_4S = false
-          self.is_iPad3 = true
+          self.is_iPad3 = false
           @devicetype="iPod touch 4th generation"
           if line.match(/5.0/)
             self.iOS = 5.0
