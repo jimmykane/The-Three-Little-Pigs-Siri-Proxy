@@ -3,7 +3,7 @@ require 'singleton'
 require 'siriproxy/db_connection'
 class Client
 
-  attr_accessor :id, :fname,:nickname,:appleDBid,:appleAccountid,:devicetype,:deviceOS,:valid,:date_added,:last_login,:last_ip
+  attr_accessor :id, :fname,:nickname,:appleDBid,:appleAccountid,:valid,:devicetype,:deviceOS,:date_added,:last_login,:last_ip
 
   def id=(value)  # The setter method for @id
     @id =  value
@@ -24,14 +24,14 @@ class Client
   def appleAccountid=(value)  # The setter method for @load
     @appleAccountid =  value
   end
+  def valid=(value)  # The setter method for @valid
+    @valid =  value
+  end
   def devicetype=(value)  # The setter method for @devicetype
     @devicetype =  value
   end
   def deviceOS=(value)  # The setter method for @deviceOS
     @deviceOS =  value
-  end
-  def valid=(value)  # The setter method for @valid
-    @valid =  value
   end
   def date_added=(value)  # The setter method for @date_added
     @date_added =  value
@@ -56,17 +56,17 @@ class ClientsDao
   end
 
   def insert(dto)
-    sql = "INSERT INTO `clients` (fname,nickname,apple_db_id,apple_account_id,devicetype,deviceOS,valid,date_added,last_login,last_ip ) VALUES ( ?  , ? , ? , ? , ? , ? , ? ,NOW(),NOW(), ? )"
+    sql = "INSERT INTO `clients` (fname,nickname,apple_db_id,apple_account_id,valid,devicetype,deviceOS,date_added,last_login,last_ip ) VALUES ( ?  , ? , ? , ? , ? , ? , ? ,NOW(),NOW(), ? )"
     st = @my.prepare(sql)
-    st.execute(dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.devicetype,dto.deviceOS,dto.valid,dto.last_ip)
+    st.execute(dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.valid,dto.devicetype,dto.deviceOS,dto.last_ip)
     st.close
   end
 
   def update(dto)
     pp dto
-    sql = "UPDATE `clients` SET fname= ? ,nickname=?,apple_db_id=?,apple_account_id=?,devicetype=?,deviceOS=?,valid=?,last_login=NOW(),last_ip=? WHERE id = ?"
+    sql = "UPDATE `clients` SET fname= ? ,nickname=?,apple_db_id=?,apple_account_id=?,valid=?,devicetype=?,deviceOS=?,last_login=NOW(),last_ip=? WHERE id = ?"
     st = @my.prepare(sql)
-    st.execute(dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.devicetype,dto.deviceOS,dto.valid,dto.last_ip,dto.id)
+    st.execute(dto.fname,dto.nickname,dto.appleDBid,dto.appleAccountid,dto.valid,dto.devicetype,dto.deviceOS,dto.last_ip,dto.id)
     st.close
   end
 
@@ -85,15 +85,6 @@ class ClientsDao
     st.close
     return result[0]
   end
-
-  def getCurrentClient(dto)
-		sql = "SELECT * FROM `clients` WHERE last_ip=? LIMIT 1" #put the limit on in case of collision
-		st = @my.prepare(sql)
-		st.execute(dto.last_ip)
-		result = fetchResults(st)
- 		st.close
-    return result
-	end
 
   def listclients()
     sql = "SELECT * FROM `clients`"
@@ -125,9 +116,9 @@ class ClientsDao
         dto.nickname=row[2]
         dto.appleDBid=row[3]
         dto.appleAccountid=row[4]
-        dto.devicetype=row[5]
-        dto.deviceOS=row[6]
-        dto.valid=row[7]
+        dto.valid=row[5]
+        dto.devicetype=row[6]
+        dto.deviceOS=row[7]
         dto.date_added=row[8]
         dto.last_login=row[9]
         dto.last_ip=row[10]

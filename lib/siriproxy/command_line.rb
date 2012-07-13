@@ -133,6 +133,7 @@ class SiriProxy::CommandLine
   `expired` enum('False','True') NOT NULL DEFAULT 'False',
   `keyload` int(255) unsigned NOT NULL DEFAULT '0',
   `date_added` datetime NOT NULL,
+  `last_used` datetime NOT NULL,
   `iPad3` enum('False','True','Sorta') NOT NULL DEFAULT 'False',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")  

@@ -5,8 +5,8 @@ require "siriproxy/functions"
 require 'cora'
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
-
-  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager,:is_4S,:is_iPad3, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport,:client,:createassistant,:loadedassistant,:loadedspeechid,:devicetype,:deviceOS,:activation_token_recieved,:activation_token,:assistant_found,:connectionfromapple,:commandFailed,:finishspeech,:GetSessionCertificateResponse,:iOS,:host
+  
+  attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager, :is_4S, :is_iPad3, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport, :client, :oldclient, :createassistant, :loadedassistant, :loadedspeechid, :devicetype, :deviceOS, :activation_token_recieved, :activation_token, :assistant_found, :connectionfromapple, :commandFailed, :finishspeech, :GetSessionCertificateResponse, :iOS, :host, :usedkey
 
   def last_ref_id=(ref_id)
     @last_ref_id = ref_id
@@ -31,8 +31,10 @@ class SiriProxy::Connection < EventMachine::Connection
     self.speechId_avail = false		#speechID available
     self.assistantId_avail = false		#assistantId available
     self.client=nil
+    self.oldclient=nil
     self.iOS=nil
     self.host=nil
+    self.usedkey=nil
     @createassistant=false
     @loadedassistant=nil
     @loadedspeechid=nil
@@ -101,12 +103,12 @@ class SiriProxy::Connection < EventMachine::Connection
     else
       puts "[Info - SiriProxy] Something went wrong. Please file this bug. Key NOT saved!"
     end
-    ##This anow allows 4S phones to be enterend into client database.
+    ##This now allows 4S phones to be entered into client database.
     begin
       @key=Key.new
       @key.id=0
 
-      if object["class"]=="CreateAssistant" # now separates initial request to Loadassistant and Create Assistant
+      if object["class"]=="CreateAssistant" # now separates initial request to LoadAssistant and Create Assistant
         @createassistant=true
         @assistant_found=false
 
@@ -115,18 +117,18 @@ class SiriProxy::Connection < EventMachine::Connection
         @createassistant=false
         @assistant_found=true
         #grab assistant
-        if object["properties"]["activationToken"] != nil and self.other_connection.key!=nil and self.validationData_avail==true and self.name=="Kryten"
+        if object["properties"]["activationToken"] != nil
+          @usedkey = $keyDao.list_keys_for_stats()
           puts '[Info - SiriProxy] Recieved token'
-          pp object
           @activation_token_recieved=true
           @activation_token=ActivationToken.new
           @activation_token.aceid=object["aceId"]
           @activation_token.data=object["properties"]["activationToken"]
           pp @activation_token if $LOG_LEVEL > 2
-          @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+          @keystats=$keystatisticsDao.get_key_stats(@usedkey)
           if @keystats==nil
-            $keystatisticsDao.insert(self.other_connection.key)
-            @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+            $keystatisticsDao.insert(@usedkey)
+            @keystats=$keystatisticsDao.get_key_stats(@usedkey)
           end
           @keystats.total_tokens_recieved+=1
           $keystatisticsDao.save_key_stats(@keystats)
@@ -256,18 +258,18 @@ class SiriProxy::Connection < EventMachine::Connection
         @createassistant=false
         @assistant_found=true
         #grab assistant
-        if object["properties"]["activationToken"] != nil and self.other_connection.key!=nil and self.validationData_avail==true and self.name=="Kryten"
+        if object["properties"]["activationToken"] != nil
+          @usedkey = $keyDao.list_keys_for_stats()
           puts '[Info - SiriProxy] Recieved token'
-          pp object
           @activation_token_recieved=true
           @activation_token=ActivationToken.new
           @activation_token.aceid=object["aceId"]
           @activation_token.data=object["properties"]["activationToken"]
           pp @activation_token if $LOG_LEVEL > 2
-          @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+          @keystats=$keystatisticsDao.get_key_stats(@usedkey)
           if @keystats==nil
-            $keystatisticsDao.insert(self.other_connection.key)
-            @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+            $keystatisticsDao.insert(@usedkey)
+            @keystats=$keystatisticsDao.get_key_stats(@usedkey)
           end
           @keystats.total_tokens_recieved+=1
           $keystatisticsDao.save_key_stats(@keystats)
@@ -1223,17 +1225,18 @@ class SiriProxy::Connection < EventMachine::Connection
             if  object["class"]=="AssistantCreated" and self.other_connection.client!=nil and self.other_connection.createassistant==true
               puts "[Info - SiriProxy] Creating new Assistant..."
               pp object
-              if object["properties"]["activationToken"] != nil and self.other_connection.key!=nil and self.validationData_avail==true and self.name=="Kryten"
+              if object["properties"]["activationToken"] != nil
+                @usedkey = $keyDao.list_keys_for_stats()
                 puts '[Info - SiriProxy] Recieved token'
                 @activation_token_recieved=true
                 @activation_token=ActivationToken.new
                 @activation_token.aceid=object["aceId"]
                 @activation_token.data=object["properties"]["activationToken"]
                 pp @activation_token if $LOG_LEVEL > 2
-                @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+                @keystats=$keystatisticsDao.get_key_stats(@usedkey)
                 if @keystats==nil
-                  $keystatisticsDao.insert(self.other_connection.key)
-                  @keystats=$keystatisticsDao.get_key_stats(self.other_connection.key)
+                  $keystatisticsDao.insert(@usedkey)
+                  @keystats=$keystatisticsDao.get_key_stats(@usedkey)
                 end
                 @keystats.total_tokens_recieved+=1
                 $keystatisticsDao.save_key_stats(@keystats)
@@ -1266,6 +1269,7 @@ class SiriProxy::Connection < EventMachine::Connection
                   @assistant.client_apple_account_id=self.other_connection.client.appleAccountid
                   $assistantDao.createassistant(@assistant)
                   puts "[Client - SiriProxy] Created Assistant ID  #{@assistant.assistantid} using key [#{self.other_connection.key.id}]"
+                  $keyDao.update_used(self.other_connection.key)
                   puts "[Client - SiriProxy] NEW Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"
 
                 else
@@ -1280,6 +1284,7 @@ class SiriProxy::Connection < EventMachine::Connection
                   @assistant.client_apple_account_id=@oldclient.appleAccountid
                   $assistantDao.createassistant(@assistant)
                   puts "[Client - SiriProxy] Created Assistant ID #{@assistant.assistantid} using key [#{self.other_connection.key.id}]"
+                  $keyDao.update_used(self.other_connection.key)
                   puts "[Client - SiriProxy] OLD Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"
 
                 end
@@ -1294,7 +1299,8 @@ class SiriProxy::Connection < EventMachine::Connection
       puts "[Info - #{self.name}] Received Object: #{object["class"]}" if $LOG_LEVEL == 1
       puts "[Info - #{self.name}] Received Object: #{object["class"]} (group: #{object["group"]})" if $LOG_LEVEL == 2
       puts "[Info - #{self.name}] Received Object: #{object["class"]} (group: #{object["group"]}, ref_id: #{object["refId"]},ace_id: #{object["aceId"]})" if $LOG_LEVEL > 2
-      puts "[Key -  #{self.name}] Recieved Object Using: Key id [#{@key.id}] and Instance Keyload[#{@key.keyload}]  " if @key!=nil &&self.validationData_avail!=false && $LOG_LEVEL >1
+      puts "[Key -  #{self.name}] Recieved Object Using: Key id [#{@key.id}] and Instance Keyload[#{@key.keyload}]  " if @key!=nil &&self.validationData_avail!=false && $LOG_LEVEL > 1
+      $keyDao.update_used(@key) if @key!=nil &&self.validationData_avail!=false
       pp object if $LOG_LEVEL > 3
 
 

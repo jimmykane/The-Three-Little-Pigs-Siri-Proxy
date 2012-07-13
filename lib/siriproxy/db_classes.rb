@@ -80,7 +80,7 @@ class ConfigDao
 
   class Key
 
-    attr_accessor :id, :assistantid,:speechid,:speechid,:expired,:sessionValidation,:keyload,:date_added,:availablekeys,:banned,:iPad3
+    attr_accessor :id, :assistantid,:speechid,:speechid,:expired,:sessionValidation,:keyload,:date_added,:last_used,:availablekeys,:banned,:iPad3
 
     def id=(value)  # The setter method for @id
       @id =  value
@@ -107,9 +107,11 @@ class ConfigDao
     def keyload=(value)  # The setter method for @load
       @keyload =  value
     end
-
     def date_added=(value)  # The setter method for @date_added
       @date_added =  value
+    end
+    def last_used=(value)  # The setter method for @last_used
+      @last_used =  value
     end
     def availablekeys=(value)  # The setter method for @date_added
       @availablekeys =  value
@@ -148,14 +150,14 @@ class ConfigDao
     end
 
     def insert(dto)
-      sql = "INSERT INTO `keys` (assistantid,speechid,sessionValidation,banned,expired,iPad3,date_added ) VALUES ( ? ,  ?  , ? , ? , ? , ? ,NOW())"
+      sql = "INSERT INTO `keys` (assistantid,speechid,sessionValidation,banned,expired,iPad3,date_added,last_used ) VALUES ( ? ,  ?  , ? , ? , ? , ? ,NOW(),NOW())"
       st = @my.prepare(sql)
       st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.iPad3)
       st.close
     end
 
     def update(dto)
-      sql = "UPDATE `keys` SET assistantid = ?,speechid= ? ,sessionValidation=?,banned=?,expired=?,keyload=?,iPad3=? WHERE id = ?"
+      sql = "UPDATE `keys` SET assistantid = ?,speechid= ? ,sessionValidation=?,banned=?,expired=?,keyload=?,last_used=NOW(),iPad3=? WHERE id = ?"
       st = @my.prepare(sql)
       st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.keyload,dto.id,dto.iPad3)
       st.close
@@ -227,6 +229,22 @@ class ConfigDao
       st.execute()
       st.close
     end
+    
+    def update_used(dto)
+      sql = "UPDATE `keys` SET last_used=NOW() WHERE id = ?"
+      st = @my.prepare(sql)
+      st.execute(dto.id)
+      st.close
+    end
+    def list_keys_for_stats()
+      sql = "SELECT * FROM `keys` ORDER by last_used DESC LIMIT 1"
+      st = @my.prepare(sql)
+      st.execute()
+      result = fetchResults(st)
+      st.close
+      return result[0]
+    end
+    
     def list4Skeys()
       sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3='False' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
       st = @my.prepare(sql)
@@ -336,7 +354,8 @@ GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
           dto.expired=row[5]
           dto.keyload=row[6]
           dto.date_added=row[7]
-          dto.iPad3=row[8]
+          dto.last_used=row[8]
+          dto.iPad3=row[9]
           rows << dto
         end
 
