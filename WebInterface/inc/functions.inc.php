@@ -68,7 +68,7 @@
         $query = 'SELECT * FROM `clients` WHERE apple_account_id="'.$accountid.'"';
         $results = $db->MakeQuery($query);
         if(mysql_num_rows($results) > 0) {
-            while($data = mysql_fetch_array($result)) {
+            while($data = mysql_fetch_array($results)) {
                 if ($data['nickname'] == "NA") {
                     $client = $data['fname'];
                 }
