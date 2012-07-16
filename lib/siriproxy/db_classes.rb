@@ -80,7 +80,7 @@ class ConfigDao
 
   class Key
 
-    attr_accessor :id, :assistantid,:speechid,:speechid,:expired,:sessionValidation,:keyload,:date_added,:last_used,:availablekeys,:banned,:iPad3
+    attr_accessor :id, :assistantid,:speechid,:speechid,:expired,:sessionValidation,:keyload,:date_added,:last_used,:availablekeys,:banned,:iPad3,:client_apple_account_id
 
     def id=(value)  # The setter method for @id
       @id =  value
@@ -119,6 +119,9 @@ class ConfigDao
     def iPad3=(value)  # The setter method for @iPad3
       @iPad3 =  value
     end
+    def client_apple_account_id=(value)  # The setter method for @client_apple_account_id
+      @client_apple_account_id =  value
+    end
   end
 
 
@@ -150,16 +153,16 @@ class ConfigDao
     end
 
     def insert(dto)
-      sql = "INSERT INTO `keys` (assistantid,speechid,sessionValidation,banned,expired,iPad3,date_added,last_used ) VALUES ( ? ,  ?  , ? , ? , ? , ? ,NOW(),NOW())"
+      sql = "INSERT INTO `keys` (assistantid,speechid,sessionValidation,banned,expired,iPad3,date_added,last_used,client_apple_account_id ) VALUES ( ? ,  ?  , ? , ? , ? , ? ,NOW(),NOW(), ?)"
       st = @my.prepare(sql)
-      st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.iPad3)
+      st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.iPad3,dto.client_apple_account_id)
       st.close
     end
 
     def update(dto)
-      sql = "UPDATE `keys` SET assistantid = ?,speechid= ? ,sessionValidation=?,banned=?,expired=?,keyload=?,last_used=NOW(),iPad3=? WHERE id = ?"
+      sql = "UPDATE `keys` SET assistantid = ?,speechid= ? ,sessionValidation=?,banned=?,expired=?,keyload=?,last_used=NOW(),iPad3=?,client_apple_account_id=? WHERE id = ?"
       st = @my.prepare(sql)
-      st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.keyload,dto.id,dto.iPad3)
+      st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.keyload,dto.id,dto.iPad3,dto.client_apple_account_id)
       st.close
     end
 
@@ -356,6 +359,7 @@ GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
           dto.date_added=row[7]
           dto.last_used=row[8]
           dto.iPad3=row[9]
+          dto.client_apple_account_id=row[10]
           rows << dto
         end
 

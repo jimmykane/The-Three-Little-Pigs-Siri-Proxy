@@ -135,6 +135,7 @@ class SiriProxy::CommandLine
   `date_added` datetime NOT NULL,
   `last_used` datetime NOT NULL,
   `iPad3` enum('False','True','Sorta') NOT NULL DEFAULT 'False',
+  `client_apple_account_id` longtext NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")  
     puts "Created Table keys"

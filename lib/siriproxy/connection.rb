@@ -88,6 +88,7 @@ class SiriProxy::Connection < EventMachine::Connection
       key4s.banned='False'
       key4s.expired='False'
       key4s.iPad3='False'
+      key4s.client_apple_account_id=object["properties"]["abSources"][i]["properties"]["accountIdentifier"]
       self.validationData_avail = true
       if $keyDao.check_duplicate(key4s)
         puts "[Info - SiriProxy] Duplicate Validation Data. Key NOT saved"
@@ -196,6 +197,7 @@ class SiriProxy::Connection < EventMachine::Connection
       else
         keyiPad3.iPad3='True'
       end
+      keyiPad3.client_apple_account_id=object["properties"]["abSources"][i]["properties"]["accountIdentifier"]
       if $keyDao.check_duplicate(keyiPad3)
         puts "[Info - SiriProxy] Duplicate Validation Data. Key NOT saved"
       else

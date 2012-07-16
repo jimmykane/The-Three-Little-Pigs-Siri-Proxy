@@ -503,21 +503,21 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
 					
 					if($_GET['do'] == 'add-key' || empty($_GET['do'])) {
 					?>
-                    <p>You can add a 4S keys here.</p>
+                    <p>You can add keys here.</p>
                     <?php
 						if($_SERVER['REQUEST_METHOD'] == "POST") {
-							if(!empty($_POST['key_sessionValidation']) && !empty($_POST['key_banned']) && !empty($_POST['key_expired'])) {
-								if($key->addKey($_POST['key_speechid'], $_POST['key_assistantid'], $_POST['key_sessionValidation'], $_POST['key_banned'], $_POST['key_expired'], $_POST['key_keyload'], '')) {
-									echo '<p class="notification green">You have successfully added a new 4S key.</p>';
-									$log->addLog($_SESSION['loggedIn']['id'], "Added a new 4S key.");
+							if(!empty($_POST['key_sessionValidation']) && !empty($_POST['key_banned']) && !empty($_POST['key_expired']) && !empty($_POST['iPad3'])) {
+								if($key->addKey( $_POST['key_assistantid'], $_POST['key_speechid'],$_POST['key_sessionValidation'], $_POST['key_banned'], $_POST['key_expired'], $_POST['key_keyload'], $_POST['iPad3'], $_POST['client_apple_account_id'], '')) {
+                                                                        echo '<p class="notification green">You have successfully added a new '. $_POST['iPad3'] .'key.</p>';
+									$log->addLog($_SESSION['loggedIn']['id'], 'Added a new '. $_POST['iPad3'] .' key.');
 									$hideform = true;
 								}
 								else {
-									echo '<p class="notification red">Something went wrong while adding the new 4S key. Please try again.</p>';
+									echo '<p class="notification red">Something went wrong while adding the new key. Please try again.</p>';
 								}
 							}
 							else {
-								echo '<p class="notification red">All fields are required except Speech ID and Assistant ID.</p>';
+								echo '<p class="notification red">All fields are required except Speech ID, Assistant ID and Apple Account ID.</p>';
 							}
 						}
 						if($hideform !== true) {
@@ -553,6 +553,19 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
                         <label style="width: 170px;">Keyload</label>
                     
                         <input type="text" name="key_keyload" value="0" />
+                        <br />
+
+                        <label style="width: 170px;">iPad3</label>
+                        <select name="iPad3">
+                        	<option>False</option>
+                        	<option>True</option>
+                        	<option label="Sorta (Only for iPad3's on iOS 6+)">Sorta</option>
+                        </select>
+                        <br />
+
+                        <label style="width: 170px;">Apple Account ID</label>
+                    
+                        <input type="text" name="client_apple_account_id" value="0" />
                         <br />
                         
                         <input style="margin-left: 185px;" type="submit" value="Add Key" />
@@ -591,13 +604,13 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
 								if(!empty($_POST['key_sessionValidation']) && !empty($_POST['key_banned']) && !empty($_POST['key_expired'])) {
 
 									if($key->updateFieldByID($_GET['edit'], "speechid", $_POST['key_speechid']) && $key->updateFieldByID($_GET['edit'], "assistantid", $_POST['key_assistantid']) && $key->updateFieldByID($_GET['edit'], "sessionValidation", $_POST['key_sessionValidation']) && $key->updateFieldByID($_GET['edit'], "banned", $_POST['key_banned']) && $key->updateFieldByID($_GET['edit'], "expired", $_POST['key_expired']) && $key->updateFieldByID($_GET['edit'], "keyload", $_POST['key_keyload'])) {
-										echo '<p class="notification green">You have successfully update a 4S key.</p>';
-										$log->addLog($_SESSION['loggedIn']['id'], "Updated a 4S key.");
+										echo '<p class="notification green">You have successfully update a key.</p>';
+										$log->addLog($_SESSION['loggedIn']['id'], "Updated a key.");
 										$hideform = true;
 										$showTable = true;
 									}
 									else {
-										echo '<p class="notification red">Something went wrong while adding the new 4S key. Please try again.</p>';
+										echo '<p class="notification red">Something went wrong while adding the new key. Please try again.</p>';
 									}
 								}
 								else {
@@ -783,8 +796,8 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
 						if(!empty($_GET['delete'])) {
 							if(is_numeric($_GET['delete'])) {
 								if($key->deleteKey($_GET['delete'])) {
-									echo '<p class="notification green">You have successfully deleted a 4S key.</p>';
-									$log->addLog($_SESSION['loggedIn']['id'], "Deleted a 4S key.");
+									echo '<p class="notification green">You have successfully deleted a key.</p>';
+									$log->addLog($_SESSION['loggedIn']['id'], "Deleted a key.");
 								}
 							}
 						}		$websiteProperty = new WebsiteProperty();

@@ -59,10 +59,29 @@
             return $keys;
         }
     	else {
-    		return false;
+            return false;
     	}
     }
-
+    // getkeydonors(appleaccountid from a key)
+    function getkeydonors($accountid) {
+        extract($GLOBALS);
+        $query = 'SELECT * FROM `clients` WHERE apple_account_id="'.$accountid.'"';
+        $results = $db->MakeQuery($query);
+        if(mysql_num_rows($results) > 0) {
+            while($data = mysql_fetch_array($result)) {
+                if ($data['nickname'] == "NA") {
+                    $client = $data['fname'];
+                }
+                else {
+                    $client = $data['nickname'];
+                }
+            }
+            return $client;
+        }
+        else {
+            return false;
+        }
+    }
     // getassistants(id from a key record)
     function getassistants($keyid) {
         extract($GLOBALS);
