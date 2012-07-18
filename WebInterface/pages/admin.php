@@ -507,8 +507,15 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
                     <?php
 						if($_SERVER['REQUEST_METHOD'] == "POST") {
 							if(!empty($_POST['key_sessionValidation']) && !empty($_POST['key_banned']) && !empty($_POST['key_expired']) && !empty($_POST['iPad3'])) {
-								if($key->addKey( $_POST['key_assistantid'], $_POST['key_speechid'],$_POST['key_sessionValidation'], $_POST['key_banned'], $_POST['key_expired'], $_POST['key_keyload'], $_POST['iPad3'], $_POST['client_apple_account_id'], '')) {
-                                                                        echo '<p class="notification green">You have successfully added a new '. $_POST['iPad3'] .'key.</p>';
+								if($key->addKey( $_POST['key_assistantid'], $_POST['key_speechid'],$_POST['key_sessionValidation'], $_POST['key_banned'], $_POST['key_expired'], $_POST['key_keyload'], $_POST['iPad3'] '')) {
+                                                                        echo '<p class="notification green">You have successfully added a new '
+                                                                            if ($_POST['iPad3'] == false) {
+                                                                                echo '4S';
+                                                                            }
+                                                                            else {
+                                                                                echo 'iPad 3';
+                                                                            }
+                                                                            'key.</p>';
 									$log->addLog($_SESSION['loggedIn']['id'], 'Added a new '. $_POST['iPad3'] .' key.');
 									$hideform = true;
 								}
@@ -563,10 +570,10 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
                         </select>
                         <br />
 
-                        <label style="width: 170px;">Apple Account ID</label>
+<!--                        <label style="width: 170px;">Apple Account ID</label>
                     
                         <input type="text" name="client_apple_account_id" value="0" />
-                        <br />
+                        <br />-->
                         
                         <input style="margin-left: 185px;" type="submit" value="Add Key" />
                         	

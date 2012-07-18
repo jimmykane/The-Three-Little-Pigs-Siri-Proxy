@@ -218,11 +218,11 @@ if(count($keys[0]) > 0) {
             <th><acronym class="toolTip" title="The current load on each key. The more packets a key processes the hotter it's getting. Once it has reached the max keyload it's paused for a short time to let it cool down.">Keyload</acronym></th>
             <th><acronym class="toolTip" title="Which device donated the key, an iPhone 4S or iPad3.">Device</acronym></th>
             <th><acronym class="toolTip" title="The Person who donated the key.">Added By</acronym></th>
-            <th><acronym class="toolTip" title="The date and time when the key was donated.">Date added</acronym></th>
+<!--            <th><acronym class="toolTip" title="The date and time when the key was donated.">Date added</acronym></th>-->
         </tr>
         <?php
 		if($keys[2] == false) {
-			echo '<td colspan="7"><p class="notification red" style="padding: 0 5px; margin: 5px;">There are no keys available right now, feed the piggies!</p></td>';
+			echo '<td colspan="6"><p class="notification red" style="padding: 0 5px; margin: 5px;">There are no keys available right now, feed the piggies!</p></td>';
 		}
 		else {
 			
@@ -300,9 +300,9 @@ if(count($keys[0]) > 0) {
                                                     echo 'iPhone4S';
                                                 } ?>
           </td>
-					<td width="100px">
-						<?php echo getkeydonors($key['client_apple_account_id']) ?>
-					</td>
+<!--					<td width="100px">
+						<?php // echo getkeydonors($key['client_apple_account_id']) ?>
+					</td>-->
 					<td width="145px">
 						<?php echo $key['date_added'] ?>
 					</td>
@@ -313,7 +313,7 @@ if(count($keys[0]) > 0) {
 					break;
 				}
 			} 
-			echo '<tr><td colspan="7" class="pagination">';
+			echo '<tr><td colspan="6" class="pagination">';
 			if($pid > 1) {
 				echo '<a href="?page=' . $_GET['page'] . '&amp;page-id=' . 1 . '#keys">&lt;&lt;</a>';
 				echo '<a href="?page=' . $_GET['page'] . '&amp;page-id=' . ($pid - 1) . '#keys">&lt;</a>';

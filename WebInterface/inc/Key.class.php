@@ -24,8 +24,8 @@
 			}
 		}
 		
-		public function addKey($assistantid, $speechid, $sessionValidation, $banned, $expired, $keyload, $iPad3, $client_apple_account_id) {
-			$query = mysql_query("INSERT INTO `keys` (assistantid,speechid,sessionValidation,banned,expired,keyload,iPad3,date_added,last_used,client_apple_account_id ) 
+		public function addKey($assistantid, $speechid, $sessionValidation, $banned, $expired, $keyload, $iPad3) {
+			$query = mysql_query("INSERT INTO `keys` (assistantid,speechid,sessionValidation,banned,expired,keyload,iPad3,date_added,last_used) 
                         VALUES  ('" . mysql_real_escape_string($assistantid) . "',
 				 '" . mysql_real_escape_string($speechid) . "',
 				 '" . mysql_real_escape_string($sessionValidation) . "',
@@ -34,8 +34,7 @@
 				 '" . $keyload . "',
 				 '" . $iPad3 . "',
 				 NOW(),
-				 NOW(),
-				 '" . $client_apple_account_id . "')");
+				 NOW())");
 			if($query) {
 				return true;
 			}
