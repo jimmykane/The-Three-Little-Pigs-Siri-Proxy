@@ -144,6 +144,14 @@ end
 add_property_to_class(SiriAnswerSnippet, :answers)
 add_property_to_class(SiriAnswerSnippet, :confirmationOptions)
 
+class SiriPersonSnippet < SiriObject
+  def initialize(persons=[])
+    super("PersonSnippet", "com.apple.ace.contact")
+    self.persons = persons
+  end
+end
+add_property_to_class(SiriPersonSnippet, :persons)
+
 #####
 # Items
 #####
@@ -159,6 +167,98 @@ end
 add_property_to_class(SiriMapItem, :label)
 add_property_to_class(SiriMapItem, :detailType)
 add_property_to_class(SiriMapItem, :location)
+
+class SiriActionableMapItem < SiriObject
+  def initialize(detail=SiriBusinessItem.new, label="Apple, Inc.", location=SiriLocation.new, commands=[], identifier="", detailType="BUSINESS_ITEM", providerCommand=[])
+    super("ActionableMapItem", "com.apple.ace.localsearch")
+    self.detail = detail
+    self.label = label
+    self.location = location
+    self.commands = commands
+    self.identifier = identifier
+    self.detailType = detailType
+    self.providerCommand = providerCommand
+  end
+end
+add_property_to_class(SiriActionableMapItem, :detail)
+add_property_to_class(SiriActionableMapItem, :label)
+add_property_to_class(SiriActionableMapItem, :location)
+add_property_to_class(SiriActionableMapItem, :commands)
+add_property_to_class(SiriActionableMapItem, :identifier)
+add_property_to_class(SiriActionableMapItem, :detailType)
+add_property_to_class(SiriActionableMapItem, :providerCommand)
+
+class SiriBusinessItem < SiriObject
+  def initialize(name="Apple, Inc.", totalNumberOfReviews=1, businessIds={"yelp"=>"DS6ma185kMXBS8trQ0wBVg", "places"=>"-7864570592007977996", "localeze"=>"91265028"}, categories=[], reviews=[], phoneNumbers=[], rating=SiriBusinessRating.new, extSessionGuid="44eee732-1fa1-4d0b-8e5b-d055f5b0a69e,Lookup")
+    super("Business", "com.apple.ace.localsearch")
+    self.name = name
+    self.totalNumberOfReviews = totalNumberOfReviews
+    self.businessIds = businessIds
+    self.categories = categories
+    self.reviews = reviews
+    self.phoneNumbers = phoneNumbers
+    self.rating = rating
+    self.extSessionGuid = extSessionGuid
+  end
+end
+add_property_to_class(SiriBusinessItem, :name)
+add_property_to_class(SiriBusinessItem, :totalNumberOfReviews)
+add_property_to_class(SiriBusinessItem, :businessIds)
+add_property_to_class(SiriBusinessItem, :categories)
+add_property_to_class(SiriBusinessItem, :reviews)
+add_property_to_class(SiriBusinessItem, :phoneNumbers)
+add_property_to_class(SiriBusinessItem, :rating)
+add_property_to_class(SiriBusinessItem, :extSessionGuid)
+
+class SiriBusinessReview < SiriObject
+  def initialize()
+    super("Review", "com.apple.ace.localsearch")
+  end
+end
+
+class SiriBusinessPhoneNumber < SiriObject
+  def initialize(value="+14088993800", type="PRIMARY")
+    super("PhoneNumber", "com.apple.ace.localsearch")
+    self.value = value
+    self.type = type
+  end
+end
+add_property_to_class(SiriBusinessPhoneNumber, :value)
+add_property_to_class(SiriBusinessPhoneNumber, :type)
+
+class SiriBusinessRating < SiriObject
+  def initialize(value=100.0, count=0)
+    super("Rating", "com.apple.ace.localsearch")
+    self.value = value
+    self.count = count
+  end
+end
+add_property_to_class(SiriBusinessRating, :value)
+add_property_to_class(SiriBusinessRating, :count)
+
+class SiriPersonItem < SiriObject
+  def initialize(identifier="")
+    super("Person", "com.apple.ace.contact")
+    self.identifier = identifier
+  end
+end
+add_property_to_class(SiriPersonItem, :identifier)
+
+class SiriListItem < SiriObject
+  def initialize(title="", selectionText="", commands=[], speakableText="", object=SOME_KIND_OF_ITEM)
+    super("ListItem", "com.apple.ace.system")
+    self.title = title
+    self.selectionText = selectionText
+    self.commands = commands
+    self.speakableText = speakableText
+    self.object = object
+  end
+end
+add_property_to_class(SiriListItem, :title)
+add_property_to_class(SiriListItem, :selectionText)
+add_property_to_class(SiriListItem, :commands)
+add_property_to_class(SiriListItem, :speakableText)
+add_property_to_class(SiriListItem, :object)
 
 #####
 # Commands
@@ -208,11 +308,33 @@ add_property_to_class(SiriConfirmSnippetCommand, :request_id)
 
 class SiriCancelSnippetCommand < SiriObject
   def initialize(request_id = "")
-    super("ConfirmSnippet", "com.apple.ace.assistant")
+    super("CancelSnippet", "com.apple.ace.assistant")
     self.request_id = request_id
   end
 end
 add_property_to_class(SiriCancelSnippetCommand, :request_id)
+
+class SiriSnippetOpenedCommand < SiriObject
+  def initialize(request_id = "", object=SOME_KIND_OF_ITEM)
+    super("SnippetOpened", "com.apple.ace.assistant")
+    self.request_id = request_id
+    self.object = object
+  end
+end
+add_property_to_class(SiriSnippetOpenedCommand, :request_id)
+add_property_to_class(SiriSnippetOpenedCommand, :object)
+
+class SiriSnippetAttributeOpenedCommand < SiriObject
+  def initialize(request_id = "", attributeValue="", attributeName="")
+    super("SnippetAttributeOpened", "com.apple.ace.assistant")
+    self.request_id = request_id
+    self.attributeValue = attributeValue
+    self.attributeName = attributeName
+  end
+end
+add_property_to_class(SiriSnippetAttributeOpenedCommand, :request_id)
+add_property_to_class(SiriSnippetAttributeOpenedCommand, :attributeValue)
+add_property_to_class(SiriSnippetAttributeOpenedCommand, :attributeName)
 
 #####
 # Objects
@@ -239,6 +361,112 @@ add_property_to_class(SiriLocation, :countryCode)
 add_property_to_class(SiriLocation, :postalCode)
 add_property_to_class(SiriLocation, :latitude)
 add_property_to_class(SiriLocation, :longitude)
+
+class SiriContact < SiriObject
+  def initialize(lastName="Jobs", lastNamePhonetic="", firstName="Steve", firstNamePhonetic="", middleName="", nickName="", suffix="", prefix="", fullName="Steve Jobs", relatedNames=[], addresses=[], emails=[], identifier="", birthday=1955-02-24, phones=[], company="Apple Inc.", me=false)
+    super("Location", "com.apple.ace.system")
+    self.lastName = lastName
+    self.lastNamePhonetic = lastNamePhonetic
+    self.firstName = firstName
+    self.firstNamePhonetic = firstNamePhonetic
+    self.middleName = middleName
+    self.nickName = nickName
+    self.suffix = suffix
+    self.prefix = prefix
+    self.fullName = fullName
+    self.relatedNames = relatedNames
+    self.addresses = addresses
+    self.emails = emails
+    self.identifier = identifier
+    self.birthday = birthday
+    self.phones = phones
+    self.company = company
+    self.me = me
+  end
+end
+add_property_to_class(SiriContact, :lastName)
+add_property_to_class(SiriContact, :lastNamePhonetic)
+add_property_to_class(SiriContact, :firstName)
+add_property_to_class(SiriContact, :firstNamePhonetic)
+add_property_to_class(SiriContact, :middleName)
+add_property_to_class(SiriContact, :nickName)
+add_property_to_class(SiriContact, :suffix)
+add_property_to_class(SiriContact, :prefix)
+add_property_to_class(SiriContact, :fullName)
+add_property_to_class(SiriContact, :relatedNames)
+add_property_to_class(SiriContact, :addresses)
+add_property_to_class(SiriContact, :emails)
+add_property_to_class(SiriContact, :identifier)
+add_property_to_class(SiriContact, :birthday)
+add_property_to_class(SiriContact, :phones)
+add_property_to_class(SiriContact, :company)
+add_property_to_class(SiriContact, :me)
+
+class SiriContactRelatedNames < SiriObject
+  def initialize(label="", name="")
+    super("RelatedName", "com.apple.ace.system")
+    self.label = label
+    self.name = name
+  end
+end
+add_property_to_class(SiriContactRelatedNames, :label)
+add_property_to_class(SiriContactRelatedNames, :name)
+
+class SiriContactAddresses < SiriObject
+  def initialize(label="", street="", city="", stateCode="", postalCode="")
+    super("Location", "com.apple.ace.system")
+    self.label = label
+    self.street = street
+    self.city = city
+    self.stateCode = stateCode
+    self.postalCode = postalCode
+  end
+end
+add_property_to_class(SiriContactAddresses, :label)
+add_property_to_class(SiriContactAddresses, :street)
+add_property_to_class(SiriContactAddresses, :city)
+add_property_to_class(SiriContactAddresses, :stateCode)
+add_property_to_class(SiriContactAddresses, :postalCode)
+
+class SiriContactEmails < SiriObject
+  def initialize(label="", emailAddress="")
+    super("Email", "com.apple.ace.system")
+    self.label = label
+    self.emailAddress = emailAddress
+  end
+end
+add_property_to_class(SiriContactEmails, :label)
+add_property_to_class(SiriContactEmails, :emailAddress)
+
+class SiriContactPhones < SiriObject
+  def initialize(label="", number="")
+    super("Phone", "com.apple.ace.system")
+    self.label = label
+    self.number = number
+  end
+end
+add_property_to_class(SiriContactPhones, :label)
+add_property_to_class(SiriContactPhones, :number)
+
+class SiriDisambiguationList < SiriObject
+  def initialize(items=[], speakableSelectionResponse="OK\u2026", listenAfterSpeaking=true, speakableText="", speakableFinalDelimiter=", or,", speakableDelimiter=", ", selectionResponse="OK\u2026")
+    super("DisambiguationList", "com.apple.ace.assistant")
+    self.items = items
+    self.speakableSelectionResponse = speakableSelectionResponse
+    self.listenAfterSpeaking = listenAfterSpeaking
+    self.speakableText = speakableText
+    self.speakableFinalDelimiter = speakableFinalDelimiter
+    self.speakableDelimiter = speakableDelimiter
+    self.selectionResponse = selectionResponse
+  end
+end
+add_property_to_class(SiriDisambiguationList, :items)
+add_property_to_class(SiriDisambiguationList, :speakableSelectionResponse)
+add_property_to_class(SiriDisambiguationList, :listenAfterSpeaking)
+add_property_to_class(SiriDisambiguationList, :speakableText)
+add_property_to_class(SiriDisambiguationList, :speakableFinalDelimiter)
+add_property_to_class(SiriDisambiguationList, :speakableDelimiter)
+add_property_to_class(SiriDisambiguationList, :selectionResponse)
 
 class SiriAnswer < SiriObject
   def initialize(title="", lines=[])
@@ -326,3 +554,13 @@ add_property_to_class(SiriSetRequestOrigin, :longitude)
 add_property_to_class(SiriSetRequestOrigin, :verticalAccuracy)
 add_property_to_class(SiriSetRequestOrigin, :direction)
 add_property_to_class(SiriSetRequestOrigin, :age)
+
+class SiriPersonSearch < SiriObject
+  def initialize(name="Steve Jobs", scope="Local")
+    super("PersonSearch", "com.apple.ace.contact")
+    self.name = name
+    self.scope = scope
+  end
+end
+add_property_to_class(SiriPersonSearch, :name)
+add_property_to_class(SiriPersonSearch, :scope)
