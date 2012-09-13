@@ -109,6 +109,10 @@ add_property_to_class(SiriAssistantUtteranceView, :speakableText)
 add_property_to_class(SiriAssistantUtteranceView, :dialogIdentifier)
 add_property_to_class(SiriAssistantUtteranceView, :listenAfterSpeaking)
 
+#####
+# SNIPPETS
+#####
+
 class SiriMapItemSnippet < SiriObject
   def initialize(userCurrentLocation=true, items=[])
     super("MapItemSnippet", "com.apple.ace.localsearch")
@@ -118,16 +122,6 @@ class SiriMapItemSnippet < SiriObject
 end
 add_property_to_class(SiriMapItemSnippet, :userCurrentLocation)
 add_property_to_class(SiriMapItemSnippet, :items)
-
-class SiriButton < SiriObject
-  def initialize(text="Button Text", commands=[])
-    super("Button", "com.apple.ace.assistant")
-    self.text = text
-    self.commands = commands
-  end
-end
-add_property_to_class(SiriButton, :text)
-add_property_to_class(SiriButton, :commands)
 
 class SiriAnswerSnippet < SiriObject
   def initialize(answers=[], confirmationOptions=nil)
@@ -152,63 +146,77 @@ class SiriPersonSnippet < SiriObject
 end
 add_property_to_class(SiriPersonSnippet, :persons)
 
-#####
-# Items
-#####
-
-class SiriMapItem < SiriObject
-  def initialize(label="Apple Headquarters", location=SiriLocation.new, detailType="BUSINESS_ITEM")
-    super("MapItem", "com.apple.ace.localsearch")
-    self.label = label
-    self.detailType = detailType
-    self.location = location
+class SiriForecastSnippet < SiriObject
+  def initialize(aceWeathers=[])
+    super("ForecastSnippet", "com.apple.ace.weather")
+    self.aceWeathers = aceWeathers
   end
 end
-add_property_to_class(SiriMapItem, :label)
-add_property_to_class(SiriMapItem, :detailType)
-add_property_to_class(SiriMapItem, :location)
+add_property_to_class(SiriForecastSnippet, :aceWeathers)
 
-class SiriActionableMapItem < SiriObject
-  def initialize(detail=SiriBusinessItem.new, label="Apple, Inc.", location=SiriLocation.new, commands=[], identifier="", detailType="BUSINESS_ITEM", providerCommand=[])
-    super("ActionableMapItem", "com.apple.ace.localsearch")
-    self.detail = detail
-    self.label = label
-    self.location = location
+#####
+# COMMANDS
+#####
+
+class SiriSendCommands < SiriObject
+  def initialize(commands=[])
+    super("SendCommands", "com.apple.ace.system")
+    self.commands=commands
+  end
+end
+add_property_to_class(SiriSendCommands, :commands)
+
+    class SiriConfirmSnippetCommand < SiriObject
+      def initialize(request_id = "")
+        super("ConfirmSnippet", "com.apple.ace.assistant")
+        self.request_id = request_id
+      end
+    end
+    add_property_to_class(SiriConfirmSnippetCommand, :request_id)
+
+    class SiriCancelSnippetCommand < SiriObject
+      def initialize(request_id = "")
+        super("CancelSnippet", "com.apple.ace.assistant")
+        self.request_id = request_id
+      end
+    end
+    add_property_to_class(SiriCancelSnippetCommand, :request_id)
+
+    class SiriSnippetOpenedCommand < SiriObject
+      def initialize(request_id = "", object=SOME_KIND_OF_ITEM)
+        super("SnippetOpened", "com.apple.ace.assistant")
+        self.request_id = request_id
+        self.object = object
+      end
+    end
+    add_property_to_class(SiriSnippetOpenedCommand, :request_id)
+    add_property_to_class(SiriSnippetOpenedCommand, :object)
+
+    class SiriSnippetAttributeOpenedCommand < SiriObject
+      def initialize(request_id = "", attributeValue="", attributeName="")
+        super("SnippetAttributeOpened", "com.apple.ace.assistant")
+        self.request_id = request_id
+        self.attributeValue = attributeValue
+        self.attributeName = attributeName
+      end
+    end
+    add_property_to_class(SiriSnippetAttributeOpenedCommand, :request_id)
+    add_property_to_class(SiriSnippetAttributeOpenedCommand, :attributeValue)
+    add_property_to_class(SiriSnippetAttributeOpenedCommand, :attributeName)
+    
+#####
+# OBJECTS
+#####
+
+class SiriButton < SiriObject
+  def initialize(text="Button Text", commands=[])
+    super("Button", "com.apple.ace.assistant")
+    self.text = text
     self.commands = commands
-    self.identifier = identifier
-    self.detailType = detailType
-    self.providerCommand = providerCommand
   end
 end
-add_property_to_class(SiriActionableMapItem, :detail)
-add_property_to_class(SiriActionableMapItem, :label)
-add_property_to_class(SiriActionableMapItem, :location)
-add_property_to_class(SiriActionableMapItem, :commands)
-add_property_to_class(SiriActionableMapItem, :identifier)
-add_property_to_class(SiriActionableMapItem, :detailType)
-add_property_to_class(SiriActionableMapItem, :providerCommand)
-
-class SiriBusinessItem < SiriObject
-  def initialize(name="Apple, Inc.", totalNumberOfReviews=1, businessIds={"yelp"=>"DS6ma185kMXBS8trQ0wBVg", "places"=>"-7864570592007977996", "localeze"=>"91265028"}, categories=[], reviews=[], phoneNumbers=[], rating=SiriBusinessRating.new, extSessionGuid="44eee732-1fa1-4d0b-8e5b-d055f5b0a69e,Lookup")
-    super("Business", "com.apple.ace.localsearch")
-    self.name = name
-    self.totalNumberOfReviews = totalNumberOfReviews
-    self.businessIds = businessIds
-    self.categories = categories
-    self.reviews = reviews
-    self.phoneNumbers = phoneNumbers
-    self.rating = rating
-    self.extSessionGuid = extSessionGuid
-  end
-end
-add_property_to_class(SiriBusinessItem, :name)
-add_property_to_class(SiriBusinessItem, :totalNumberOfReviews)
-add_property_to_class(SiriBusinessItem, :businessIds)
-add_property_to_class(SiriBusinessItem, :categories)
-add_property_to_class(SiriBusinessItem, :reviews)
-add_property_to_class(SiriBusinessItem, :phoneNumbers)
-add_property_to_class(SiriBusinessItem, :rating)
-add_property_to_class(SiriBusinessItem, :extSessionGuid)
+add_property_to_class(SiriButton, :text)
+add_property_to_class(SiriButton, :commands)
 
 class SiriBusinessReview < SiriObject
   def initialize()
@@ -236,42 +244,6 @@ end
 add_property_to_class(SiriBusinessRating, :value)
 add_property_to_class(SiriBusinessRating, :count)
 
-class SiriPersonItem < SiriObject
-  def initialize(identifier="")
-    super("Person", "com.apple.ace.contact")
-    self.identifier = identifier
-  end
-end
-add_property_to_class(SiriPersonItem, :identifier)
-
-class SiriListItem < SiriObject
-  def initialize(title="", selectionText="", commands=[], speakableText="", object=SOME_KIND_OF_ITEM)
-    super("ListItem", "com.apple.ace.system")
-    self.title = title
-    self.selectionText = selectionText
-    self.commands = commands
-    self.speakableText = speakableText
-    self.object = object
-  end
-end
-add_property_to_class(SiriListItem, :title)
-add_property_to_class(SiriListItem, :selectionText)
-add_property_to_class(SiriListItem, :commands)
-add_property_to_class(SiriListItem, :speakableText)
-add_property_to_class(SiriListItem, :object)
-
-#####
-# Commands
-#####
-
-class SiriSendCommands < SiriObject
-  def initialize(commands=[])
-    super("SendCommands", "com.apple.ace.system")
-    self.commands=commands
-  end
-end
-add_property_to_class(SiriSendCommands, :commands)
-
 class SiriConfirmationOptions < SiriObject
   def initialize(submitCommands=[], cancelCommands=[], denyCommands=[], confirmCommands=[], denyText="Cancel", cancelLabel="Cancel", submitLabel="Send", confirmText="Send", cancelTrigger="Deny")
     super("ConfirmationOptions", "com.apple.ace.assistant")
@@ -297,48 +269,6 @@ add_property_to_class(SiriConfirmationOptions, :cancelLabel)
 add_property_to_class(SiriConfirmationOptions, :submitLabel)
 add_property_to_class(SiriConfirmationOptions, :confirmText)
 add_property_to_class(SiriConfirmationOptions, :cancelTrigger)
-
-class SiriConfirmSnippetCommand < SiriObject
-  def initialize(request_id = "")
-    super("ConfirmSnippet", "com.apple.ace.assistant")
-    self.request_id = request_id
-  end
-end
-add_property_to_class(SiriConfirmSnippetCommand, :request_id)
-
-class SiriCancelSnippetCommand < SiriObject
-  def initialize(request_id = "")
-    super("CancelSnippet", "com.apple.ace.assistant")
-    self.request_id = request_id
-  end
-end
-add_property_to_class(SiriCancelSnippetCommand, :request_id)
-
-class SiriSnippetOpenedCommand < SiriObject
-  def initialize(request_id = "", object=SOME_KIND_OF_ITEM)
-    super("SnippetOpened", "com.apple.ace.assistant")
-    self.request_id = request_id
-    self.object = object
-  end
-end
-add_property_to_class(SiriSnippetOpenedCommand, :request_id)
-add_property_to_class(SiriSnippetOpenedCommand, :object)
-
-class SiriSnippetAttributeOpenedCommand < SiriObject
-  def initialize(request_id = "", attributeValue="", attributeName="")
-    super("SnippetAttributeOpened", "com.apple.ace.assistant")
-    self.request_id = request_id
-    self.attributeValue = attributeValue
-    self.attributeName = attributeName
-  end
-end
-add_property_to_class(SiriSnippetAttributeOpenedCommand, :request_id)
-add_property_to_class(SiriSnippetAttributeOpenedCommand, :attributeValue)
-add_property_to_class(SiriSnippetAttributeOpenedCommand, :attributeName)
-
-#####
-# Objects
-#####
 
 class SiriLocation < SiriObject
   def initialize(label="Apple", street="1 Infinite Loop", city="Cupertino", stateCode="CA", countryCode="US", postalCode="95014", latitude=37.3317031860352, longitude=-122.030089795589)
@@ -488,8 +418,214 @@ end
 add_property_to_class(SiriAnswerLine, :text)
 add_property_to_class(SiriAnswerLine, :image)
 
+class SiriWeatherObject < SiriObject
+  def initialize(currentConditions=SiriCurrentWeatherConditions.new, view="HOURLY", hourlyForecasts=[], weatherLocation=SiriWeatherLocation.new, extendedForecastUrl="http://m.yahoo.com/search?p=Cupertino,+CA&.tsrc=appleww", dailyForecasts=[], units=SiriWeatherUnits.new)
+    super("Object", "com.apple.ace.weather")
+    self.currentConditions = currentConditions
+    self.view = view
+    self.hourlyForecasts = hourlyForecasts
+    self.weatherLocation = weatherLocation
+    self.extendedForecastUrl = extendedForecastUrl
+    self.dailyForecasts = dailyForecasts
+    self.units = units
+  end
+end
+add_property_to_class(SiriWeatherObject, :currentConditions)
+add_property_to_class(SiriWeatherObject, :view)
+add_property_to_class(SiriWeatherObject, :hourlyForecasts)
+add_property_to_class(SiriWeatherObject, :weatherLocation)
+add_property_to_class(SiriWeatherObject, :extendedForecastUrl)
+add_property_to_class(SiriWeatherObject, :dailyForecasts)
+add_property_to_class(SiriWeatherObject, :units)
+
+class SiriCurrentWeatherConditions < SiriObject
+  def initialize(heatIndex="38", dayOfWeek=7, timeOfObservation="13:53", barometricPressure=SiriBarometricPressure.new, visibility="16.09", percentOfMoonFaceVisible=92.3, temperature="34", sunrise="06:42", sunset="20:10", moonPhase="WANING_GIBBOUS", percentHumidity="32", timeZone="Central Standard Time", dewPoint="21", condition=SiriWeatherCondition.new, windChill="34")
+    super("CurrentConditions", "com.apple.ace.weather")
+    self.heatIndex = heatIndex
+    self.dayOfWeek = dayOfWeek
+    self.timeOfObservation = timeOfObservation
+    self.barometricPressure = barometricPressure
+    self.visibility = visibility
+    self.percentOfMoonFaceVisible = percentOfMoonFaceVisible
+    self.temperature = temperature
+    self.sunrise = sunrise
+    self.sunset = sunset
+    self.moonPhase = moonPhase
+    self.percentHumidity = percentHumidity
+    self.timeZone = timeZone
+    self.dewPoint = dewPoint
+    self.condition = condition
+    self.windChill = windChill
+  end
+end
+add_property_to_class(SiriCurrentWeatherConditions, :heatIndex)
+add_property_to_class(SiriCurrentWeatherConditions, :dayOfWeek)
+add_property_to_class(SiriCurrentWeatherConditions, :timeOfObservation)
+add_property_to_class(SiriCurrentWeatherConditions, :barometricPressure)
+add_property_to_class(SiriCurrentWeatherConditions, :visibility)
+add_property_to_class(SiriCurrentWeatherConditions, :percentOfMoonFaceVisible)
+add_property_to_class(SiriCurrentWeatherConditions, :temperature)
+add_property_to_class(SiriCurrentWeatherConditions, :sunrise)
+add_property_to_class(SiriCurrentWeatherConditions, :sunset)
+add_property_to_class(SiriCurrentWeatherConditions, :moonPhase)
+add_property_to_class(SiriCurrentWeatherConditions, :percentHumidity)
+add_property_to_class(SiriCurrentWeatherConditions, :timeZone)
+add_property_to_class(SiriCurrentWeatherConditions, :dewPoint)
+add_property_to_class(SiriCurrentWeatherConditions, :condition)
+add_property_to_class(SiriCurrentWeatherConditions, :windChill)
+
+class SiriBarometricPressure < SiriObject
+  def initialize(value="1014.8", trend="Falling")
+    super("BarometricPressure", "com.apple.ace.weather")
+    self.value = value
+    self.trend = trend
+  end
+end
+add_property_to_class(SiriBarometricPressure, :value)
+add_property_to_class(SiriBarometricPressure, :trend)
+
+class SiriWeatherCondition < SiriObject
+  def initialize(conditionCode="PartlyCloudyDay", conditionCodeIndex=30)
+    super("Condition", "com.apple.ace.weather")
+    self.conditionCode = conditionCode
+    self.conditionCodeIndex = conditionCodeIndex
+  end
+end
+add_property_to_class(SiriWeatherCondition, :conditionCode)
+add_property_to_class(SiriWeatherCondition, :conditionCodeIndex)
+
+class SiriHourlyForecast < SiriObject
+  def initialize(chanceOfPrecipitation=10, isUserRequested=true, condition=SiriWeatherCondition.new, temperature=33.0, timeIndex=15)
+    super("HourlyForecast", "com.apple.ace.weather")
+    self.chanceOfPrecipitation = chanceOfPrecipitation
+    self.isUserRequested = isUserRequested
+    self.condition = condition
+    self.temperature = temperature
+    self.timeIndex = timeIndex
+  end
+end
+add_property_to_class(SiriHourlyForecast, :chanceOfPrecipitation)
+add_property_to_class(SiriHourlyForecast, :isUserRequested)
+add_property_to_class(SiriHourlyForecast, :condition)
+add_property_to_class(SiriHourlyForecast, :temperature)
+add_property_to_class(SiriHourlyForecast, :timeIndex)
+
+class SiriDailyForecast < SiriObject
+  def initialize(lowTemperature=24.0, highTemperature=34.0, timeIndex=7, chanceOfPrecipitation=10, isUserRequested=true, condition=SiriWeatherCondition.new)
+    super("DailyForecast", "com.apple.ace.weather")
+    self.lowTemperature = lowTemperature
+    self.highTemperature = highTemperature
+    self.timeIndex = timeIndex
+    self.chanceOfPrecipitation = chanceOfPrecipitation
+    self.isUserRequested = isUserRequested
+    self.condition = condition
+  end
+end
+add_property_to_class(SiriDailyForecast, :lowTemperature)
+add_property_to_class(SiriDailyForecast, :highTemperature)
+add_property_to_class(SiriDailyForecast, :timeIndex)
+add_property_to_class(SiriDailyForecast, :chanceOfPrecipitation)
+add_property_to_class(SiriDailyForecast, :isUserRequested)
+add_property_to_class(SiriDailyForecast, :condition)
+
+class SiriWeatherUnits < SiriObject
+  def initialize(distanceUnits="Kilometers", temperatureUnits="Celsius", pressureUnits="MB")
+    super("Units", "com.apple.ace.weather")
+    self.distanceUnits = distanceUnits
+    self.temperatureUnits = temperatureUnits
+    self.pressureUnits = pressureUnits
+  end
+end
+add_property_to_class(SiriWeatherUnits, :distanceUnits)
+add_property_to_class(SiriWeatherUnits, :temperatureUnits)
+add_property_to_class(SiriWeatherUnits, :pressureUnits)
+
 #####
-# Guzzoni Commands (commands that typically come from the server side)
+# ITEMS
+#####
+
+class SiriMapItem < SiriObject
+  def initialize(label="Apple Headquarters", location=SiriLocation.new, detailType="BUSINESS_ITEM")
+    super("MapItem", "com.apple.ace.localsearch")
+    self.label = label
+    self.detailType = detailType
+    self.location = location
+  end
+end
+add_property_to_class(SiriMapItem, :label)
+add_property_to_class(SiriMapItem, :detailType)
+add_property_to_class(SiriMapItem, :location)
+
+class SiriActionableMapItem < SiriObject
+  def initialize(detail=SiriBusinessItem.new, label="Apple, Inc.", location=SiriLocation.new, commands=[], identifier="", detailType="BUSINESS_ITEM", providerCommand=[])
+    super("ActionableMapItem", "com.apple.ace.localsearch")
+    self.detail = detail
+    self.label = label
+    self.location = location
+    self.commands = commands
+    self.identifier = identifier
+    self.detailType = detailType
+    self.providerCommand = providerCommand
+  end
+end
+add_property_to_class(SiriActionableMapItem, :detail)
+add_property_to_class(SiriActionableMapItem, :label)
+add_property_to_class(SiriActionableMapItem, :location)
+add_property_to_class(SiriActionableMapItem, :commands)
+add_property_to_class(SiriActionableMapItem, :identifier)
+add_property_to_class(SiriActionableMapItem, :detailType)
+add_property_to_class(SiriActionableMapItem, :providerCommand)
+
+class SiriBusinessItem < SiriObject
+  def initialize(name="Apple, Inc.", totalNumberOfReviews=1, businessIds={"yelp"=>"DS6ma185kMXBS8trQ0wBVg", "places"=>"-7864570592007977996", "localeze"=>"91265028"}, categories=[], reviews=[], phoneNumbers=[], rating=SiriBusinessRating.new, extSessionGuid="44eee732-1fa1-4d0b-8e5b-d055f5b0a69e,Lookup")
+    super("Business", "com.apple.ace.localsearch")
+    self.name = name
+    self.totalNumberOfReviews = totalNumberOfReviews
+    self.businessIds = businessIds
+    self.categories = categories
+    self.reviews = reviews
+    self.phoneNumbers = phoneNumbers
+    self.rating = rating
+    self.extSessionGuid = extSessionGuid
+  end
+end
+add_property_to_class(SiriBusinessItem, :name)
+add_property_to_class(SiriBusinessItem, :totalNumberOfReviews)
+add_property_to_class(SiriBusinessItem, :businessIds)
+add_property_to_class(SiriBusinessItem, :categories)
+add_property_to_class(SiriBusinessItem, :reviews)
+add_property_to_class(SiriBusinessItem, :phoneNumbers)
+add_property_to_class(SiriBusinessItem, :rating)
+add_property_to_class(SiriBusinessItem, :extSessionGuid)
+
+class SiriPersonItem < SiriObject
+  def initialize(identifier="")
+    super("Person", "com.apple.ace.contact")
+    self.identifier = identifier
+  end
+end
+add_property_to_class(SiriPersonItem, :identifier)
+
+class SiriListItem < SiriObject
+  def initialize(title="", selectionText="", commands=[], speakableText="", object=SOME_KIND_OF_ITEM)
+    super("ListItem", "com.apple.ace.system")
+    self.title = title
+    self.selectionText = selectionText
+    self.commands = commands
+    self.speakableText = speakableText
+    self.object = object
+  end
+end
+add_property_to_class(SiriListItem, :title)
+add_property_to_class(SiriListItem, :selectionText)
+add_property_to_class(SiriListItem, :commands)
+add_property_to_class(SiriListItem, :speakableText)
+add_property_to_class(SiriListItem, :object)
+
+
+
+#####
+# APPLE COMMANDS (commands that typically come from the server side)
 #####
 
 class SiriGetRequestOrigin < SiriObject
@@ -513,7 +649,7 @@ end
 add_property_to_class(SiriRequestCompleted, :callbacks)
 
 #####
-# iPhone Responses (misc meta data back to the server)
+# IPHONE RESPONSES (misc meta data back to the server)
 #####
 
 class SiriStartRequest < SiriObject

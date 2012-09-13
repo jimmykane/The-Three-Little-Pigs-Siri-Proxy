@@ -10,7 +10,7 @@ then
 fi
 if [ "${server1}" == "" ]
 then
-  server1="kryten.apple.com"
+  server1="guzzoni.apple.com"
 fi
 if [ "${server2}" == "" ]
 then

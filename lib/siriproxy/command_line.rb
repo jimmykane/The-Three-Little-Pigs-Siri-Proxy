@@ -286,7 +286,7 @@ def parse_options
     opts.on('-n', '--name CA_NAME',  '[gencerts] Define a common name for the CA (default: "SiriProxyCA")') do |ca_name|
       $APP_CONFIG.ca_name = ca_name
     end
-    opts.on('-serv1', '--name SERVER1',  '[gencerts] Define a Server 1 for the CA (default: "kryten.apple.com")') do |server1|
+    opts.on('-serv1', '--name SERVER1',  '[gencerts] Define a Server 1 for the CA (default: "guzzoni.apple.com")') do |server1|
       $APP_CONFIG.server1 = server1
     end 
     opts.on('-serv2', '--name SERVER2',  '[gencerts] Define a Server 2 for the CA (default: "your.siri.proxy.server.com")') do |server2|
@@ -329,7 +329,7 @@ def load_code
   require 'siriproxy'
   require 'siriproxy/connection'
   require 'siriproxy/connection/iphone'
-  require 'siriproxy/connection/kryten'
+  require 'siriproxy/connection/apple' #rather than guzzoni or kryten in case apple changes server again
   require 'siriproxy/plugin'
   require 'siriproxy/plugin_manager'
   require 'siriproxy/db_classes'

@@ -256,8 +256,16 @@ class ConfigDao
       st.close
       return result
     end
+    def listiPad3Dictationkeys()
+      sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
+      st = @my.prepare(sql)
+      st.execute()
+      result = fetchResults(st)
+      st.close
+      return result
+    end
     def listiPad3keys()
-      sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3!='False' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
+      sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3='Sorta' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
       st = @my.prepare(sql)
       st.execute()
       result = fetchResults(st)
@@ -265,16 +273,8 @@ class ConfigDao
       return result
     end
 
-    def list_4S_keys_for_new_assistant()
-      sql = "SELECT * FROM `keys` WHERE expired!='True' AND banned!='True' AND iPad3='False' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
-      st = @my.prepare(sql)
-      st.execute()
-      result = fetchResults(st)
-      st.close
-      return result
-    end
-    def list_iPad3_keys_for_new_assistant()
-      sql = "SELECT * FROM `keys` WHERE expired!='True' AND banned!='True' AND iPad3!='False' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
+    def list_keys_for_new_assistant()
+      sql = "SELECT * FROM `keys` WHERE expired!='True' AND banned!='True' AND iPad3!='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
       st = @my.prepare(sql)
       st.execute()
       result = fetchResults(st)
@@ -292,8 +292,8 @@ class ConfigDao
     end
 
 
-    def next_available_4S()
-      sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3='False' AND keyload<(SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC LIMIT 1"
+    def next_available()
+      sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3!='True' AND keyload<(SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC LIMIT 1"
       st = @my.prepare(sql)
       st.execute()
       result = fetchResults(st)
@@ -302,8 +302,8 @@ class ConfigDao
 
     end
 
-    def next_available_iPad3()
-      sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3!='False' AND keyload<(SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC LIMIT 1"
+    def next_available_Dictation()
+      sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3='True' AND keyload<(SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC LIMIT 1"
       st = @my.prepare(sql)
       st.execute()
       result = fetchResults(st)
@@ -312,19 +312,9 @@ class ConfigDao
 
     end
 
-    def next_available_4S_for_new_assistant() #we will need the outer join here
+    def next_available_for_new_assistant() #we will need the outer join here
       sql = "SELECT K.*, Count(1) FROM `keys` K
- LEFT OUTER JOIN `assistants` A ON A.key_id = K.id  WHERE K.expired='FALSE'  AND K.banned='False' AND K.iPad3='False'  AND K.keyload <(SELECT max_keyload FROM `config` WHERE id=1)
-GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
-      st = @my.prepare(sql)
-      st.execute()
-      result = fetchResults(st)
-      st.close
-      return result[0]
-    end
-    def next_available_iPad3_for_new_assistant() #we will need the outer join here
-      sql = "SELECT K.*, Count(1) FROM `keys` K
- LEFT OUTER JOIN `assistants` A ON A.key_id = K.id  WHERE K.expired='FALSE'   AND K.banned='False' AND K.iPad3!='False'  AND K.keyload<(SELECT max_keyload FROM `config` WHERE id=1)
+ LEFT OUTER JOIN `assistants` A ON A.key_id = K.id  WHERE K.expired='FALSE'  AND K.banned='False' AND K.iPad3!='True'  AND K.keyload <(SELECT max_keyload FROM `config` WHERE id=1)
 GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
       st = @my.prepare(sql)
       st.execute()
