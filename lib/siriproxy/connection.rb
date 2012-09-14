@@ -377,7 +377,7 @@ class SiriProxy::Connection < EventMachine::Connection
 
         else #if no assistant registed found
 
-          if ($APP_CONFIG.private_server.to_s.upcase=="ON" or $APP_CONFIG.clients_must_be_in_database==true) and self.is_4S!=true
+          if ($APP_CONFIG.private_server.to_s.upcase=="ON" or $APP_CONFIG.clients_must_be_in_database==true) and self.is_4S!=true and self.is_iPad3!=true
 
             puts "[Authentification - SiriProxy] Assistant [#{@loadedassistant}] is not registered. Banning Connection"
             self.validationData_avail = false
@@ -1064,9 +1064,6 @@ class SiriProxy::Connection < EventMachine::Connection
                 @client.appleDBid=object["properties"]["meCards"][i]["properties"]["identifier"]
               else
                 @client.appleDBid="NA"
-                @client.devicetype=@devicetype
-                @client.deviceOS=self.iOS
-                @client.last_ip=@clientip
               end
             end
           end
@@ -1096,7 +1093,10 @@ class SiriProxy::Connection < EventMachine::Connection
         @client.appleAccountid="NA" if @client.appleAccountid==nil
 
         @client.valid="True" #needed if config in empy for the below
-        @client.valid="False" if $APP_CONFIG.private_server.to_s.upcase == "ON" and self.is_4S!=true
+        @client.valid="False" if $APP_CONFIG.private_server.to_s.upcase == "ON" and self.is_4S!=true and self.is_iPad3!=true
+        @client.devicetype=@devicetype
+        @client.deviceOS=self.iOS
+        @client.last_ip=@clientip
         #this must not be updated in onld clients from here
         #pp @client
 
@@ -1219,7 +1219,7 @@ class SiriProxy::Connection < EventMachine::Connection
             checkHaveiPad3Data(object)
           else
             get_validationData(object)
-            if  self.validationData_avail
+            if self.validationData_avail
               puts "[Info - SiriProxy] using saved sessionvalidationData"
               object["properties"]["sessionValidationData"] = plist_blob(self.sessionValidationData)
             else
