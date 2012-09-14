@@ -145,12 +145,11 @@ class SiriProxy::Connection < EventMachine::Connection
 
         if  @userassistant!=nil #If there is one then
 
-          @userassistant.last_ip=@clientip
-          puts "[Authentification - SiriProxy] Registered Assistant Found "
+          puts "[Authentification - SiriProxy] Registered Assistant Found"
           @user=$clientsDao.find_by_assistant(@userassistant) #find the user with that assistant
           if @user==nil #Incase this user doesnt exist!!!!!!! Bug or not complete transaction
             puts "[Authentification - SiriProxy] No client for Assistant [#{@loadedassistant}]  Found :-("
-          elsif @user.valid=='False' # Shouldn't ever be invalid on a 4S
+          elsif @user.valid=='False' # Shouldn't ever be invalid on a 4S or iPad3
             @user.valid='True'
           elsif @user.valid=='True' #if its valid!!!
             $assistantDao.updateassistant(@userassistant)
@@ -213,7 +212,7 @@ class SiriProxy::Connection < EventMachine::Connection
         $keyDao.insert(keyiPad3)
         puts "[Info - SiriProxy] Keys written to Database"
         #also unban all keys available.
-        if $APP_CONFIG.private_server.to_s.upcase == "ON" and keyiPad3.iPad3=="Sorta"
+        if $APP_CONFIG.private_server.to_s.upcase == "ON" and keyiPad3.iPad3=="Sorta" #unBan is key is usable for more than dictation
           $keyDao.unban_keys #unBan because a key was inserted! should spoof enough
           puts "[Info - SiriProxy] New iPad 3 Key added and keys set to unbanned"
         end
@@ -296,12 +295,11 @@ class SiriProxy::Connection < EventMachine::Connection
         @userassistant.assistantid=@loadedassistant
         @userassistant.speechid=@loadedspeechid
         @userassistant.last_ip=@clientip
-        @userassistant=$assistantDao.check_duplicate(@userassistant)  #check if there is a registerd assistant
+        @userassistant=$assistantDao.check_duplicate(@userassistant)  #check if there is a registered assistant
 
         if  @userassistant!=nil #If there is one then
 
-          @userassistant.last_ip=@clientip
-          puts "[Authentification - SiriProxy] Registered Assistant Found "
+          puts "[Authentification - SiriProxy] Registered Assistant Found :-)"
           @user=$clientsDao.find_by_assistant(@userassistant) #find the user with that assistant
 
           if @user==nil #Incase this user doesnt exist!!!!!!! Bug or not complete transaction
@@ -377,13 +375,69 @@ class SiriProxy::Connection < EventMachine::Connection
 
         else #if no assistant registed found
 
-          if ($APP_CONFIG.private_server.to_s.upcase=="ON" or $APP_CONFIG.clients_must_be_in_database==true) and self.is_4S!=true and self.is_iPad3!=true
+          if $APP_CONFIG.private_server.to_s.upcase=="ON" and self.is_4S!=true and self.is_iPad3!=true
 
-            puts "[Authentification - SiriProxy] Assistant [#{@loadedassistant}] is not registered. Banning Connection"
+            puts "[Authentification - SiriProxy] Assistant [#{@loadedassistant}] is not registered. Banning Connection :-("
             self.validationData_avail = false
             self.close_connection() #close connections
             self.other_connection.close_connection() #close other
             return false
+
+          elsif $APP_CONFIG.clients_must_be_in_database==true and self.is_4S!=true and self.is_iPad3!=true
+
+            puts "[Authentification - SiriProxy] Assistant [#{@loadedassistant}] is not registered!! :-O"
+            @checkclient=$clientsDao.find_by_assistant(@loadedassistant) # In case client exists, but assistant data was not generated or something
+
+            if @checkclient==nil
+
+              puts "[Authentification - SiriProxy] Couldn't find client with assistant [#{@loadedassistant}]!! Banning Connection :-("
+              self.validationData_avail = false
+              self.close_connection() #close connections
+              self.other_connection.close_connection() #close other
+              return false
+
+            else
+
+              puts "[Authentification - SiriProxy] Found client with assistant [#{@loadedassistant}]! Allowing connection... :-)"
+              @key=Key.new
+              @available_keys=$keyDao.list4Skeys().count + $keyDao.listiPad3keys().count
+
+              if (@available_keys) > 0
+
+                puts "[Key - SiriProxy] Keys available [#{@available_keys}]"
+                @key=$keyDao.next_available()
+                puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data"
+                puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
+                @oldkeyload=@key.keyload
+                @key.keyload=@key.keyload+10
+                $keyDao.setkeyload(@key)
+                puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]"
+                self.sessionValidationData= @key.sessionValidation
+                self.validationData_avail = true
+
+              else
+                @available_keys=$keyDao.listiPad3Dictationkeys().count
+                if $APP_CONFIG.try_iPad3==true and (@available_keys) > 0
+                  puts "[Key - SiriProxy] iPad 3 Dictation Keys available to clients [#{@available_keys}]"
+                  @key=$keyDao.next_available_Dictation()
+                  puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data"
+                  puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
+                  @oldkeyload=@key.keyload
+                  @key.keyload=@key.keyload+10
+                  $keyDao.setkeyload(@key)
+                  puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]"
+                  self.sessionValidationData= @key.sessionValidation
+                  self.validationData_avail = true
+                else
+                  puts "[Key - SiriProxy] No keys available in database Closing connections"
+                  self.validationData_avail = false
+                  self.close_connection() #close connections
+                  self.other_connection.close_connection() #close other
+                  return false
+                end
+              end
+
+            end
 
           else # if its a public server
 
