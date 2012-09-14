@@ -25,7 +25,9 @@ class SiriProxy::Plugin::Example < SiriProxy::Plugin
   #get the user's location and display it in the logs
   #filters are still in their early stages. Their interface may be modified
   filter "SetRequestOrigin", direction: :from_iphone do |object|
-    puts "[Info - User Location] lat: #{object["properties"]["latitude"]}, long: #{object["properties"]["longitude"]}"       
+    puts "[Info - User Location] lat: #{object["properties"]["latitude"]}, long: #{object["properties"]["longitude"]}"
+    long = object["properties"]["longitude"]
+    lat = object["properties"]["latitude"]
   end 
     
   #Essential for server status
@@ -70,6 +72,23 @@ class SiriProxy::Plugin::Example < SiriProxy::Plugin
     request_completed #always complete your request! Otherwise the phone will "spin" at the user!
   end
   
+  listen_for /who am i/i do
+    if !self.manager.user_fname.nil?
+      say "I'm sorry but I couldn't retrieve any user data for you.."
+    elsif self.manager.user_nickname.to_s == "NA"
+      say "You are #{self.manager.user_fname} and are using an #{self.manager.user_devicetype} on iOS #{self.manager.user_deviceOS} and are speaking #{self.manager.user_language}."
+      say "Your IP address is #{self.manager.user_lastIP} and you are speaking #{self.manager.user_language}."
+    else
+      say "You are #{self.manager.user_nickname} and are using an #{self.manager.user_devicetype} on iOS #{self.manager.user_deviceOS} and are speaking #{self.manager.user_language}."
+      say "Your IP address is #{self.manager.user_lastIP} and you are speaking #{self.manager.user_language}."
+    end
+    request_completed
+  end
+
+  listen_for /where am i/i do
+    say "Your location is: #{location.address}"
+  end
+
   #Demonstrate that you can have Siri say one thing and write another"!
   listen_for /you don't say/i do
     say "Sometimes I don't write what I say", spoken: "Sometimes I don't say what I write"
@@ -115,7 +134,31 @@ class SiriProxy::Plugin::Example < SiriProxy::Plugin
     add_views = SiriAddViews.new
     add_views.make_root(last_ref_id)
     map_snippet = SiriMapItemSnippet.new
-    map_snippet.items << SiriMapItem.new
+    map_item = SiriMapItem.new
+    if !self.manager.user_fname.nil?
+      map_item.label = "User Location"
+    elsif self.manager.user_nickname.to_s != "NA"
+      map_item.label = "#{self.manager.user_nickname}"
+    else
+      map_item.label = "#{self.manager.user_fname}"
+    end
+    item_location = SiriLocation.new
+    if !self.manager.user_fname.nil?
+      item_location.label = "User Location"
+    elsif self.manager.user_nickname.to_s != "NA"
+      item_location.label = "#{self.manager.user_nickname}"
+    else
+      item_location.label = "#{self.manager.user_fname}"
+    end
+#    item_location.street = location.address # Pretty sure this returns full address and not just street info
+    item_location.city = location.city
+    item_location.stateCode = location.state_code
+    item_location.countryCode = location.country_code
+    item_location.postalCode = location.postal_code
+    item_location.latitude = location.longitude
+    item_location.longitude = location.latitude
+    map_item.location = item_location
+    map_snippet.items << map_item
     utterance = SiriAssistantUtteranceView.new("Testing map injection!")
     add_views.views << utterance
     add_views.views << map_snippet

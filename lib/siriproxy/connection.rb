@@ -159,9 +159,9 @@ class SiriProxy::Connection < EventMachine::Connection
             plugin_manager.user_fname = @user.fname
             plugin_manager.user_nickname = @user.nickname
             plugin_manager.user_language = object["language"]
-            plugin_manager.user_device_type = @user.deviceOS
-            plugin_manager.user_device_os = @user.devicetype
-            plugin_manager.user_last_ip = @user.last_ip
+            plugin_manager.user_devicetype = @user.devicetype
+            plugin_manager.user_deviceOS = @user.deviceOS
+            plugin_manager.user_lastIP = @user.last_ip
             plugin_manager.user_last_login = @user.last_login
           end
         end
@@ -326,9 +326,9 @@ class SiriProxy::Connection < EventMachine::Connection
             plugin_manager.user_fname = @user.fname
             plugin_manager.user_nickname = @user.nickname
             plugin_manager.user_language = object["language"]
-            plugin_manager.user_device_type = @user.deviceOS
-            plugin_manager.user_device_os = @user.devicetype
-            plugin_manager.user_last_ip = @user.last_ip
+            plugin_manager.user_devicetype = @user.devicetype
+            plugin_manager.user_deviceOS = @user.deviceOS
+            plugin_manager.user_lastIP = @user.last_ip
             plugin_manager.user_last_login = @user.last_login
 
             @key=Key.new

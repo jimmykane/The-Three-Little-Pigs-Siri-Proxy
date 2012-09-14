@@ -2,17 +2,8 @@ require 'cora'
 require 'pp'
 
 class SiriProxy::PluginManager < Cora
-  attr_accessor :plugins, :iphone_conn, :apple_conn, :user_assistant, :user_appleid, :user_fname, :user_nickname, :user_language, :user_device_type, :user_device_os, :user_last_ip, :user_last_login, :person
+  attr_accessor :plugins, :iphone_conn, :apple_conn, :user_assistant, :user_appleid, :user_fname, :user_nickname, :user_language, :user_devicetype, :user_deviceOS, :user_lastIP, :user_last_login, :person
   def initialize()
-#    @user_assistant = ""
-#    @user_appleid = ""
-#    @user_fname = ""
-#    @user_nickname = ""
-#    @user_language = ""
-#    @user_device_type = ""
-#    @user_device_os = ""
-#    @user_last_ip = ""
-#    @user_last_login = ""
     @person = ""
     load_plugins()
   end
@@ -72,10 +63,10 @@ class SiriProxy::PluginManager < Cora
       result = super(text)
       self.apple_conn.block_rest_of_session if result
       return result
-#    rescue Exception=>e
-#      log "Plugin Crashed: #{e}"
-#      respond e.to_s, spoken: "a plugin crashed"
-#      return true
+    rescue Exception=>e
+      respond e.to_s, spoken: "Oh no! A plugin crashed:"
+      log "Plugin Crashed: #{e}"
+      return true
     end
   end
 
