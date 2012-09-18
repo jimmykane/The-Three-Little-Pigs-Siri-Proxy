@@ -385,8 +385,12 @@ class SiriProxy::Connection < EventMachine::Connection
 
           elsif $APP_CONFIG.clients_must_be_in_database==true and self.is_4S!=true and self.is_iPad3==false
 
+            @checkuserassistant=Assistant.new
+            @checkuserassistant.assistantid=@loadedassistant
+            @checkuserassistant.speechid=@loadedspeechid
+            @checkuserassistant.last_ip=@clientip
             puts "[Authentification - SiriProxy] Assistant [#{@loadedassistant}] is not registered!! :-O"
-            @checkclient=$clientsDao.find_by_assistant(@userassistant) # In case client exists, but assistant data was not generated or something
+            @checkclient=$clientsDao.find_by_assistant(@checkuserassistant) # In case client exists, but assistant data was not generated or something
 
             if @checkclient==nil
 
