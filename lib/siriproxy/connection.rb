@@ -375,7 +375,7 @@ class SiriProxy::Connection < EventMachine::Connection
 
         else #if no assistant registed found
 
-          if $APP_CONFIG.private_server.to_s.upcase=="ON" and self.is_4S!=true and self.is_iPad3!=true
+          if $APP_CONFIG.private_server.to_s.upcase=="ON" and self.is_4S!=true and self.is_iPad3==false
 
             puts "[Authentification - SiriProxy] Assistant [#{@loadedassistant}] is not registered. Banning Connection :-("
             self.validationData_avail = false
@@ -383,10 +383,10 @@ class SiriProxy::Connection < EventMachine::Connection
             self.other_connection.close_connection() #close other
             return false
 
-          elsif $APP_CONFIG.clients_must_be_in_database==true and self.is_4S!=true and self.is_iPad3!=true
+          elsif $APP_CONFIG.clients_must_be_in_database==true and self.is_4S!=true and self.is_iPad3==false
 
             puts "[Authentification - SiriProxy] Assistant [#{@loadedassistant}] is not registered!! :-O"
-            @checkclient=$clientsDao.find_by_assistant(@loadedassistant) # In case client exists, but assistant data was not generated or something
+            @checkclient=$clientsDao.find_by_assistant(@userassistant) # In case client exists, but assistant data was not generated or something
 
             if @checkclient==nil
 
@@ -1147,7 +1147,7 @@ class SiriProxy::Connection < EventMachine::Connection
         @client.appleAccountid="NA" if @client.appleAccountid==nil
 
         @client.valid="True" #needed if config in empy for the below
-        @client.valid="False" if $APP_CONFIG.private_server.to_s.upcase == "ON" and self.is_4S!=true and self.is_iPad3!=true
+        @client.valid="False" if $APP_CONFIG.private_server.to_s.upcase == "ON" and self.is_4S!=true and self.is_iPad3==false
         @client.devicetype=@devicetype
         @client.deviceOS=self.iOS
         @client.last_ip=@clientip
