@@ -220,6 +220,75 @@ class SiriProxy::Connection < EventMachine::Connection
     else
       puts "[Info - SiriProxy] Something went wrong. Please file this bug. Key NOT saved!"
     end
+    ##This now allows iPad3s to be entered into client database.
+    begin
+      @key=Key.new
+      @key.id=0
+
+      if object["class"]=="CreateAssistant" # now separates initial request to LoadAssistant and Create Assistant
+        @createassistant=true
+        @assistant_found=false
+
+      elsif object["class"]=="LoadAssistant" and object["properties"]["assistantId"] !=nil and object["properties"]["speechId"] !=nil
+
+        @createassistant=false
+        @assistant_found=true
+        #grab assistant
+        if object["properties"]["activationToken"] != nil
+          @usedkey = $keyDao.list_keys_for_stats()
+          puts '[Info - SiriProxy] Recieved token'
+          @activation_token_recieved=true
+          @activation_token=ActivationToken.new
+          @activation_token.aceid=object["aceId"]
+          @activation_token.data=object["properties"]["activationToken"]
+          pp @activation_token if $LOG_LEVEL > 2
+          @keystats=$keystatisticsDao.get_key_stats(@usedkey)
+          if @keystats==nil
+            $keystatisticsDao.insert(@usedkey)
+            @keystats=$keystatisticsDao.get_key_stats(@usedkey)
+          end
+          @keystats.total_tokens_recieved+=1
+          $keystatisticsDao.save_key_stats(@keystats)
+          pp @keystats
+        end
+        @loadedassistant=object["properties"]["assistantId"]
+        @loadedspeechid=object["properties"]["speechId"]
+        @userassistant=Assistant.new
+        @userassistant.assistantid=@loadedassistant
+        @userassistant.speechid=@loadedspeechid
+        @userassistant.last_ip=@clientip
+        @userassistant=$assistantDao.check_duplicate(@userassistant)  #check if there is a registerd assistant
+
+        if  @userassistant!=nil #If there is one then
+
+          puts "[Authentification - SiriProxy] Registered Assistant Found"
+          @user=$clientsDao.find_by_assistant(@userassistant) #find the user with that assistant
+          if @user==nil #Incase this user doesnt exist!!!!!!! Bug or not complete transaction
+            puts "[Authentification - SiriProxy] No client for Assistant [#{@loadedassistant}]  Found :-("
+          elsif @user.valid=='False' # Shouldn't ever be invalid on a 4S or iPad3
+            @user.valid='True'
+          elsif @user.valid=='True' #if its valid!!!
+            $assistantDao.updateassistant(@userassistant)
+            puts "[Authentification - SiriProxy] Access Granted! -> Client name:[#{@user.fname}] nickname[#{@user.nickname}] appleid[#{@user.appleAccountid}] Connected "
+            plugin_manager.user_assistant = @loadedassistant
+            plugin_manager.user_appleid = @user.appleAccountid
+            plugin_manager.user_fname = @user.fname
+            plugin_manager.user_nickname = @user.nickname
+            plugin_manager.user_language = object["language"]
+            plugin_manager.user_devicetype = @user.devicetype
+            plugin_manager.user_deviceOS = @user.deviceOS
+            plugin_manager.user_lastIP = @user.last_ip
+            plugin_manager.user_last_login = @user.last_login
+          end
+        end
+
+
+      end
+
+      #rescue SystemCallError,NoMethodError
+    rescue SystemCallError
+      puts "[ERROR - SiriProxy] Something went wrong with the iPad3 session..."
+    end
     get_validationData(object) if self.iOS < 6 and $APP_CONFIG.try_iPad3!=true
     if  self.validationData_avail
       puts "[Info - SiriProxy] using saved sessionvalidationData"
@@ -402,7 +471,11 @@ class SiriProxy::Connection < EventMachine::Connection
 
             else
 
-              puts "[Authentification - SiriProxy] Found client with assistant [#{@loadedassistant}]! Allowing connection... :-)"
+              puts "[Authentification - SiriProxy] Found client with assistant [#{@loadedassistant}]! Allowing connection and registering assistant... :-)"
+              
+              $assistantDao.createassistant(@checkuserassistant)
+              puts "[Client - SiriProxy] Created Assistant ID  #{@checkuserassistant.assistantid}!!"
+                  
               @key=Key.new
               @available_keys=$keyDao.list4Skeys().count + $keyDao.listiPad3keys().count
 
@@ -509,7 +582,7 @@ class SiriProxy::Connection < EventMachine::Connection
         else
           @available_keys=$keyDao.listiPad3Dictationkeys().count
           if $APP_CONFIG.try_iPad3==true and (@available_keys) > 0
-            puts "[Key - SiriProxy] iPad 3 Keys available clients [#{@available_keys}]"
+            puts "[Key - SiriProxy] iPad 3 Dictation Keys available clients [#{@available_keys}]"
             @key=$keyDao.next_available_Dictation()
             puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data"
             puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
@@ -769,7 +842,7 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] iPad 3 Wi-Fi only connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line["iPad/iPad3,1"] = "iPhone/iPhone4,1" if self.iOS < 6 #No need on iOS6
-          puts "[Info - SiriProxy] Changed header to iphone4s "
+          puts "[Info - SiriProxy] Changed header to iphone4s " if self.iOS < 6 #No need on iOS6
           puts "[Info - SiriProxy] Final Header: " + line if $LOG_LEVEL > 2
         elsif line.match(/iPad3,2;/)
           self.is_4S = false
@@ -785,7 +858,7 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] iPad 3 CDMA connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line["iPad/iPad3,2"] = "iPhone/iPhone4,1" if self.iOS < 6 #No need on iOS6
-          puts "[Info - SiriProxy] Changed header to iphone4s "
+          puts "[Info - SiriProxy] Changed header to iphone4s " if self.iOS < 6 #No need on iOS6
           puts "[Info - SiriProxy] Final Header: " + line if $LOG_LEVEL > 2
         elsif line.match(/iPad3,3;/)
           self.is_4S = false
@@ -801,7 +874,7 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] iPad 3 GSM connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line["iPad/iPad3,3"] = "iPhone/iPhone4,1" if self.iOS < 6 #No need on iOS6
-          puts "[Info - SiriProxy] Changed header to iphone4s "
+          puts "[Info - SiriProxy] Changed header to iphone4s " if self.iOS < 6 #No need on iOS6
           puts "[Info - SiriProxy] Final Header: " + line if $LOG_LEVEL > 2
         elsif line.match(/iPod4,1;/)
           self.is_4S = false
