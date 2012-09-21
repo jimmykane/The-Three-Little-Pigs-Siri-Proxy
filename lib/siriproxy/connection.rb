@@ -5,7 +5,7 @@ require "siriproxy/functions"
 require 'cora'
 class SiriProxy::Connection < EventMachine::Connection
   include EventMachine::Protocols::LineText2
-  
+
   attr_accessor :other_connection, :name, :ssled, :output_buffer, :input_buffer, :processed_headers, :unzip_stream, :zip_stream, :consumed_ace, :unzipped_input, :unzipped_output, :last_ref_id, :plugin_manager, :is_4S, :is_iPad3, :sessionValidationData, :speechId, :assistantId, :aceId, :speechId_avail, :assistantId_avail, :validationData_avail, :key, :clientip, :clientport, :client, :oldclient, :createassistant, :loadedassistant, :loadedspeechid, :devicetype, :deviceOS, :activation_token_recieved, :activation_token, :assistant_found, :connectionfromapple, :commandFailed, :finishspeech, :GetSessionCertificateResponse, :iOS, :host, :usedkey
 
   def last_ref_id=(ref_id)
@@ -52,11 +52,7 @@ class SiriProxy::Connection < EventMachine::Connection
     #puts pending_connect_timeout()
     self.comm_inactivity_timeout=240 #very important and also depends on how many people connect!!!
     ##Checks For avalible keys before any object is loaded
-    if $APP_CONFIG.try_iPad3==true
-      available_keys=($keyDao.list4Skeys().count + $keyDao.listiPad3keys().count + $keyDao.listiPad3Dictationkeys().count)
-    else
-      available_keys=($keyDao.list4Skeys().count + $keyDao.listiPad3keys().count)
-    end
+    available_keys=($keyDao.list4Skeys().count + $keyDao.listiPad3keys().count)
     if available_keys > 0
       self.validationData_avail = true
     else
@@ -88,7 +84,7 @@ class SiriProxy::Connection < EventMachine::Connection
       key4s.banned='False'
       key4s.expired='False'
       key4s.iPad3='False'
-      key4s.client_apple_account_id="This is not working."
+      key4s.client_apple_account_id=object["properties"]["assistantId"] if object["properties"]["assistantId"] #This will allow us to know/display who donated keys
       self.validationData_avail = true
       if $keyDao.check_duplicate(key4s)
         puts "[Info - SiriProxy] Duplicate Validation Data. Key NOT saved"
@@ -198,21 +194,15 @@ class SiriProxy::Connection < EventMachine::Connection
       end
       keyiPad3.banned='False'
       keyiPad3.expired='False'
-      if self.iOS < 6
-        keyiPad3.iPad3='True'
-      elsif self.iOS >= 6
-        keyiPad3.iPad3='Sorta'
-      else #In case getting the iOS version fails for some reason
-        keyiPad3.iPad3='True'
-      end
-      keyiPad3.client_apple_account_id="This is not working."
+      keyiPad3.iPad3='True'
+      keyiPad3.client_apple_account_id=object["properties"]["assistantId"] if object["properties"]["assistantId"] #This will allow us to know/display who donated keys
       if $keyDao.check_duplicate(keyiPad3)
         puts "[Info - SiriProxy] Duplicate Validation Data. Key NOT saved"
       else
         $keyDao.insert(keyiPad3)
         puts "[Info - SiriProxy] Keys written to Database"
         #also unban all keys available.
-        if $APP_CONFIG.private_server.to_s.upcase == "ON" and keyiPad3.iPad3=="Sorta" #unBan is key is usable for more than dictation
+        if $APP_CONFIG.private_server.to_s.upcase == "ON"
           $keyDao.unban_keys #unBan because a key was inserted! should spoof enough
           puts "[Info - SiriProxy] New iPad 3 Key added and keys set to unbanned"
         end
@@ -389,7 +379,7 @@ class SiriProxy::Connection < EventMachine::Connection
             return false
 
           elsif @user.valid=='True' #if its valid!!!
-            
+
             plugin_manager.user_assistant = @loadedassistant
             plugin_manager.user_appleid = @user.appleAccountid
             plugin_manager.user_fname = @user.fname
@@ -416,25 +406,12 @@ class SiriProxy::Connection < EventMachine::Connection
               self.validationData_avail = true
 
             else
-              @available_keys=$keyDao.listiPad3Dictationkeys().count
-              if $APP_CONFIG.try_iPad3==true and (@available_keys) > 0
-                puts "[Key - SiriProxy] iPad 3 Dictation Keys available for Registered Only clients [#{@available_keys}]"
-                @key=$keyDao.next_available_Dictation()
-                puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data"
-                puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
-                @oldkeyload=@key.keyload
-                @key.keyload=@key.keyload+10
-                $keyDao.setkeyload(@key)
-                puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]"
-                self.sessionValidationData= @key.sessionValidation
-                self.validationData_avail = true
-              else
-                puts "[Key - SiriProxy] No 4S keys available in database Closing connections"
-                self.validationData_avail = false
-                self.close_connection() #close connections
-                self.other_connection.close_connection() #close other
-                return false
-              end
+
+              puts "[Key - SiriProxy] No keys available in database Closing connections"
+              self.validationData_avail = false
+              self.close_connection() #close connections
+              self.other_connection.close_connection() #close other
+              return false
             end
 
             $assistantDao.updateassistant(@userassistant)
@@ -472,10 +449,10 @@ class SiriProxy::Connection < EventMachine::Connection
             else
 
               puts "[Authentification - SiriProxy] Found client with assistant [#{@loadedassistant}]! Allowing connection and registering assistant... :-)"
-              
+
               $assistantDao.createassistant(@checkuserassistant)
               puts "[Client - SiriProxy] Created Assistant ID  #{@checkuserassistant.assistantid}!!"
-                  
+
               @key=Key.new
               @available_keys=$keyDao.list4Skeys().count + $keyDao.listiPad3keys().count
 
@@ -493,25 +470,12 @@ class SiriProxy::Connection < EventMachine::Connection
                 self.validationData_avail = true
 
               else
-                @available_keys=$keyDao.listiPad3Dictationkeys().count
-                if $APP_CONFIG.try_iPad3==true and (@available_keys) > 0
-                  puts "[Key - SiriProxy] iPad 3 Dictation Keys available to clients [#{@available_keys}]"
-                  @key=$keyDao.next_available_Dictation()
-                  puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data"
-                  puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
-                  @oldkeyload=@key.keyload
-                  @key.keyload=@key.keyload+10
-                  $keyDao.setkeyload(@key)
-                  puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]"
-                  self.sessionValidationData= @key.sessionValidation
-                  self.validationData_avail = true
-                else
-                  puts "[Key - SiriProxy] No keys available in database Closing connections"
-                  self.validationData_avail = false
-                  self.close_connection() #close connections
-                  self.other_connection.close_connection() #close other
-                  return false
-                end
+
+                puts "[Key - SiriProxy] No keys available in database Closing connections"
+                self.validationData_avail = false
+                self.close_connection() #close connections
+                self.other_connection.close_connection() #close other
+                return false
               end
 
             end
@@ -535,25 +499,12 @@ class SiriProxy::Connection < EventMachine::Connection
               self.validationData_avail = true
 
             else
-              @available_keys=$keyDao.listiPad3Dictationkeys().count
-              if $APP_CONFIG.try_iPad3==true and (@available_keys) > 0
-                puts "[Key - SiriProxy] iPad 3 Dictation Keys available to clients [#{@available_keys}]"
-                @key=$keyDao.next_available_Dictation()
-                puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data"
-                puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
-                @oldkeyload=@key.keyload
-                @key.keyload=@key.keyload+10
-                $keyDao.setkeyload(@key)
-                puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]"
-                self.sessionValidationData= @key.sessionValidation
-                self.validationData_avail = true
-              else
-                puts "[Key - SiriProxy] No keys available in database Closing connections"
-                self.validationData_avail = false
-                self.close_connection() #close connections
-                self.other_connection.close_connection() #close other
-                return false
-              end
+
+              puts "[Key - SiriProxy] No keys available in database Closing connections"
+              self.validationData_avail = false
+              self.close_connection() #close connections
+              self.other_connection.close_connection() #close other
+              return false
             end
 
           end
@@ -580,25 +531,12 @@ class SiriProxy::Connection < EventMachine::Connection
           self.validationData_avail = true
 
         else
-          @available_keys=$keyDao.listiPad3Dictationkeys().count
-          if $APP_CONFIG.try_iPad3==true and (@available_keys) > 0
-            puts "[Key - SiriProxy] iPad 3 Dictation Keys available clients [#{@available_keys}]"
-            @key=$keyDao.next_available_Dictation()
-            puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data"
-            puts "[Keys - SiriProxy] Key [#{@key.id}] Loaded from Database for Validation Data For Object with aceid [#{object["aceId"]}] and class #{object["class"]}" if $LOG_LEVEL > 2
-            @oldkeyload=@key.keyload
-            @key.keyload=@key.keyload+10
-            $keyDao.setkeyload(@key)
-            puts "[Key - SiriProxy] Key with id[#{@key.id}] increased it's keyload from [#{@oldkeyload}] to [#{@key.keyload}]"
-            self.sessionValidationData= @key.sessionValidation
-            self.validationData_avail = true
-          else
-            puts "[Key - SiriProxy] No keys available in database Closing connections"
-            self.validationData_avail = false
-            self.close_connection() #close connections
-            self.other_connection.close_connection() #close other
-            return false
-          end
+
+          puts "[Key - SiriProxy] No keys available in database Closing connections"
+          self.validationData_avail = false
+          self.close_connection() #close connections
+          self.other_connection.close_connection() #close other
+          return false
         end
 
       end
@@ -655,7 +593,7 @@ class SiriProxy::Connection < EventMachine::Connection
         self.is_4S = true
         self.is_iPad3 = false
         @devicetype="iPhone 4S"
-      elsif line.match(/iPad3,1;/) and $APP_CONFIG.try_iPad3==true
+      elsif line.match(/iPad3,1;/)
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPad 3 Wi-Fi only connected from IP #{self.clientip}"
         puts "[RollEyes - Siri*-*Proxy]"
@@ -669,7 +607,7 @@ class SiriProxy::Connection < EventMachine::Connection
         self.is_4S = false
         self.is_iPad3 = true
         @devicetype="iPad 3 Wi-Fi only"
-      elsif line.match(/iPad3,2;/) and $APP_CONFIG.try_iPad3==true
+      elsif line.match(/iPad3,2;/)
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPad 3 CDMA connected from IP #{self.clientip}"
         puts "[RollEyes - Siri*-*Proxy]"
@@ -683,7 +621,7 @@ class SiriProxy::Connection < EventMachine::Connection
         self.is_4S = false
         self.is_iPad3 = true
         @devicetype="iPad 3 CDMA"
-      elsif line.match(/iPad3,3;/) and $APP_CONFIG.try_iPad3==true
+      elsif line.match(/iPad3,3;/)
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPad 3 GSM connected from IP #{self.clientip}"
         puts "[RollEyes - Siri*-*Proxy]"
@@ -697,7 +635,7 @@ class SiriProxy::Connection < EventMachine::Connection
         self.is_4S = false
         self.is_iPad3 = true
         @devicetype="iPad 3 GSM"
-      else # now seperates anything else exept 4s
+      else # now seperates anything else exept 4s and ipad3
         #we can close connections here .... and we can count them here
         puts "[Info - Siriproxy] Curent connections [#{$conf.active_connections}]"
         #Some code in order connections to depend on the evailable keys
@@ -827,54 +765,6 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line["iPad/iPad1,1"] = "iPhone/iPhone4,1"
           puts "[Info - SiriProxy] Changed header to iphone4s "
-          puts "[Info - SiriProxy] Final Header: " + line if $LOG_LEVEL > 2
-        elsif line.match(/iPad3,1;/)
-          self.is_4S = false
-          self.is_iPad3 = true
-          @devicetype="iPad 3 Wi-Fi only"
-          if line.match(/5.0/)
-            self.iOS = 5
-          elsif line.match(/5.1/)
-            self.iOS = 5.1
-          elsif line.match(/6.0/)
-            self.iOS = 6
-          end
-          puts "[Info - SiriProxy] iPad 3 Wi-Fi only connected from IP #{self.clientip}"
-          puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
-          line["iPad/iPad3,1"] = "iPhone/iPhone4,1" if self.iOS < 6 #No need on iOS6
-          puts "[Info - SiriProxy] Changed header to iphone4s " if self.iOS < 6 #No need on iOS6
-          puts "[Info - SiriProxy] Final Header: " + line if $LOG_LEVEL > 2
-        elsif line.match(/iPad3,2;/)
-          self.is_4S = false
-          self.is_iPad3 = true
-          @devicetype="iPad 3 CDMA"
-          if line.match(/5.0/)
-            self.iOS = 5
-          elsif line.match(/5.1/)
-            self.iOS = 5.1
-          elsif line.match(/6.0/)
-            self.iOS = 6
-          end
-          puts "[Info - SiriProxy] iPad 3 CDMA connected from IP #{self.clientip}"
-          puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
-          line["iPad/iPad3,2"] = "iPhone/iPhone4,1" if self.iOS < 6 #No need on iOS6
-          puts "[Info - SiriProxy] Changed header to iphone4s " if self.iOS < 6 #No need on iOS6
-          puts "[Info - SiriProxy] Final Header: " + line if $LOG_LEVEL > 2
-        elsif line.match(/iPad3,3;/)
-          self.is_4S = false
-          self.is_iPad3 = true
-          @devicetype="iPad 3 GSM"
-          if line.match(/5.0/)
-            self.iOS = 5
-          elsif line.match(/5.1/)
-            self.iOS = 5.1
-          elsif line.match(/6.0/)
-            self.iOS = 6
-          end
-          puts "[Info - SiriProxy] iPad 3 GSM connected from IP #{self.clientip}"
-          puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
-          line["iPad/iPad3,3"] = "iPhone/iPhone4,1" if self.iOS < 6 #No need on iOS6
-          puts "[Info - SiriProxy] Changed header to iphone4s " if self.iOS < 6 #No need on iOS6
           puts "[Info - SiriProxy] Final Header: " + line if $LOG_LEVEL > 2
         elsif line.match(/iPod4,1;/)
           self.is_4S = false
