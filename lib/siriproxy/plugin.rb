@@ -40,8 +40,8 @@ class SiriProxy::Plugin < Cora::Plugin
     def filter(class_names, options={}, &block)
       [class_names].flatten.each do |class_name|
         filters[class_name] = {
-          direction: (options[:direction] ||= :both),
-          block: block
+          direction => (options[:direction] ||= :both),
+          block => block
         }
       end
     end

@@ -64,7 +64,7 @@ class SiriProxy::PluginManager < Cora
       self.apple_conn.block_rest_of_session if result
       return result
     rescue Exception=>e
-      respond e.to_s, spoken: "Oh no! A plugin crashed:"
+      respond e.to_s, spoken => "Oh no! A plugin crashed:"
       log "Plugin Crashed: #{e}"
       return true
     end
