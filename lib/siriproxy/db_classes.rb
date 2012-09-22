@@ -155,14 +155,14 @@ class ConfigDao
     def insert(dto)
       sql = "INSERT INTO `keys` (assistantid,speechid,sessionValidation,banned,expired,iPad3,date_added,last_used,client_apple_account_id ) VALUES ( ? ,  ?  , ? , ? , ? , ? ,NOW(),NOW(), ?)"
       st = @my.prepare(sql)
-      st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.iPad3,dto.client_apple_account_id)
+      st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.iPad3,dto.client_apple_account_id.to_s)
       st.close
     end
 
     def update(dto)
       sql = "UPDATE `keys` SET assistantid = ?,speechid= ? ,sessionValidation=?,banned=?,expired=?,keyload=?,last_used=NOW(),iPad3=?,client_apple_account_id=? WHERE id = ?"
       st = @my.prepare(sql)
-      st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.keyload,dto.id,dto.iPad3,dto.client_apple_account_id)
+      st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.keyload,dto.id,dto.iPad3,dto.client_apple_account_id.to_s)
       st.close
     end
 
