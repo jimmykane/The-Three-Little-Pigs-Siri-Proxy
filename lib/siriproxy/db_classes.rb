@@ -248,7 +248,7 @@ class ConfigDao
       return result[0]
     end
 
-    def listkeys()
+    def list4Skeys()
       sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3='False' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
       st = @my.prepare(sql)
       st.execute()
