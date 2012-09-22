@@ -35,12 +35,12 @@ class SiriProxy::PluginManager < Cora
       properties = object['properties']
       set_location(properties['latitude'], properties['longitude'], properties)
     end
-    if object['class'] == 'PersonSearchCompleted'
-      for x in (0..object["properties"]["results"].length)
-        @person = object["properties"]["results"][x]["properties"]
-      end
-    end
-
+#    if object['class'] == 'PersonSearchCompleted'
+#      for x in (0..object["properties"]["results"].length)
+#        @person = object["properties"]["results"][x]["properties"]
+#      end
+#    end
+# Caused crashes like if you tell siri "Call me Mr Cool".
     plugins.each do |plugin|
       #log "Processing filters on #{plugin} for '#{object["class"]}'"
       new_obj = plugin.process_filters(object, direction)
