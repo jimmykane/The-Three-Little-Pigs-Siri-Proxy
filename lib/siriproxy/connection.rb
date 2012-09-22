@@ -593,6 +593,10 @@ class SiriProxy::Connection < EventMachine::Connection
         self.is_4S = true
         self.is_iPad3 = false
         @devicetype="iPhone 4S"
+      elsif line.match(/AssistantServices/)
+        puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+        puts "[Info - SiriProxy] Seems to be a 2nd User-Agent that siri is using, that" if $LOG_LEVEL > 2
+        puts "[Info - SiriProxy] was being mislabled as DDOS atack" if $LOG_LEVEL > 2
       elsif line.match(/iPad3,1;/)
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPad 3 Wi-Fi only connected from IP #{self.clientip}"
