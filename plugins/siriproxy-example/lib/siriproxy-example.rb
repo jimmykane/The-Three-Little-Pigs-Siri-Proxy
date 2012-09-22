@@ -34,14 +34,12 @@ class SiriProxy::Plugin::Example < SiriProxy::Plugin
   listen_for /how many keys/i do
     @keysavailable4s=$keyDao.list4Skeys().count
     @keysavailableipad3=$keyDao.listiPad3keys().count
-    @keysavailabledictation=$keyDao.listiPad3Dictationkeys().count
-    
-    if @keysavailable4s==1
-      say "There is one 4S key available on the server" #say something to the user!    
+        if @keysavailable4s==1
+      say "There is one 4S/5 key available on the server" #say something to the user!    
     elsif @keysavailable4s>0    
-      say "There are #{@keysavailable4s} 4S keys available" #say something to the user!    
+      say "There are #{@keysavailable4s} 4S/5 keys available" #say something to the user!    
     else
-      say "There are no 4s keys available" #say something to the user!    
+      say "There are no 4s/5 keys available" #say something to the user!    
     end
     if @keysavailableipad3==1
       say "There is one iPad 3 key available on the server" #say something to the user!
@@ -49,13 +47,6 @@ class SiriProxy::Plugin::Example < SiriProxy::Plugin
       say "There are #{@keysavailableipad3} iPad 3 keys available" #say something to the user!
     else
       say "There are no iPad 3 keys available" #say something to the user!
-    end
-    if @keysavailabledictation==1
-      say "There is one iPad 3 Dictation-Only key available on the server" #say something to the user!
-    elsif @keysavailabledictation>0
-      say "There are #{@keysavailabledictation} iPad 3 Dictation-Only keys available" #say something to the user!
-    else
-      say "There are no iPad 3 Dictation-Only keys available" #say something to the user!
     end
     request_completed #always complete your request! Otherwise the phone will "spin" at the user!
     
