@@ -279,13 +279,6 @@ class SiriProxy::Connection < EventMachine::Connection
     rescue SystemCallError
       puts "[ERROR - SiriProxy] Something went wrong with the iPad3 session..."
     end
-    get_validationData(object) if self.iOS < 6 and $APP_CONFIG.try_iPad3!=true
-    if  self.validationData_avail
-      puts "[Info - SiriProxy] using saved sessionvalidationData"
-      object["properties"]["sessionValidationData"] = plist_blob(self.sessionValidationData)
-    else
-      puts "[Info - SiriProxy] no validationData available :("
-    end
 
   end
   #this method validation data now is the one that defines the keyload.
