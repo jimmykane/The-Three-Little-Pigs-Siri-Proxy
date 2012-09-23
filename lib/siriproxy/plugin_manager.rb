@@ -2,9 +2,9 @@ require 'cora'
 require 'pp'
 
 class SiriProxy::PluginManager < Cora
-  attr_accessor :plugins, :iphone_conn, :guzzoni_conn
-
+  attr_accessor :plugins, :iphone_conn, :apple_conn, :user_assistant, :user_appleid, :user_fname, :user_nickname, :user_language, :user_devicetype, :user_deviceOS, :user_lastIP, :user_last_login, :person
   def initialize()
+    @person = ""
     load_plugins()
   end
 
@@ -35,7 +35,15 @@ class SiriProxy::PluginManager < Cora
       properties = object['properties']
       set_location(properties['latitude'], properties['longitude'], properties)
     end
-
+    if object['class'] == 'PersonSearchCompleted'
+      begin # Caused crashes like if you tell siri "Call me Mr Cool".
+        for x in (0..object["properties"]["results"].length)
+          @person = object["properties"]["results"][x]["properties"]
+        end
+      rescue
+        #No person found
+      end
+    end
     plugins.each do |plugin|
       #log "Processing filters on #{plugin} for '#{object["class"]}'"
       new_obj = plugin.process_filters(object, direction)
@@ -56,23 +64,23 @@ class SiriProxy::PluginManager < Cora
   def process(text)
     begin
       result = super(text)
-      self.guzzoni_conn.block_rest_of_session if result
+      self.apple_conn.block_rest_of_session if result
       return result
     rescue Exception=>e
+      respond e.to_s, spoken => "Oh no! A plugin crashed:"
       log "Plugin Crashed: #{e}"
-      respond e.to_s, spoken: "a plugin crashed"
       return true
     end
   end
 
   def send_request_complete_to_iphone
     log "Sending Request Completed"
-    object = generate_request_completed(self.guzzoni_conn.last_ref_id)
-    self.guzzoni_conn.inject_object_to_output_stream(object)
+    object = generate_request_completed(self.apple_conn.last_ref_id)
+    self.apple_conn.inject_object_to_output_stream(object)
   end
 
   def respond(text, options={})
-    self.guzzoni_conn.inject_object_to_output_stream(generate_siri_utterance(self.guzzoni_conn.last_ref_id, text, (options[:spoken] or text), options[:prompt_for_response] == true))
+    self.apple_conn.inject_object_to_output_stream(generate_siri_utterance(self.apple_conn.last_ref_id, text, (options[:spoken] or text), options[:prompt_for_response] == true))
   end
 
   def no_matches

@@ -80,7 +80,7 @@ class ConfigDao
 
   class Key
 
-    attr_accessor :id, :assistantid,:speechid,:speechid,:expired,:sessionValidation,:keyload,:date_added,:availablekeys,:banned,:iPad3
+    attr_accessor :id, :assistantid,:speechid,:speechid,:expired,:sessionValidation,:keyload,:date_added,:last_used,:availablekeys,:banned,:iPad3,:client_apple_account_id
 
     def id=(value)  # The setter method for @id
       @id =  value
@@ -107,15 +107,20 @@ class ConfigDao
     def keyload=(value)  # The setter method for @load
       @keyload =  value
     end
-
     def date_added=(value)  # The setter method for @date_added
       @date_added =  value
+    end
+    def last_used=(value)  # The setter method for @last_used
+      @last_used =  value
     end
     def availablekeys=(value)  # The setter method for @date_added
       @availablekeys =  value
     end
     def iPad3=(value)  # The setter method for @iPad3
       @iPad3 =  value
+    end
+    def client_apple_account_id=(value)  # The setter method for @client_apple_account_id
+      @client_apple_account_id =  value
     end
   end
 
@@ -148,16 +153,16 @@ class ConfigDao
     end
 
     def insert(dto)
-      sql = "INSERT INTO `keys` (assistantid,speechid,sessionValidation,banned,expired,iPad3,date_added ) VALUES ( ? ,  ?  , ? , ? , ? , ? ,NOW())"
+      sql = "INSERT INTO `keys` (assistantid,speechid,sessionValidation,banned,expired,iPad3,date_added,last_used,client_apple_account_id ) VALUES ( ? ,  ?  , ? , ? , ? , ? ,NOW(),NOW(), ?)"
       st = @my.prepare(sql)
-      st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.iPad3)
+      st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.iPad3,dto.client_apple_account_id.to_s)
       st.close
     end
 
     def update(dto)
-      sql = "UPDATE `keys` SET assistantid = ?,speechid= ? ,sessionValidation=?,banned=?,expired=?,keyload=?,iPad3=? WHERE id = ?"
+      sql = "UPDATE `keys` SET assistantid = ?,speechid= ? ,sessionValidation=?,banned=?,expired=?,keyload=?,last_used=NOW(),iPad3=?,client_apple_account_id=? WHERE id = ?"
       st = @my.prepare(sql)
-      st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.keyload,dto.id,dto.iPad3)
+      st.execute(dto.assistantid,dto.speechid,dto.sessionValidation,dto.banned,dto.expired,dto.keyload,dto.id,dto.iPad3,dto.client_apple_account_id.to_s)
       st.close
     end
 
@@ -227,14 +232,31 @@ class ConfigDao
       st.execute()
       st.close
     end
+
+    def update_used(dto)
+      sql = "UPDATE `keys` SET last_used=NOW() WHERE id = ?"
+      st = @my.prepare(sql)
+      st.execute(dto.id)
+      st.close
+    end
+    def list_keys_for_stats()
+      sql = "SELECT * FROM `keys` ORDER by last_used DESC LIMIT 1"
+      st = @my.prepare(sql)
+      st.execute()
+      result = fetchResults(st)
+      st.close
+      return result[0]
+    end
+
     def list4Skeys()
-      sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3!='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
+      sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3='False' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
       st = @my.prepare(sql)
       st.execute()
       result = fetchResults(st)
       st.close
       return result
     end
+
     def listiPad3keys()
       sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
       st = @my.prepare(sql)
@@ -244,16 +266,8 @@ class ConfigDao
       return result
     end
 
-    def list_4S_keys_for_new_assistant()
-      sql = "SELECT * FROM `keys` WHERE expired!='True' AND banned!='True' AND iPad3!='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
-      st = @my.prepare(sql)
-      st.execute()
-      result = fetchResults(st)
-      st.close
-      return result
-    end
-    def list_iPad3_keys_for_new_assistant()
-      sql = "SELECT * FROM `keys` WHERE expired!='True' AND banned!='True' AND iPad3='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
+    def list_keys_for_new_assistant()
+      sql = "SELECT * FROM `keys` WHERE expired!='True' AND banned!='True' AND keyload < (SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC"
       st = @my.prepare(sql)
       st.execute()
       result = fetchResults(st)
@@ -271,8 +285,8 @@ class ConfigDao
     end
 
 
-    def next_available_4S()
-      sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3!='True' AND keyload<(SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC LIMIT 1"
+    def next_available()
+      sql = "SELECT * FROM `keys` WHERE expired!='True' AND keyload<(SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC LIMIT 1"
       st = @my.prepare(sql)
       st.execute()
       result = fetchResults(st)
@@ -281,29 +295,9 @@ class ConfigDao
 
     end
 
-    def next_available_iPad3()
-      sql = "SELECT * FROM `keys` WHERE expired!='True' AND iPad3='True' AND keyload<(SELECT max_keyload FROM `config` WHERE id=1) ORDER by keyload ASC LIMIT 1"
-      st = @my.prepare(sql)
-      st.execute()
-      result = fetchResults(st)
-      st.close
-      return result[0]
-
-    end
-
-    def next_available_4S_for_new_assistant() #we will need the outer join here
+    def next_available_for_new_assistant() #we will need the outer join here
       sql = "SELECT K.*, Count(1) FROM `keys` K
- LEFT OUTER JOIN `assistants` A ON A.key_id = K.id  WHERE K.expired='FALSE'  AND K.banned='False' AND K.iPad3='False'  AND K.keyload <(SELECT max_keyload FROM `config` WHERE id=1)
-GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
-      st = @my.prepare(sql)
-      st.execute()
-      result = fetchResults(st)
-      st.close
-      return result[0]
-    end
-    def next_available_iPad3_for_new_assistant() #we will need the outer join here
-      sql = "SELECT K.*, Count(1) FROM `keys` K
- LEFT OUTER JOIN `assistants` A ON A.key_id = K.id  WHERE K.expired='FALSE'   AND K.banned='False' AND K.iPad3='True'  AND K.keyload<(SELECT max_keyload FROM `config` WHERE id=1)
+ LEFT OUTER JOIN `assistants` A ON A.key_id = K.id  WHERE K.expired='FALSE'  AND K.banned='False' AND K.keyload <(SELECT max_keyload FROM `config` WHERE id=1)
 GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
       st = @my.prepare(sql)
       st.execute()
@@ -336,7 +330,9 @@ GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
           dto.expired=row[5]
           dto.keyload=row[6]
           dto.date_added=row[7]
-          dto.iPad3=row[8]
+          dto.last_used=row[8]
+          dto.iPad3=row[9]
+          dto.client_apple_account_id=row[10]
           rows << dto
         end
 
@@ -345,7 +341,7 @@ GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
     end
 
     class Assistant
-      attr_accessor :id, :key_id,:client_apple_account_id,:assistantid,:speechid,:devicetype,:date_created,:last_login,:last_ip
+      attr_accessor :id, :key_id,:client_apple_account_id,:assistantid,:speechid,:devicetype,:deviceOS,:date_created,:last_login,:last_ip
       def id=(value)  # The setter method for @id
         @id =  value
       end
@@ -363,6 +359,9 @@ GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
       end
       def devicetype=(value)  # The setter method for @devicetype
         @devicetype =  value
+      end
+      def deviceOS=(value)  # The setter method for @deviceOS
+        @deviceOS =  value
       end
       def date_created=(value)  # The setter method for @date_created
         @date_created =  value
@@ -407,16 +406,16 @@ GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
       end
 
       def createassistant(dto)
-        sql = "INSERT INTO `assistants` (key_id,client_apple_account_id,assistantid,speechid,device_type,date_created,last_login,last_ip) VALUES ( ? ,? , ? , ? , ? ,NOW(), NOW() , ? )"
+        sql = "INSERT INTO `assistants` (key_id,client_apple_account_id,assistantid,speechid,device_type,device_OS,date_created,last_login,last_ip) VALUES ( ? ,? , ? , ? , ? , ? ,NOW(), NOW() , ? )"
         st = @my.prepare(sql)
-        st.execute(dto.key_id,dto.client_apple_account_id,dto.assistantid,dto.speechid,dto.devicetype,dto.last_ip)
+        st.execute(dto.key_id,dto.client_apple_account_id,dto.assistantid,dto.speechid,dto.devicetype,dto.deviceOS,dto.last_ip)
         st.close
       end
 
       def updateassistant(dto)
         sql = "UPDATE `assistants` SET last_login=NOW(), last_ip=? WHERE id=?"
         st = @my.prepare(sql)
-        st.execute(dto.last_ip,dto.id)
+        st.execute(dto.last_ip,dto.id) rescue puts "***Could not update Assistant! most likly the last_ip failed to work"
         st.close
       end
 
@@ -437,9 +436,10 @@ GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
             dto.assistantid=row[3]
             dto.speechid=row[4]
             dto.devicetype=row[5]
-            dto.date_created=row[6]
-            dto.last_login=row[7]
-            dto.last_ip=row[8]
+            dto.deviceOS=row[6]
+            dto.date_created=row[7]
+            dto.last_login=row[8]
+            dto.last_ip=row[9]
             rows << dto
           end
           return rows

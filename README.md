@@ -14,7 +14,7 @@ Twitter: http://twitter.com/JimmyKane9
 Google+: http://gplus.to/jimmykane
 
 
-The Three Little Pigs siri proxy server is an intelligent server with key throttling and database connection.
+The Three Little Pigs siri proxy server is an intelligent server with key throttling and database connection. It uses Keys from iPhone 4S, iPhone 5, and the iPad 3 (AKA the New iPad)
 
 **A little info upon public/semipublic servers**
 
@@ -28,7 +28,7 @@ So you got a server and you are afraid if apple will ban your device? Lets get t
 
 4. Also keep in mind that there is a limit on how many assistants you can create per key per day. I am not sure but 30 is an average. Please correct me if I am mistaken. There will be a new release soon where there will be a limit on that and hopefully this issue will be resolved.
 
-To the point: You got a 4S, you get commandFailed and/or cannot create assistantid? 
+To the point: You got a iPhone 4S, iPhone 5, or iPad 3, you get commandFailed and/or cannot create assistantid? 
 
 Solution 1: Change IP/Network
 
@@ -40,311 +40,6 @@ Solution 3: Use other iPhone4s DATA
 
 __if you Jailbrake an iPhone 4S. Just add http://cydia.myrepospace.com/thpryrchn/ to your cydia Sources, and install `Spire 4S` on your 4S. Then you can point it to your server just like you do with any other iPhone 4. This will work on all iOS 5 versions. Also works if you install a Siri GUI that does not include Spire.. It only adds the spire settings, and will not install siri on devices without siri.__
 
-
-
-Version 0.9.13 
----------------------
-* iPhone 4S now is added to client table. That phone will most likely need the __com.apple.assistant.plist__ in order to get it in the database. You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
-
-* Fixes and tweeks. 
-
-    Better iPad 3 key tracking. Will be counted in max connections if *try_iPad3* is enabled.
-
-    When you ask "How many keys are avalible" it will tell you how many of each are avalible.
-
-* New option in config.yml
-
-  `clients_must_be_in_database` When set to "true", this will only allow a device that is in the users database to connect on a public server… Making it semi-private. The client will most likely have to delete their `com.apple.assistant.plist` in order to use the server. This setting doesn't apply to 4S's.
-  
- ** Update How **
- 
- From Version 0.9.12, a `siriproxy update` will work fine, and if you want to add the new option in your config.yml, you can, but it will work just fine without it. If you are upgrading from an earlier version, follow the instructions in the Version 0.9.12.
-
-
-
-
-Version 0.9.12 
----------------------
-
-* Now saves iPhone 4S and the New iPad (AKA iPad 3) keys, and keeps track separately
-
-* New options in config.yml.  
-
-  `expiration_sesitivity: 0` will now disable expiring of keys due to no response from finish speech (Some clients have invalid assistants that kill them). 
-
-  `hours_till_key_expires: 24` - Put how long you want the keys to last before they expire. Default is 20 if this option isn't in there. 
-
-  `try_iPad3: true` - If there are no 4S keys, it will use iPad3 keys. NOTE: iPad 3 keys only work for dictation. 
-
-
-
-** Update How **
-
-* Install phpMyAdmin (google how), and backup your keys, clients, config, etc.
-
-* In the `Three-Little_Pigs` Folder do all these steps and don't forget to regenerate the tables
-
-    gem uninstall siriproxy
-    
-    git pull
-
-    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
-
-    rake install && siriproxy bundle
-
-    siriproxy gentables
-
-* Web Interface install
-
-    copy the contents of WebInterface to your http docs root and run the install script! 
-
-* Restore the stuff you backed up. 
-
-
-Version 0.9.9 
----------------------
-
-* New web Interface by @WouterDS
-
-* Lots of additions, take a look at the features
-
-** Update How **
-
-* In the `Three-Little_Pigs` Folder do all these steps and dont forget to regenerate the tables
-
-    gem uninstall siriproxy
-    
-    git pull
-
-    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
-
-    rake install && siriproxy bundle
-
-    siriproxy gentables
-
-* Web Interface install
-
-    copy the contents of WebInterface to your http docs root and run the install script! 
-
-
-
-Version 0.9.8.3-expr 
----------------------
-
-* Improvements upon activation Token
-
-* Added ip and last login logging for clients 
-
-* Fixed email notification 
-
-* Fixed detection of validation data due to apple not replying back with validation expired
-
-* Added default sensitivity to 5 invalid requests without apple response! You can change that and read more info in config.yml
-
-**Info about the Validation and access token System**
-
-* Go to (http://quartzcoding.blogspot.com/2012/02/siri-validation-data-and-access-token.html)
-
-
-**UPDATE HOW TO**
-
-* In the `Three-Little_Pigs` Folder do 
-
-    gem uninstall siriproxy
-    
-    git pull
-
-    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
-
-    rake install && siriproxy bundle
-
-
--Done
-
-
-Version 0.9.8.2-expr (This is a beta release! More work is needed)
-----------------------------------------------------------------
-
-
-* Added Temporary fix for Expiration of Validation Data! Now keys in database will be checked every 10 minutes and any key found existing in database longer than 24 hours is set to expired! Working on a better fix.
-
-* Added 4S exploit tnx for helping @xnlzee, Matthew Lau and @786IC0NIC
-
-**UPDATE HOW TO**
-
-* Backup your keys and tables that you need!
-
-* In the `Three-Little_Pigs` Folder do 
-
-    git pull
-
-    copy and edit `.config.example.yml` to `~/.siriproxy/config.yml`
-
-    rake install && siriproxy bundle
-    
-    siriproxy gentables 
-
--Done
-
-**The Exploit WARNING!!!! YOU DO THIS ON YOUR OWN RISK**
-
-* More on 
-
-* Steps 
-
-    0. Requires JailBroken iPhone4s! Preferably with Spire installed, and your server address setup on it. So do the following
-
-    1. Go to config.yml and set regenarate_interval to how many seconds you want the iPhone4S generate new Validation Data good value is 15 seconds
-
-    2. Delete /var/mobile/Library/Preferences/com.apple.assistant.plist. You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
-
-    4. Respring!!!
-
-    5. Connect to the server and make a request. You should see something like -> "[Exploit - SiriProxy] Command send to iPhone4s to regenerate multiple keys every 15 seconds"
-
-    6. Done. Wait 15 seconds and use Siri again! You should have another key in your DB
-
-    7. Repeat as many times you want! 
-
-    To restore just delete com.apple.assistant.plist again. You can do this by putting `cydia://package/mobi.macciti.assistantdelete` in safari on your iDevice, or just search `assistantdelete` in cydia.
-
-
-
-Version 0.9.8-expr (This is a beta release! More work is needed)
-----------------------------------------------------------------
-
-* Please keep in mind that you need new clients to delete the`assistnat.plist` in `/var/mobile/Library/com.apple.assistant.plist` or chnage Spire host 
-
-* Also they must have iCloud enabled on their phones!!! -> This on what clients are unique!!!!
-
-* Always reboot after that!!!
-
-* You can also run the server with the following command for less verbose output in the terminal and error logging
-
-     ./siriproxy-restarter 2> error2.log | grep -E 'Processing|NEW Client|OLD Client|RollEyes|Assistant ID|nickname|Happy hour'
-
-
-
-**New Features**
- 
-
-* New Web Interface by @WouterDS
-
-* 4S Exploit
-
-* Public and private mode
-
-* Authorization :-) -> Requires the client to have an apple account! (97% have!!!) Read here on how to use (http://quartzcoding.blogspot.com/2012/02/three-little-pigs-authentication-system.html)
-
-* Ban Detection. Detects witch keys cannot create more assistants and sets them as banned. Read what this is here (http://quartzcoding.blogspot.com/2012/02/three-little-pigs-authentication-system.html)
-
-* Improved grabber. Now the connection limit wont apply on the 4S devices. Max active connections reached? No problem! :-) 
-
-* Improved Connection dropping
-
-* Now stores counters in database so even after a crash the keyload dropdown works
-
-* Happy hour. When this timers is reached then sets the keys as unbanned in order for new people to connect. Mostly useful by public servers.
-
-* Many many many bug fixes, almost everything reported in github!!!
-
-
-**Updating from previous versions**
-
-* Just download the experimental branch into a new folder using
-
-    `git clone -b experimental https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy`
-
-* Copy the new config to `~/.siriproxy/` and edit it to your needs
-
-* Do a rake install and a bundle again
-
-    `rake install && siriproxy bundle`
-
-* Regenerate all tables (Warning this will erase everything in the Database so make sure you backup your keys and settings)
-
-    `siriproxy gentables`
-
-
-
-Version 0.9ba
--------------
-
-* Re-added Capturing of assistantid's and speechid's just for reference although they are not used
-
-* Added function in web-Interface to manually create a key, and show old expired keys. Coming soon new and improved web Interface
-
-* Improved grabber. Now if the 4S is not setup the keys are saved! 
-
-* Detection of iPad2
-
-* Several bug fixes
-
-* Tutorial for OSX Snow Leoparf, and OSX Lion!!!  Thanks to @Thpryrchn
-
-
-**Coming soon**
-
-* Assistantid monitor per key and assistant limits!
-
-* Improved web Interface by @Wouter DS
-
-
-Version 0.9am
--------------
-
-* Added in example plugin custom commands to display server stats. Be sure to have it enabled in your `~/.siriproxy/config.yml` 
-
-    Say: 'How many keys' and Siri replies with the available keys
-
-    Say: 'How many active connections' and Siri replies with the current active connections
-
-* Added recommended values in gentables functions. Please regenerate your Tables. Keep in mind that this will destroy all data in db!
-
-* Added premature admin login and settings change via web. See webInterface/inc/config.inc.php
-
-* Added max connections per key!
-
-* Changed method about the keyload increases. Now its based upon session utilization!
-
-* Fixed a bug where when a key expired and a client established a connection the wrong key was marked expired
-
-* Fixed a bug where when a 4s would connect and its not setup the server did not recognize it
-
-* Bug fixes
-
-
-**Recommended default values**
-
-* Max Connections per key: default=15
-
-* Max Keyload: default=500
-
-* Keyload Dropdown: default=100~125
-
-* Keyload Dropdown Interval: default=1200~1800
-
-
-
-Version 0.8b
-------------
-
-* Fixed several bugs, added email notifications, key protection and much more
-
-
-**Updating from v.0.7**
-
-There is no need to do anything more (create db etc) than these steps
-
-1. Run `siriproxy update`
-
-2. Edit ` ~/.siriproxy/config.yml` with the new email setup lines from `config.example.yml` !
-
-3. Start the server `siriproxy server`
-
-4. (Optional) Update to the new webinterface. Just copy all files from `webInterface/` to your html/docs and dont forget to edit the database connection info in `inc/connection.inc.php`
-
-    
 
 
 
@@ -371,21 +66,32 @@ Features
 
 * MySql Database connection support: Supports MySQL database connection for storing configuration,keys and runtime statistics. Now you can edit and build that (NEW)
 
-* Multiple key support: You can connect more than 1 iPhone4S and store even more keys. The more the keys, the more the clients!
+* Multiple key support: You can connect more than 1 iPhone 4S, iPhone 5, and the iPad 3 and store even more keys. The more the keys, the more the clients!
 
 * Key Throttling: Each client uses a different key, if more than one Keys are available. The throttler makes sure that each Key is throttled thus enabling several client registration and assistant object creation.
 
-* KeyLoad Safeguard: Never worry about how many people use your iPhone4S key. Each Key has a maximum keyload. Even when the key is still valid, if the keyload limit is exceeded, the safeguard disables the key and protects the iPhone4S from getting banned.
+* KeyLoad Safeguard: Never worry about how many people use your iPhone 4S, iPhone 5, and the iPad 3 key. Each Key has a maximum keyload. Even when the key is still valid, if the keyload limit is exceeded, the safeguard disables the key and protects the iPhone4S from getting banned.
 
 * KeyLoad Aware: Checks what key is not "Hot" anymore and periodically decreases the load, thus re-enabling Safeguarded Keys
 
 * Web interface and monitoring: Always know what is happening without a CLI! With a web interface you can check statistics such as active connections, valid keys, server load, keyload etc.
 
-* One certificate for all devices: Both Siri Capable devices (currently only iPhone4s) and older devices are using the same certificate and the same port (443 default for SSL)
+* One certificate for all devices: Both Siri Capable devices (currently only iPhone 4s, iPhone 5, and the iPad 3) and older devices are using the same certificate and the same port (443 default for SSL)
 
 * One instance of the server: Due to one certificate you can run only one instance of the server.
 
 * Bug Free (I hope...) :-) Never worry if the server has crashed. Most of the bugs that were causing the server to crash are fixed now.
+
+
+
+Version 0.11.3 
+---------------------
+
+* Now supports iOS 6
+
+* Now Supports iPad 3 keys! Even if they are still on iOS 5, the keys now function the same as 4S!
+
+* After updating, make sure you backup your Database (With something like phpMyAdmin), and do a `siriproxy gentables`.
 
 
 Notice About Plugins

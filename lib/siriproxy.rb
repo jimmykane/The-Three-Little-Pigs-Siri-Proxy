@@ -81,16 +81,12 @@ class SiriProxy
       puts '[Info - SiriProxy] This is a Private Server!'
     else
       puts '[Info - SiriProxy] This is a PUBLIC Server!' if $APP_CONFIG.clients_must_be_in_database != true
-      puts '[Info - SiriProxy] This is a PUBLIC Server with only clients in Database!' if $APP_CONFIG.clients_must_be_in_database == true 
+      puts '[Info - SiriProxy] This is a SEMI-PUBLIC Server only for clients in the Database!' if $APP_CONFIG.clients_must_be_in_database == true
     end
     #Set default to prevent errors.
     if $APP_CONFIG.hours_till_key_expires==nil
       puts '[Info - SiriProxy] hours_till_key_expires not set in config.yml. Using default: 20'
       $APP_CONFIG.hours_till_key_expires = 20
-    end
-    if $APP_CONFIG.try_iPad3==nil
-      puts '[Info - SiriProxy] try_iPad3 not set in config.yml. Will not try using iPad3 Keys'
-      $APP_CONFIG.try_iPad3 = false
     end
 
     if $APP_CONFIG.happy_hour_countdown==nil
@@ -142,12 +138,12 @@ class SiriProxy
           $statistics.uptime+=@timer
           $statistics.happy_hour_elapsed+=@timer
           #if the autokeyban is not "ON" there is no need for happy hour
-          if $APP_CONFIG.enable_auto_key_ban.to_s.upcase != 'ON' 
+          if $APP_CONFIG.enable_auto_key_ban.to_s.upcase != 'ON'
             $statistics.happy_hour_elapsed=0
           end
 
           #Happy hour enabler only if autokeyban is on
-          if $statistics.happy_hour_elapsed > $APP_CONFIG.happy_hour_countdown and $APP_CONFIG.enable_auto_key_ban.to_s.upcase == 'ON' and @unbanned==false 
+          if $statistics.happy_hour_elapsed > $APP_CONFIG.happy_hour_countdown and $APP_CONFIG.enable_auto_key_ban.to_s.upcase == 'ON' and @unbanned==false
             $keyDao.unban_keys
             @unbanned=true
             puts "[Happy hour - SiriProxy] Unbanning Keys and Doors are open"
@@ -179,11 +175,7 @@ class SiriProxy
           $confDao.update($conf)
           ### Per Key based connections
           @max_connections=$conf.max_connections
-          if $APP_CONFIG.try_iPad3==true
-            @availablekeys=($keyDao.list4Skeys().count + $keyDao.listiPad3keys().count)
-          else
-            @availablekeys=$keyDao.list4Skeys().count
-          end
+          @availablekeys=($keyDao.list4Skeys().count + $keyDao.listiPad3keys().count)
           if @availablekeys==0 #this is not needed anymore!
             @max_connections=700#max mem
           elsif @availablekeys>0

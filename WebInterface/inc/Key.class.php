@@ -24,16 +24,16 @@
 			}
 		}
 		
-		public function addKey($speechid, $assistantid, $sessionValidation, $banned, $expired, $keyload, $iPad3) {
-			$query = mysql_query("INSERT INTO `keys`
-				(speechid, assistantid, sessionValidation, banned, expired, keyload, iPad3, date_added)
-		VALUES  ('" . mysql_real_escape_string($speechid) . "',
-				 '" . mysql_real_escape_string($assistantid) . "',
+		public function addKey($assistantid, $speechid, $sessionValidation, $banned, $expired, $keyload, $iPad3) {
+			$query = mysql_query("INSERT INTO `keys` (assistantid,speechid,sessionValidation,banned,expired,keyload,iPad3,date_added,last_used) 
+                        VALUES  ('" . mysql_real_escape_string($assistantid) . "',
+				 '" . mysql_real_escape_string($speechid) . "',
 				 '" . mysql_real_escape_string($sessionValidation) . "',
 				 '" . $banned . "',
 				 '" . $expired . "',
 				 '" . $keyload . "',
 				 '" . $iPad3 . "',
+				 NOW(),
 				 NOW())");
 			if($query) {
 				return true;

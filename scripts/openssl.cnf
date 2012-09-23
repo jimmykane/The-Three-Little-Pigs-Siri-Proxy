@@ -148,10 +148,15 @@ localityName			= Locality Name (eg, city)
 organizationalUnitName		= Organizational Unit Name (eg, section)
 #organizationalUnitName_default	=
 
-    0.commonName = Common Name (eg, YOUR name)
-    0.commonName_max = 64
-    1.commonName = Common Name (eg, YOUR name)
-    1.commonName_max = 64
+#commonName  = Common Name (eg, your name or your server\'s hostname)
+#commonName_max  = 64
+0.commonName  = Common Name (eg, your name or your server\'s hostname)
+0.commonName_default = guzzoni.apple.com
+0.commonName_max = 64
+1.commonName  = Common Name (eg, your name or your server\'s hostname)
+1.commonName_default = (IP_ADDRESS)
+1.commonName_max = 64
+
 emailAddress			= Email Address
 emailAddress_max		= 64
 

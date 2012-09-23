@@ -13,26 +13,26 @@ end
 class SiriProxy::CommandLine
   BANNER = <<-EOS
   Siri Proxy is a proxy server for Apple's Siri "assistant." The idea is to allow non Siri Capable Devices to connect. Welcome to The Three Little Pigs.
-    
+
     See: https://github.com/jimmykane/The-Three-Little-Pigs-Siri-Proxy
-    
+
     Usage: siriproxy COMMAND OPTIONS
-    
+
     Commands:
 
     server            Start up the Siri proxy server
     gentables         Generate the tables for Database Siri
     gencerts          Generate a the certificates needed for SiriProxy
     bundle            Install any dependancies needed by plugins
-    console           Launch the plugin test console 
+    console           Launch the plugin test console
     update [dir]      Updates to the latest code from GitHub or from a provided directory
     help              Show this usage information
-    
+
     Options:
 
     Option                           Command    Description
   EOS
-    
+
   def initialize
     @branch = nil
     parse_options
@@ -41,8 +41,8 @@ class SiriProxy::CommandLine
     case command
     when 'server'           then run_server(subcommand)
     when 'gencerts'         then gen_certs
-    when 'gennewtables'     then gen_newtables  
-    when 'gentables'        then gen_tables  
+    when 'gennewtables'     then gen_newtables
+    when 'gentables'        then gen_tables
     when 'bundle'           then run_bundle(subcommand)
     when 'console'          then run_console
     when 'update'           then update(subcommand)
@@ -50,10 +50,10 @@ class SiriProxy::CommandLine
     else                    usage
     end
   end
-    
+
   def run_console
     load_code
-    $LOG_LEVEL = 0 
+    $LOG_LEVEL = 0
     # this is ugly, but works for now
     SiriProxy::PluginManager.class_eval do
       def respond(text, options={})
@@ -76,17 +76,17 @@ class SiriProxy::CommandLine
         puts "=> #{object}"
       end
     end
-    
+
     cora = SiriProxy::PluginManager.new
     repl = -> prompt { print prompt; cora.process(gets.chomp!) }
     loop { repl[">> "] }
   end
-    
+
   def run_bundle(subcommand='')
     setup_bundler_path
     puts `bundle #{subcommand} #{ARGV.join(' ')}`
   end
-    
+
   def run_server(subcommand='start')
     load_code
     start_server
@@ -98,12 +98,12 @@ class SiriProxy::CommandLine
     # when 'restart'  then restart_server
     # end
   end
-    
+
   def start_server
     proxy = SiriProxy.new
     proxy.start()
   end
-    
+
   def gen_certs
     ca_name = $APP_CONFIG.ca_name ||= ""
     server1 = $APP_CONFIG.server1 ||= ""
@@ -112,12 +112,12 @@ class SiriProxy::CommandLine
     sp_root = File.join(File.dirname(__FILE__), '..', "..")
     puts `#{command} "#{sp_root}" "#{ca_name}" "#{server1}" "#{server2}"`
   end
-    
+
   def gen_tables
     require 'siriproxy/db_connection'
     if dbh=db_connect()
       puts "DATABASE FOUND"
-    else 
+    else
       puts "Could not connect to database"
     end
 
@@ -133,9 +133,11 @@ class SiriProxy::CommandLine
   `expired` enum('False','True') NOT NULL DEFAULT 'False',
   `keyload` int(255) unsigned NOT NULL DEFAULT '0',
   `date_added` datetime NOT NULL,
+  `last_used` datetime NOT NULL,
   `iPad3` enum('False','True') NOT NULL DEFAULT 'False',
+  `client_apple_account_id` longtext NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")  
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
     puts "Created Table keys"
 
 
@@ -153,13 +155,13 @@ class SiriProxy::CommandLine
   `keyload_dropdown_interval` int(5) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;")
-    
+
     puts "Created Table config"
     dbh.query("INSERT INTO `config` VALUES ('1', '40', '50', '0', '1800', '600', '600');")
         puts "Added Default setting in Table config"
-        
+
     dbh.query("DROP TABLE IF EXISTS `assistants`;")
-    puts "Table Assistants Dropped"   
+    puts "Table Assistants Dropped"
     dbh.query("CREATE TABLE `assistants` (
   `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
   `key_id` int(255) unsigned NOT NULL,
@@ -167,16 +169,17 @@ class SiriProxy::CommandLine
   `assistantid` longtext NOT NULL,
   `speechid` longtext NOT NULL,
   `device_type` mediumtext NOT NULL,
+  `device_OS` text NOT NULL,
   `date_created` datetime NOT NULL,
   `last_login` datetime NOT NULL,
   `last_ip` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
     puts "Created Table Assistants"
-    
-    
+
+
     dbh.query("DROP TABLE IF EXISTS `stats`;")
-    puts "Table Statistics Dropped"   
+    puts "Table Statistics Dropped"
     dbh.query("CREATE TABLE `stats` (
   `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
   `elapsed_key_check_interval` int(255) NOT NULL,
@@ -184,14 +187,14 @@ class SiriProxy::CommandLine
   `happy_hour_elapsed` int(255) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;")
-    puts "Table Statistics Created"   
+    puts "Table Statistics Created"
     dbh.query("INSERT INTO `stats` VALUES ('1', '0', '0','0');")
-    puts "Table Statistics Initialized"   
-    
-    
-    
+    puts "Table Statistics Initialized"
+
+
+
      dbh.query("DROP TABLE IF EXISTS `clients`;")
-     puts "Table Clients Dropped"  
+     puts "Table Clients Dropped"
  dbh.query("CREATE TABLE `clients` (
   `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
   `fname` mediumtext,
@@ -199,17 +202,21 @@ class SiriProxy::CommandLine
   `apple_db_id` longtext NOT NULL,
   `apple_account_id` longtext NOT NULL,
   `valid` enum('False','True') NOT NULL DEFAULT 'True',
+  `devicetype` mediumtext NOT NULL,
+  `deviceOS` text NOT NULL,
   `date_added` datetime NOT NULL,
+  `last_login` datetime NOT NULL,
+  `last_ip` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
-     puts "Table Clients Created"   
-    
-    dbh.query("INSERT INTO `clients` VALUES ('1', 'NA', 'NA', 'NA', 'NA', 'False', '0000-00-00 00:00:00');")
-    
-         puts "Table Clients Populated"   
-    
+     puts "Table Clients Created"
+
+    dbh.query("INSERT INTO `clients` VALUES ('1', 'NA', 'NA', 'NA', 'NA', 'False', 'NA', 'NA', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'NA');")
+
+         puts "Table Clients Populated"
+
      dbh.query("DROP TABLE IF EXISTS `key_stats`;")
-     puts "Table Key_stats Dropped"  
+     puts "Table Key_stats Dropped"
  dbh.query("CREATE TABLE `key_stats` (
   `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
   `key_id` int(255) unsigned NOT NULL,
@@ -217,14 +224,14 @@ class SiriProxy::CommandLine
   `total_tokens_recieved` int(255) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;")
-     puts "Table Key_stats Created"   
-   
-    
-    
-    
+     puts "Table Key_stats Created"
+
+
+
+
   end
-   
-   
+
+
   def update(directory=nil)
     if(directory)
       puts "=== Installing from '#{directory}' ==="
@@ -282,7 +289,7 @@ def parse_options
     opts.on('-serv1', '--name SERVER1',  '[gencerts] Define a Server 1 for the CA (default: "guzzoni.apple.com")') do |server1|
       $APP_CONFIG.server1 = server1
     end
-    opts.on('-serv2', '--name CA_NAME',  '[gencerts] Define a Server 2 for the CA (default: "your.siri.proxy.server.com")') do |server2|
+    opts.on('-serv2', '--name SERVER2',  '[gencerts] Define a Server 2 for the CA (default: "your.siri.proxy.server.com")') do |server2|
       $APP_CONFIG.server2 = server2
     end
     opts.on('-host', '--db_host Hostname',  '[server] Define a host name for mysql (default: "localhost")') do |db_host|
@@ -322,7 +329,7 @@ def load_code
   require 'siriproxy'
   require 'siriproxy/connection'
   require 'siriproxy/connection/iphone'
-  require 'siriproxy/connection/guzzoni'
+  require 'siriproxy/connection/apple' #rather than guzzoni or kryten in case apple changes server again
   require 'siriproxy/plugin'
   require 'siriproxy/plugin_manager'
   require 'siriproxy/db_classes'

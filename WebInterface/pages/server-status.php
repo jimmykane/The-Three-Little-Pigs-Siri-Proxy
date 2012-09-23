@@ -19,10 +19,11 @@ $stats = getstats();
 $server_running = $statistics->checkServer($websiteProperty->getProperty("hostname_or_ip") . ':443');
 
 //error_reporting(0);
+header('Refresh: 45');
 ?>
 <h1>Server Status and Statistics</h1>
 
-<p>Hover with your mouse over the table headers to get a detailed explantion of what it is.</p>
+<p>Hover with your mouse over the table headers to get a detailed explanation of what it is.</p>
 
 <div style="overflow: hidden">
 <div style="width:300px; float:left; margin-right: 25px;">
@@ -33,7 +34,7 @@ $server_running = $statistics->checkServer($websiteProperty->getProperty("hostna
 		$keyFactor = 0;
 if(count($keys[0]) > 0) {	
 	foreach($keys[0] as $key) {
-		if($key['iPad3'] == 'False') {
+		if($key['iPad3'] == 'False' || $key['iPad3'] == 'True') {
 			if($key['keyload'] < $config['max_keyload']) {
 				$keyFactor++;
 			}
@@ -150,7 +151,7 @@ if(count($keys[0]) > 0) {
 		
 				$secondsLeft = $websiteProperty->getProperty("accepting_people_in") - $stats['happy_hour_elapsed'];
 				
-				if($secondsLeft < 0) {
+				if($secondsLeft < 0 || $stats['happy_hour_elapsed'] == 0) {
 					echo '<p class="notification green minimal">Happy Hour!</p>';
 				}
 				else {
@@ -216,7 +217,8 @@ if(count($keys[0]) > 0) {
             <th><acronym class="toolTip" title="How many assistants a key has generated. This is where Apple bans keys. If too many assistants are generated in short time Apple will stop generating assistants. Keys with <b>0</b> are just donated or probably banned and can't generate a new assistant but they can still be used to process speech packets.">Assistants</acronym></th>
             <th><acronym class="toolTip" title="The current load on each key. The more packets a key processes the hotter it's getting. Once it has reached the max keyload it's paused for a short time to let it cool down.">Keyload</acronym></th>
             <th><acronym class="toolTip" title="Which device donated the key, an iPhone 4S or iPad3.">Device</acronym></th>
-            <th><acronym class="toolTip" title="The date and time when the key was donated.">Date added</acronym></th>
+            <th><acronym class="toolTip" title="The Person who donated the key.">Added By</acronym></th>
+<!--            <th><acronym class="toolTip" title="The date and time when the key was donated.">Date added</acronym></th>-->
         </tr>
         <?php
 		if($keys[2] == false) {
@@ -290,14 +292,17 @@ if(count($keys[0]) > 0) {
 						}
 						?>
 					</td>
-          <td width="50px">
-            <?php if($key['iPad3'] == 'True') {
-                                                    echo 'iPad 3';
+          <td width="60px">
+            <?php if($key['iPad3'] != 'False') {
+                                                    echo 'iPad3';
                                                 }
                                                 else {
-                                                    echo 'iPhone 4S';
+                                                    echo 'iPhone4S';
                                                 } ?>
           </td>
+<!--					<td width="100px">
+						<?php // echo getkeydonors($key['client_apple_account_id']) ?>
+					</td>-->
 					<td width="145px">
 						<?php echo $key['date_added'] ?>
 					</td>
