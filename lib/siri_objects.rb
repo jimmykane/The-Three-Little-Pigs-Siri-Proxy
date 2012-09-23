@@ -166,44 +166,44 @@ class SiriSendCommands < SiriObject
 end
 add_property_to_class(SiriSendCommands, :commands)
 
-    class SiriConfirmSnippetCommand < SiriObject
-      def initialize(request_id = "")
-        super("ConfirmSnippet", "com.apple.ace.assistant")
-        self.request_id = request_id
-      end
-    end
-    add_property_to_class(SiriConfirmSnippetCommand, :request_id)
+class SiriConfirmSnippetCommand < SiriObject
+  def initialize(request_id = "")
+    super("ConfirmSnippet", "com.apple.ace.assistant")
+    self.request_id = request_id
+  end
+end
+add_property_to_class(SiriConfirmSnippetCommand, :request_id)
 
-    class SiriCancelSnippetCommand < SiriObject
-      def initialize(request_id = "")
-        super("CancelSnippet", "com.apple.ace.assistant")
-        self.request_id = request_id
-      end
-    end
-    add_property_to_class(SiriCancelSnippetCommand, :request_id)
+class SiriCancelSnippetCommand < SiriObject
+  def initialize(request_id = "")
+    super("CancelSnippet", "com.apple.ace.assistant")
+    self.request_id = request_id
+  end
+end
+add_property_to_class(SiriCancelSnippetCommand, :request_id)
 
-    class SiriSnippetOpenedCommand < SiriObject
-      def initialize(request_id = "", object=SOME_KIND_OF_ITEM)
-        super("SnippetOpened", "com.apple.ace.assistant")
-        self.request_id = request_id
-        self.object = object
-      end
-    end
-    add_property_to_class(SiriSnippetOpenedCommand, :request_id)
-    add_property_to_class(SiriSnippetOpenedCommand, :object)
+class SiriSnippetOpenedCommand < SiriObject
+  def initialize(request_id = "", object=SOME_KIND_OF_ITEM)
+    super("SnippetOpened", "com.apple.ace.assistant")
+    self.request_id = request_id
+    self.object = object
+  end
+end
+add_property_to_class(SiriSnippetOpenedCommand, :request_id)
+add_property_to_class(SiriSnippetOpenedCommand, :object)
 
-    class SiriSnippetAttributeOpenedCommand < SiriObject
-      def initialize(request_id = "", attributeValue="", attributeName="")
-        super("SnippetAttributeOpened", "com.apple.ace.assistant")
-        self.request_id = request_id
-        self.attributeValue = attributeValue
-        self.attributeName = attributeName
-      end
-    end
-    add_property_to_class(SiriSnippetAttributeOpenedCommand, :request_id)
-    add_property_to_class(SiriSnippetAttributeOpenedCommand, :attributeValue)
-    add_property_to_class(SiriSnippetAttributeOpenedCommand, :attributeName)
-    
+class SiriSnippetAttributeOpenedCommand < SiriObject
+  def initialize(request_id = "", attributeValue="", attributeName="")
+    super("SnippetAttributeOpened", "com.apple.ace.assistant")
+    self.request_id = request_id
+    self.attributeValue = attributeValue
+    self.attributeName = attributeName
+  end
+end
+add_property_to_class(SiriSnippetAttributeOpenedCommand, :request_id)
+add_property_to_class(SiriSnippetAttributeOpenedCommand, :attributeValue)
+add_property_to_class(SiriSnippetAttributeOpenedCommand, :attributeName)
+
 #####
 # OBJECTS
 #####
