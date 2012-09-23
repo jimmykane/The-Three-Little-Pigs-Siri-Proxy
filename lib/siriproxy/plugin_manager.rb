@@ -36,12 +36,12 @@ class SiriProxy::PluginManager < Cora
       set_location(properties['latitude'], properties['longitude'], properties)
     end
     if object['class'] == 'PersonSearchCompleted'
-      for x in (0..object["properties"]["results"].length)
-        begin # Caused crashes like if you tell siri "Call me Mr Cool".
+      begin # Caused crashes like if you tell siri "Call me Mr Cool".
+        for x in (0..object["properties"]["results"].length)
           @person = object["properties"]["results"][x]["properties"]
-        rescue
-          #No person found
         end
+      rescue
+        #No person found
       end
     end
     plugins.each do |plugin|
