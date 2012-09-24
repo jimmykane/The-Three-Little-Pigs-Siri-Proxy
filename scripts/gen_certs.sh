@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 commonName=$2
 server1=$3
