@@ -413,10 +413,14 @@ GROUP BY K.id ORDER BY K.keyload,Count(1) ASC LIMIT 1"
       end
 
       def updateassistant(dto)
-        sql = "UPDATE `assistants` SET last_login=NOW(), last_ip=? WHERE id=?"
-        st = @my.prepare(sql)
-        st.execute(dto.last_ip,dto.id) rescue puts "***Could not update Assistant! most likly the last_ip failed to work"
-        st.close
+        begin
+          sql = "UPDATE `assistants` SET last_login=NOW(), last_ip=? WHERE id=?"
+          st = @my.prepare(sql)
+          st.execute(dto.last_ip,dto.id)
+          st.close
+        rescue
+          puts "***Could not update Assistant! most likly the last_ip failed to work"
+        end
       end
 
       def delete_expired_assistants
