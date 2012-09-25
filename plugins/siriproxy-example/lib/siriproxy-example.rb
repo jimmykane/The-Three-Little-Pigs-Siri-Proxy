@@ -71,14 +71,14 @@ class SiriProxy::Plugin::Example < SiriProxy::Plugin
   end
   
   listen_for /who am i/i do
-    if !self.manager.user_fname.nil?
+    if self.manager.user_fname.nil?
       say "I'm sorry but I couldn't retrieve any user data for you.."
     elsif self.manager.user_nickname.to_s == "NA"
-      say "You are #{self.manager.user_fname} and are using an #{self.manager.user_devicetype} on iOS #{self.manager.user_deviceOS} and are speaking #{self.manager.user_language}."
-      say "Your IP address is #{self.manager.user_lastIP} and you are speaking #{self.manager.user_language}."
+      say "You are #{self.manager.user_fname.to_s} and are using an #{self.manager.user_devicetype.to_s} on iOS #{self.manager.user_deviceOS.to_s} and are speaking #{self.manager.user_language.to_s}."
+      say "Your IP address is #{self.manager.user_lastIP.to_s} and you are speaking #{self.manager.user_language.to_s}."
     else
-      say "You are #{self.manager.user_nickname} and are using an #{self.manager.user_devicetype} on iOS #{self.manager.user_deviceOS} and are speaking #{self.manager.user_language}."
-      say "Your IP address is #{self.manager.user_lastIP} and you are speaking #{self.manager.user_language}."
+      say "You are #{self.manager.user_nickname.to_s} and are using an #{self.manager.user_devicetype.to_s} on iOS #{self.manager.user_deviceOS.to_s} and are speaking #{self.manager.user_language.to_s}."
+      say "Your IP address is #{self.manager.user_lastIP.to_s} and you are speaking #{self.manager.user_language.to_s}."
     end
     request_completed
   end
