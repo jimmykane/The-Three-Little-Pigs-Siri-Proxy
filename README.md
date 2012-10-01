@@ -38,7 +38,9 @@ Solution 3: Use other iPhone4s DATA
 
 
 
-__if you Jailbrake an iPhone 4S. Just add http://cydia.myrepospace.com/thpryrchn/ to your cydia Sources, and install `Spire 4S` on your 4S. Then you can point it to your server just like you do with any other iPhone 4. This will work on all iOS 5 versions. Also works if you install a Siri GUI that does not include Spire.. It only adds the spire settings, and will not install siri on devices without siri.__
+__if you or someone you know has a jailbroken iPhone 4S then just add http://cydia.myrepospace.com/thpryrchn/ to your Cydia Sources and install `Spire 4S` on your iPhone 4S. Then you can point it to your server just like you do with any other iPhone. This will work on all iOS 5 versions. Also works with non Spire GUI's__
+
+__NOTE: It only adds the Spire in the settings app and will not work without a proper Siri GUI.__
 
 
 
