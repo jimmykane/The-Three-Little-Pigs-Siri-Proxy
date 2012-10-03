@@ -23,13 +23,13 @@ class SiriProxy::Connection < EventMachine::Connection
     self.unzip_stream = Zlib::Inflate.new
     self.zip_stream = Zlib::Deflate.new
     self.consumed_ace = false
-    self.is_4S = false 			#bool if its iPhone 4S
-    self.is_iPad3 = false		#bool if its iPad3
-    self.sessionValidationData = nil	#validationData
-    self.speechId = nil			#speechID
-    self.assistantId = nil			#assistantID
-    self.speechId_avail = false		#speechID available
-    self.assistantId_avail = false		#assistantId available
+    self.is_4S = false      #bool if its iPhone 4S
+    self.is_iPad3 = false   #bool if its iPad3
+    self.sessionValidationData = nil  #validationData
+    self.speechId = nil     #speechID
+    self.assistantId = nil      #assistantID
+    self.speechId_avail = false   #speechID available
+    self.assistantId_avail = false    #assistantId available
     self.client=nil
     self.oldclient=nil
     self.iOS=nil
@@ -697,6 +697,22 @@ class SiriProxy::Connection < EventMachine::Connection
           puts "[Info - SiriProxy] CDMA iPhone 4 connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
           line["iPhone3,3"] = "iPhone4,1"
+          puts "[Info - SiriProxy] Changed header to iphone4s "
+          puts "[Info - SiriProxy] Final Header: " + line if $LOG_LEVEL > 2
+        elsif  line.match(/iPhone2,1;/)
+          self.is_4S = false
+          self.is_iPad3 = false
+          @devicetype="iPhone3GS"
+          if line.match(/5.0/)
+            self.iOS = 5
+          elsif line.match(/5.1/)
+            self.iOS = 5.1
+          elsif line.match(/6.0/)
+            self.iOS = 6
+          end
+          puts "[Info - SiriProxy] iPhone 3GS connected from IP #{self.clientip}"
+          puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
+          line["iPhone2,1"] = "iPhone4,1"
           puts "[Info - SiriProxy] Changed header to iphone4s "
           puts "[Info - SiriProxy] Final Header: " + line if $LOG_LEVEL > 2
         elsif line.match(/iPad2,1;/)
