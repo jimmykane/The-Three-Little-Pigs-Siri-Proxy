@@ -133,23 +133,16 @@ If you don't already have Ruby 1.9.3 installed through RVM, please do so in orde
 
 	* Download/install RVM:  
 
-		`bash < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer)`  
+		`curl -L https://get.rvm.io | bash -s stable`  
 
 	* Activate RVM:  
 
-		`[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"`  
+		`source "$HOME/.rvm/scripts/rvm"`  
 
-	* (optional, but useful) Add RVM to your .bash_profile:  
+2. Install, use and make default ruby 1.9.3:   
 
-		`echo '[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm" # Load RVM function' >> ~/.bash_profile`   
-
-2. Install Ruby 1.9.3 (if you don't have it already):   
-
-	`rvm install 1.9.3`  
-
-3. Set RVM to use/default to 1.9.3:   
-
-	`rvm use 1.9.3 --default`
+	`rvm requirements` # read and follow instructions, make sure to support gcc-4.2
+	`rvm use 1.9.3 --default --install`
 
 
 **Setup MySQL**
@@ -179,7 +172,7 @@ Clone this repo locally, then navigate into the The-Three-Little-Pigs directory 
     
 3. Install Rake and Bundler:  
 
-	`sudo gem install rake bundler`  
+	`gem install rake bundler`  
 
 4. Install SiriProxy gem (do this from your SiriProxy directory):  
 
@@ -224,7 +217,7 @@ Clone this repo locally, then navigate into the The-Three-Little-Pigs directory 
 
 13. Start SiriProxy (must start as root because it uses a port < 1024):  
 
-	`sudo siriproxy server`
+	`rvmsudo siriproxy server`
 
 	You can also start the server by a re-open script that ensures to restart the server if it crashes
 
@@ -328,29 +321,17 @@ If you don't already have Ruby 1.9.3 installed through RVM, please do so in orde
 
 	* Download/install RVM:  
 
-		`bash < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer)`  
+		`curl -L https://get.rvm.io | bash -s stable`  
 
 	* Activate RVM:  
 
-		`source /Users/benjamin/.profile`  
+		`source $HOME/.rvm/scripts/rvm`  
 
 
+2. Install, use and make default ruby 1.9.3:   
 
-2. Install Ruby 1.9.3 (if you don't have it already):   
-
-	* **Snow Leopard**
-
-	`rvm install 1.9.3`  
-
-
-	* **Lion** (Or if using xcode 4.2 or higher)
-
-	`rvm install 1.9.3 --with-gcc=clang`  
-
-
-3. Set RVM to use/default to 1.9.3:   
-
-	`rvm use 1.9.3 --default`
+	`rvm requirements` # read and follow instructions, make sure to support gcc-4.2
+	`rvm use 1.9.3 --default --install`
 
 
 **Setup MySQL**
@@ -367,7 +348,7 @@ Install MySQL on your system and create a database called siri or whatever you l
 
 3. Setup MySql Gem
 
-	`sudo gem install mysql -- --with-mysql-config=/usr/local/mysql/bin/mysql_config`
+	`gem install mysql -- --with-mysql-config=/usr/local/mysql/bin/mysql_config`
 	
 **Set up The Three Little Pigs**
 
@@ -384,11 +365,12 @@ Clone this repo locally, then navigate into the The-Three-Little-Pigs directory 
 	Answer yes to "Do you wish to trust this .rvmrc file?"
     
 	* _If you miss it, just type in `rvm reload` and you can do it again._
+        * Alternatively you can force trusting with: `rvm rvmrc trust .`
 
 
 3. Install Rake and Bundler:  
 
-	`sudo gem install rake bundler`  
+	`gem install rake bundler`  
 
 4. Install mysql & SiriProxy gem (do this from your SiriProxy directory):  
 
@@ -484,7 +466,7 @@ Make sure you enable Web Sharing in System Preferences.
 
 6. Enable PHP because it isn't by default on a mac
 
-	`sudo nano nano /etc/apache2/httpd.conf` 
+	`sudo nano /etc/apache2/httpd.conf` 
 
 	around line 111 uncomment this line: 
 
@@ -502,9 +484,6 @@ Make sure you enable Web Sharing in System Preferences.
 9. In your browser, try out your server!
 
 	`http://localhost`
-
-
-
     
 
 **Updating SiriProxy**
@@ -548,7 +527,7 @@ Try Deleting your com.apple.assistant.plist. You can do this by putting `cydia:/
 
 **Gem is not installing?**
 
-0. Type rvm requirements and install all packages that RVM proposes!
+0. Type `rvm requirements `and install all packages that RVM proposes!
 
 1. Review the error output and run the manual install as suggested.
 
