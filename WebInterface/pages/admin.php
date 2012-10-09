@@ -507,8 +507,8 @@ if($_GET['do'] == 'add-announcement' || empty($_GET['do'])) {
                     <?php
 						if($_SERVER['REQUEST_METHOD'] == "POST") {
 							if(!empty($_POST['key_sessionValidation']) && !empty($_POST['key_banned']) && !empty($_POST['key_expired']) && !empty($_POST['iPad3'])) {
-								if($key->addKey( $_POST['key_assistantid'], $_POST['key_speechid'],$_POST['key_sessionValidation'], $_POST['key_banned'], $_POST['key_expired'], $_POST['key_keyload'], $_POST['iPad3'] '')) {
-                                                                        echo '<p class="notification green">You have successfully added a new '
+								if($key->addKey( $_POST['key_assistantid'], $_POST['key_speechid'],$_POST['key_sessionValidation'], $_POST['key_banned'], $_POST['key_expired'], $_POST['key_keyload'], $_POST['iPad3'] )) {
+                                                                        echo '<p class="notification green">You have successfully added a new ';
                                                                             if ($_POST['iPad3'] == false) {
                                                                                 echo '4S';
                                                                             }
