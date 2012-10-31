@@ -235,6 +235,7 @@
 										  `assistantid` longtext NOT NULL,
 										  `speechid` longtext NOT NULL,
 										  `device_type` mediumtext NOT NULL,
+                                                                                  `device_OS` text NOT NULL,
 										  `date_created` datetime NOT NULL,
 										  `last_login` datetime NOT NULL,
 										  `last_ip` text NOT NULL,
@@ -252,9 +253,15 @@
 										  `apple_db_id` longtext NOT NULL,
 										  `apple_account_id` longtext NOT NULL,
 										  `valid` enum('False','True') NOT NULL DEFAULT 'True',
+										  `devicetype` mediumtext NOT NULL,
+										  `deviceOS` text NOT NULL,
 										  `date_added` datetime NOT NULL,
+										  `last_login` datetime NOT NULL,
+										  `last_ip` text NOT NULL,
 										  PRIMARY KEY (`id`)
 										) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+                                                                                
+                                                                                INSERT INTO `clients` VALUES ('1', 'NA', 'NA', 'NA', 'NA', 'False', 'NA', 'NA', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 'NA');
 
 										-- ----------------------------
 										--  Table structure for `config`
@@ -262,12 +269,12 @@
 										DROP TABLE IF EXISTS `config`;
 										CREATE TABLE `config` (
 										  `id` int(2) NOT NULL,
-										  `max_threads` int(5) unsigned NOT NULL DEFAULT '20',
-										  `max_connections` int(5) unsigned NOT NULL DEFAULT '30',
+										  `max_threads` int(5) unsigned NOT NULL DEFAULT '40',
+										  `max_connections` int(5) unsigned NOT NULL DEFAULT '50',
 										  `active_connections` int(100) unsigned NOT NULL DEFAULT '0',
-										  `max_keyload` int(5) unsigned NOT NULL DEFAULT '1200',
+										  `max_keyload` int(5) unsigned NOT NULL DEFAULT '1800',
 										  `keyload_dropdown` int(5) unsigned NOT NULL DEFAULT '600',
-										  `keyload_dropdown_interval` int(5) unsigned NOT NULL DEFAULT '900',
+										  `keyload_dropdown_interval` int(5) unsigned NOT NULL DEFAULT '600',
 										  PRIMARY KEY (`id`)
 										) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -677,15 +684,15 @@
 					echo '
 					<label for="pc_threads">Max threads</label>
 					<input type="text" name="pc_threads" id="pc_threads" value="' . $_POST['pc_threads'] . '" />
-					<span class="tooltip">(Recommended: 20)</span>
+					<span class="tooltip">(Recommended: 40)</span>
 					
 					<label for="pc_maxCon">Max connections</label>
 					<input type="text" name="pc_maxCon" id="pc_maxCon" value="' . $_POST['pc_maxCon'] . '" />
-					<span class="tooltip">(Recommended: 30)</span>
+					<span class="tooltip">(Recommended: 50)</span>
 					
 					<label for="pc_maxKeyload">Max keyload</label>
 					<input type="text" name="pc_maxKeyload" id="pc_maxKeyload" value="' . $_POST['pc_maxKeyload'] . '" />
-					<span class="tooltip">(Recommended: 1200)</span>
+					<span class="tooltip">(Recommended: 1800)</span>
 					
 					<label for="pc_keyloadDropdown">Keyload dropdown</label>
 					<input type="text" name="pc_keyloadDropdown" id="pc_keyloadDropdown" value="' . $_POST['pc_keyloadDropdown'] . '" />
