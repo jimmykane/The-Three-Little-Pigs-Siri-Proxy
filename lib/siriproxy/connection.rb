@@ -209,7 +209,7 @@ class SiriProxy::Connection < EventMachine::Connection
     else
       puts "[Info - SiriProxy] Something went wrong. Please file this bug. Key NOT saved!"
     end
-    ##This now allows iPad3s to be entered into client database.
+    ##This now allows iPad 3, iPad mini, iPod Touch 5g to be entered into client database.
     begin
       @key=Key.new
       @key.id=0
@@ -275,7 +275,7 @@ class SiriProxy::Connection < EventMachine::Connection
 
       #rescue SystemCallError,NoMethodError
     rescue SystemCallError
-      puts "[ERROR - SiriProxy] Something went wrong with the iPad3 session..."
+      puts "[ERROR - SiriProxy] Something went wrong with the iPad 3, iPad mini, iPod Touch 5g session..."
     end
 
   end
@@ -644,6 +644,81 @@ class SiriProxy::Connection < EventMachine::Connection
         self.is_4S = false
         self.is_iPad3 = true
         @devicetype="iPad 3 GSM"
+      elsif line.match(/iPod5;/)
+        puts "[RollEyes - Siri*-*Proxy]"
+        puts "[Info - SiriProxy] iPod touch 5th generation connected from IP #{self.clientip}"
+        puts "[RollEyes - Siri*-*Proxy]"
+        if line.match(/5.0/)
+          self.iOS = 5
+        elsif line.match(/5.1/)
+          self.iOS = 5.1
+        elsif line.match(/6.0/)
+          self.iOS = 6
+        end
+        self.is_4S = false
+        self.is_iPad3 = true
+        @devicetype="iPod 5th Gen"
+      elsif line.match(/iPod6;/)
+        puts "[RollEyes - Siri*-*Proxy]"
+        puts "[Info - SiriProxy] iPod touch 6th generation?? connected from IP #{self.clientip}"
+        puts "[Info - SiriProxy] Device Header: " + line + " --Post what device this is, and the Useragent in the Issues section of github."
+        puts "[RollEyes - Siri*-*Proxy]"
+        if line.match(/5.0/)
+          self.iOS = 5
+        elsif line.match(/5.1/)
+          self.iOS = 5.1
+        elsif line.match(/6.0/)
+          self.iOS = 6
+        end
+        self.is_4S = false
+        self.is_iPad3 = true
+        @devicetype="iPod 5th Gen"
+      elsif line.match(/iPad3;/)
+        puts "[RollEyes - Siri*-*Proxy]"
+        puts "[Info - SiriProxy] iPad 3 Other from IP #{self.clientip}"
+        puts "[Info - SiriProxy] Device Header: " + line + " --Post what device this is, and the Useragent in the Issues section of github."
+        puts "[RollEyes - Siri*-*Proxy]"
+        if line.match(/5.0/)
+          self.iOS = 5
+        elsif line.match(/5.1/)
+          self.iOS = 5.1
+        elsif line.match(/6.0/)
+          self.iOS = 6
+        end
+        self.is_4S = false
+        self.is_iPad3 = true
+        @devicetype="iPad 3 other"
+      elsif line.match(/iPad4;/)
+        puts "[RollEyes - Siri*-*Proxy]"
+        puts "[Info - SiriProxy] iPad Something new from IP #{self.clientip}"
+        puts "[Info - SiriProxy] Device Header: " + line + " --Post what device this is, and the Useragent in the Issues section of github."
+        puts "[RollEyes - Siri*-*Proxy]"
+        if line.match(/5.0/)
+          self.iOS = 5
+        elsif line.match(/5.1/)
+          self.iOS = 5.1
+        elsif line.match(/6.0/)
+          self.iOS = 6
+        end
+        self.is_4S = false
+        self.is_iPad3 = true
+        @devicetype="iPad 4 something"
+      elsif line.match(/iPad5;/)
+        puts "[RollEyes - Siri*-*Proxy]"
+        puts "[Info - SiriProxy] iPad Something new from IP #{self.clientip}"
+        puts "[Info - SiriProxy] Device Header: " + line + " --Post what device this is, and the Useragent in the Issues section of github."
+        puts "[RollEyes - Siri*-*Proxy]"
+        if line.match(/5.0/)
+          self.iOS = 5
+        elsif line.match(/5.1/)
+          self.iOS = 5.1
+        elsif line.match(/6.0/)
+          self.iOS = 6
+        end
+        self.is_4S = false
+        self.is_iPad3 = true
+        @devicetype="iPad 5 something"
+
       else # now seperates anything else except 4S/5 and ipad3
         #we can close connections here .... and we can count them here
         puts "[Info - Siriproxy] Curent connections [#{$conf.active_connections}]"
