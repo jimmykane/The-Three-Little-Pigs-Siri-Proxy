@@ -18,7 +18,7 @@
 	$websiteProperty = new WebsiteProperty();
 	echo $websiteProperty->getProperty('hostname_or_ip');
 
-	echo '</strong> (note that it uses <strong>https</strong> and there is <strong>no</strong> port number)</p><p>You will also need a certificate in order to make a secure connection to the server.<br />You can download the certificate here: <a href="files/certs/certificate.pem">certificate.pem</a>.<br />Open it with Mobile Safari to install. If you are having trouble then download it via PC/Mac/Linux and email it to yourself.</p><p class="notification yellow">If the instructions are not clear to you, you might try <a href="http://wouterds.be/2012/02/03/tutorial-how-to-install-the-the-three-little-pigs-siri-proxy-on-your-idevice/479/">watching this video tutorial</a>.<br />The server is accepting new people in <b>';
+	echo '</strong> (note that it uses <strong>https</strong> and there is <strong>no</strong> port number)</p><p>You will also need a certificate in order to make a secure connection to the server.<br />You can download the certificate here: <a href="files/certs/certificate.pem">certificate.pem</a>.<br />Open it with Mobile Safari to install. If you are having trouble then download it via PC/Mac/Linux and email it to yourself.</p><p class="notification yellow">If the instructions are not clear to you, you might try <a href="https://www.youtube.com/watch?v=DdgZcgE05zM">watching this video tutorial</a>.<br />The server is accepting new people in <b>';
 
 	$secondsLeft = $websiteProperty->getProperty("accepting_people_in") - $stats['happy_hour_elapsed'];
 	if($secondsLeft < 0) {
