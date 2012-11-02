@@ -644,7 +644,7 @@ class SiriProxy::Connection < EventMachine::Connection
         self.is_4S = false
         self.is_iPad3 = true
         @devicetype="iPad 3 GSM"
-      elsif line.match(/iPod5;/)
+      elsif line.match(/iPod5,/)
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPod touch 5th generation connected from IP #{self.clientip}"
         puts "[RollEyes - Siri*-*Proxy]"
@@ -658,7 +658,7 @@ class SiriProxy::Connection < EventMachine::Connection
         self.is_4S = false
         self.is_iPad3 = true
         @devicetype="iPod 5th Gen"
-      elsif line.match(/iPod6;/)
+      elsif line.match(/iPod6,/)
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPod touch 6th generation?? connected from IP #{self.clientip}"
         puts "[Info - SiriProxy] Device Header: " + line + " --Post what device this is, and the Useragent in the Issues section of github."
@@ -673,7 +673,7 @@ class SiriProxy::Connection < EventMachine::Connection
         self.is_4S = false
         self.is_iPad3 = true
         @devicetype="iPod 5th Gen"
-      elsif line.match(/iPad3;/)
+      elsif line.match(/iPad3,/)
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPad 3 Other from IP #{self.clientip}"
         puts "[Info - SiriProxy] Device Header: " + line + " --Post what device this is, and the Useragent in the Issues section of github."
@@ -688,7 +688,7 @@ class SiriProxy::Connection < EventMachine::Connection
         self.is_4S = false
         self.is_iPad3 = true
         @devicetype="iPad 3 other"
-      elsif line.match(/iPad4;/)
+      elsif line.match(/iPad4,/)
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPad Something new from IP #{self.clientip}"
         puts "[Info - SiriProxy] Device Header: " + line + " --Post what device this is, and the Useragent in the Issues section of github."
@@ -703,7 +703,7 @@ class SiriProxy::Connection < EventMachine::Connection
         self.is_4S = false
         self.is_iPad3 = true
         @devicetype="iPad 4 something"
-      elsif line.match(/iPad5;/)
+      elsif line.match(/iPad5,/)
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPad Something new from IP #{self.clientip}"
         puts "[Info - SiriProxy] Device Header: " + line + " --Post what device this is, and the Useragent in the Issues section of github."
