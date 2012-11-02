@@ -18,12 +18,21 @@
 			$hostWithPort = explode(":", $hostWithPort);
 			$host = $hostWithPort[0];
 			$port = $hostWithPort[1];
+
+			$cmd = "ps -C ruby";
+			exec($cmd, $output2, $result);
+			if (count($output2) >= 2) {
+			    return true;
+			}
+			$cmd = "ps -C siriproxy";
+			exec($cmd, $output, $result);
+			if (count($output) >= 2) {
+			    return true;
+			}
 			if(@fsockopen($host, $port, $errNum, $errStr, 1)) {
-				return true;
+		           return true;
 			}
-			else {
-				return false;
-			}
+			return false;
 		}
 
 		public function getTableRecordCount($table, $when = "total") {
