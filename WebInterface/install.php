@@ -105,6 +105,10 @@
 								$websiteproperties = 'Please enter a value for the hostname.';
 								$inputErrors[] = 'wp_hostname';
 							}
+							elseif(empty($_POST['wp_port'])) {
+								$websiteproperties = 'Please enter a value for the port.';
+								$inputErrors[] = 'wp_port';
+							}
 							elseif(empty($_POST['wp_gbEntries'])) {
 								$websiteproperties = 'Please enter a value for the maximum guestbook entries per page.';
 								$inputErrors[] = 'wp_gbEntries';
@@ -136,6 +140,10 @@
 							elseif(empty($_POST['wp_cEmail'])) {
 								$websiteproperties = 'Please enter a value for the contact email.';
 								$inputErrors[] = 'wp_cEmail';
+							}
+							elseif(!is_numeric($_POST['wp_port'])) {
+								$websiteproperties = 'Please enter a numeric value for the port.';
+								$inputErrors[] = 'wp_port';
 							}
 							elseif(@!eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", $_POST['wp_cEmail'])) {
 								$websiteproperties = 'Please enter a valid email.';
@@ -435,6 +443,10 @@
 															(	'hostname_or_ip',
 																'" . mysql_real_escape_string($_POST['wp_hostname']). "',
 																NOW()),
+																
+															(	'port',
+																'" . mysql_real_escape_string($_POST['wp_port']). "',
+																NOW()),
 
 															(	'max_gb_entries_per_page',
 																'" . mysql_real_escape_string($_POST['wp_gbEntries']). "',
@@ -642,7 +654,7 @@
 			<body>
 			<h1>Installation The Three Little Pigs - Siri Proxy</h1>';
 			if($success == true) {
-				echo '<fieldset><legend><span>✓</span>Installation feedback</legend><div class="form-block">';
+				echo '<fieldset><legend><span>?</span>Installation feedback</legend><div class="form-block">';
 				if(empty($error)) {
 					echo '<p class="success">You have successfully installed the web interface.<br />Now please delete this file (install.php) to get started!</p>';
 				}
@@ -728,10 +740,14 @@
 					}
 					echo '
 					<label for="wp_hostname">Hostname or IP</label>
-					<input type="text" name="wp_hostname" id="wp_hostname" value="' . $_POST['admin_password'] . '" />
+					<input type="text" name="wp_hostname" id="wp_hostname" value="' . $_POST['wp_hostname'] . '" />
 					<span class="tooltip">(Where proxy is running on)</span>
 
-					<label for="dd">Guestbook entries per page</label>
+					<label for="wp_port">Port</label>
+					<input type="text" name="wp_port" id="wp_port" value="' . $_POST['wp_port'] . '" />
+					<span class="tooltip">(Default: 443)</span>
+
+					<label for="wp_gbEntries">Guestbook entries per page</label>
 					<input type="text" name="wp_gbEntries" id="wp_gbEntries" value="' . $_POST['wp_gbEntries'] . '" />
 					
 					<label for="wp_kEntries">Keys per page</label>
