@@ -16,7 +16,7 @@ $statistics = new Statistics();
 $keys = getkeys();
 $config = getconfig();
 $stats = getstats();
-$server_running = $statistics->checkServer($websiteProperty->getProperty("hostname_or_ip") . ':443');
+$server_running = $statistics->checkServer($websiteProperty->getProperty("hostname_or_ip") . ':' . $websiteProperty->getProperty("port"));
 
 //error_reporting(0);
 header('Refresh: 45');
