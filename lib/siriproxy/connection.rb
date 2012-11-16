@@ -580,6 +580,8 @@ class SiriProxy::Connection < EventMachine::Connection
           self.iOS = 5.1
         elsif line.match(/6.0/)
           self.iOS = 6
+        elsif line.match(/6.1/)
+          self.iOS = 6.1
         end
         self.is_4S = true
         self.is_iPad3 = false
@@ -598,6 +600,8 @@ class SiriProxy::Connection < EventMachine::Connection
           self.iOS = 5.1
         elsif line.match(/6.0/)
           self.iOS = 6
+        elsif line.match(/6.1/)
+          self.iOS = 6.1
         end
         self.is_4S = true
         self.is_iPad3 = false
@@ -612,6 +616,8 @@ class SiriProxy::Connection < EventMachine::Connection
           self.iOS = 5.1
         elsif line.match(/6.0/)
           self.iOS = 6
+        elsif line.match(/6.1/)
+          self.iOS = 6.1
         end
         self.is_4S = false
         self.is_iPad3 = true
@@ -626,6 +632,8 @@ class SiriProxy::Connection < EventMachine::Connection
           self.iOS = 5.1
         elsif line.match(/6.0/)
           self.iOS = 6
+        elsif line.match(/6.1/)
+          self.iOS = 6.1
         end
         self.is_4S = false
         self.is_iPad3 = true
@@ -640,6 +648,8 @@ class SiriProxy::Connection < EventMachine::Connection
           self.iOS = 5.1
         elsif line.match(/6.0/)
           self.iOS = 6
+        elsif line.match(/6.1/)
+          self.iOS = 6.1
         end
         self.is_4S = false
         self.is_iPad3 = true
@@ -654,10 +664,60 @@ class SiriProxy::Connection < EventMachine::Connection
           self.iOS = 5.1
         elsif line.match(/6.0/)
           self.iOS = 6
+        elsif line.match(/6.1/)
+          self.iOS = 6.1
         end
         self.is_4S = false
         self.is_iPad3 = true
         @devicetype="iPod 5th Gen"
+      elsif line.match(/iPad2,5/)
+        puts "[RollEyes - Siri*-*Proxy]"
+        puts "[Info - SiriProxy] iPad Mini Wifi connected from IP #{self.clientip}"
+        puts "[RollEyes - Siri*-*Proxy]"
+        if line.match(/5.0/)
+          self.iOS = 5
+        elsif line.match(/5.1/)
+          self.iOS = 5.1
+        elsif line.match(/6.0/)
+          self.iOS = 6
+        elsif line.match(/6.1/)
+          self.iOS = 6.1
+        end
+        self.is_4S = false
+        self.is_iPad3 = true
+        @devicetype="iPad Mini Wifi"
+      elsif line.match(/iPad2,6/)
+        puts "[RollEyes - Siri*-*Proxy]"
+        puts "[Info - SiriProxy] iPad Mini GSM connected from IP #{self.clientip}"
+        puts "[RollEyes - Siri*-*Proxy]"
+        if line.match(/5.0/)
+          self.iOS = 5
+        elsif line.match(/5.1/)
+          self.iOS = 5.1
+        elsif line.match(/6.0/)
+          self.iOS = 6
+        elsif line.match(/6.1/)
+          self.iOS = 6.1
+        end
+        self.is_4S = false
+        self.is_iPad3 = true
+        @devicetype="iPad Mini GSM"
+      elsif line.match(/iPad2,7/)
+        puts "[RollEyes - Siri*-*Proxy]"
+        puts "[Info - SiriProxy] iPad Mini CDMA connected from IP #{self.clientip}"
+        puts "[RollEyes - Siri*-*Proxy]"
+        if line.match(/5.0/)
+          self.iOS = 5
+        elsif line.match(/5.1/)
+          self.iOS = 5.1
+        elsif line.match(/6.0/)
+          self.iOS = 6
+        elsif line.match(/6.1/)
+          self.iOS = 6.1
+        end
+        self.is_4S = false
+        self.is_iPad3 = true
+        @devicetype="iPad Mini CDMA"
       elsif line.match(/iPod6,/)
         puts "[RollEyes - Siri*-*Proxy]"
         puts "[Info - SiriProxy] iPod touch 6th generation?? connected from IP #{self.clientip}"
@@ -669,6 +729,8 @@ class SiriProxy::Connection < EventMachine::Connection
           self.iOS = 5.1
         elsif line.match(/6.0/)
           self.iOS = 6
+        elsif line.match(/6.1/)
+          self.iOS = 6.1
         end
         self.is_4S = false
         self.is_iPad3 = true
@@ -684,6 +746,8 @@ class SiriProxy::Connection < EventMachine::Connection
           self.iOS = 5.1
         elsif line.match(/6.0/)
           self.iOS = 6
+        elsif line.match(/6.1/)
+          self.iOS = 6.1
         end
         self.is_4S = false
         self.is_iPad3 = true
@@ -699,6 +763,8 @@ class SiriProxy::Connection < EventMachine::Connection
           self.iOS = 5.1
         elsif line.match(/6.0/)
           self.iOS = 6
+        elsif line.match(/6.1/)
+          self.iOS = 6.1
         end
         self.is_4S = false
         self.is_iPad3 = true
@@ -714,6 +780,8 @@ class SiriProxy::Connection < EventMachine::Connection
           self.iOS = 5.1
         elsif line.match(/6.0/)
           self.iOS = 6
+        elsif line.match(/6.1/)
+          self.iOS = 6.1
         end
         self.is_4S = false
         self.is_iPad3 = true
@@ -750,6 +818,8 @@ class SiriProxy::Connection < EventMachine::Connection
             self.iOS = 5.1
           elsif line.match(/6.0/)
             self.iOS = 6
+          elsif line.match(/6.1/)
+            self.iOS = 6.1
           end
           puts "[Info - SiriProxy] GSM iPhone 4 connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
@@ -766,6 +836,8 @@ class SiriProxy::Connection < EventMachine::Connection
             self.iOS = 5.1
           elsif line.match(/6.0/)
             self.iOS = 6
+          elsif line.match(/6.1/)
+            self.iOS = 6.1
           end
           puts "[Info - SiriProxy] CDMA iPhone 4 connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
@@ -782,6 +854,8 @@ class SiriProxy::Connection < EventMachine::Connection
             self.iOS = 5.1
           elsif line.match(/6.0/)
             self.iOS = 6
+          elsif line.match(/6.1/)
+            self.iOS = 6.1
           end
           puts "[Info - SiriProxy] iPhone 3GS connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
@@ -798,6 +872,8 @@ class SiriProxy::Connection < EventMachine::Connection
             self.iOS = 5.1
           elsif line.match(/6.0/)
             self.iOS = 6
+          elsif line.match(/6.1/)
+            self.iOS = 6.1
           end
           puts "[Info - SiriProxy] iPad2 Wifi Only connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
@@ -814,6 +890,8 @@ class SiriProxy::Connection < EventMachine::Connection
             self.iOS = 5.1
           elsif line.match(/6.0/)
             self.iOS = 6
+          elsif line.match(/6.1/)
+            self.iOS = 6.1
           end
           puts "[Info - SiriProxy] iPad2 GSM connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
@@ -830,6 +908,8 @@ class SiriProxy::Connection < EventMachine::Connection
             self.iOS = 5.1
           elsif line.match(/6.0/)
             self.iOS = 6
+          elsif line.match(/6.1/)
+            self.iOS = 6.1
           end
           puts "[Info - SiriProxy] iPad2 CDMA connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
@@ -846,6 +926,8 @@ class SiriProxy::Connection < EventMachine::Connection
             self.iOS = 5.1
           elsif line.match(/6.0/)
             self.iOS = 6
+          elsif line.match(/6.1/)
+            self.iOS = 6.1
           end
           puts "[Info - SiriProxy] iPad2 32nm Wifi Only connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
@@ -876,6 +958,8 @@ class SiriProxy::Connection < EventMachine::Connection
             self.iOS = 5.1
           elsif line.match(/6.0/)
             self.iOS = 6
+          elsif line.match(/6.1/)
+            self.iOS = 6.1
           end
           puts "[Info - SiriProxy] iPod touch 4th generation connected from IP #{self.clientip}"
           puts "[Info - SiriProxy] Original Header: " + line if $LOG_LEVEL > 2
