@@ -1049,6 +1049,7 @@ class SiriProxy::Connection < EventMachine::Connection
     return false if unzipped_input==nil or unzipped_input.empty?  #empty
     unpacked = unzipped_input[0...5].unpack('H*').first
     return true if(unpacked.match(/^0[34]/)) #Ping or pong
+    return true if(unpacked.match(/^ff/)) #clear context
     begin
       if unpacked.match(/^[0-9][15-9]/)
         puts "ROGUE PACKET!!! WHAT IS IT?! TELL US!!! IN IRC!! COPY THE STUFF FROM BELOW"
@@ -1067,9 +1068,9 @@ class SiriProxy::Connection < EventMachine::Connection
     #the problem here is that the packet is now complete or something unknown for the match!
     #if first character is 0
 
-    unpacked="0400000001" if !unpacked.match(/^0(.)(.{8})$/) # its the value that causes the bug! Will treat it as ping pong!!! Hope this resolves this
+    #unpacked="0400000001" if !unpacked.match(/^(..)(.{8})$/) # its the value that causes the bug! Will treat it as ping pong!!! Hope this resolves this
     #fingers crossed
-    info = unpacked.match(/^0(.)(.{8})$/) #some times this doesnt match! needs 10 chars !!!
+    info = unpacked.match(/^(..)(.{8})$/) #some times this doesnt match! needs 10 chars !!!
 
     if unpacked==nil
       $stderr.puts "bug flash on unpacked"
@@ -1083,7 +1084,7 @@ class SiriProxy::Connection < EventMachine::Connection
       #return object
     end
     if info!=nil #lets hope for the magic fix
-      if(info[1] == "3" || info[1] == "4"  ) #Ping or pong -- just get these out of the way (and log them for good measure)
+      if(info[1] == "03" || info[1] == "04" || info[1] == "ff") #Ping, pong or Clear Context -- just get these out of the way (and log them for good measure)
         #puts "Ping Pong #{unpacked}"
         object = unzipped_input[0...5]
 
@@ -1095,7 +1096,7 @@ class SiriProxy::Connection < EventMachine::Connection
 
         self.unzipped_output << object
 
-        type = (info[1] == "3") ? "Ping" : "Pong"
+        type = (info[1] == "03") ? "Ping" : ((info[1] == "04") ? "Pong" : "Clear Context")
         puts "[#{type} - #{self.name}] (#{info[2].to_i(16)})" if $LOG_LEVEL > 3
         self.unzipped_input = unzipped_input[5..-1]
 
