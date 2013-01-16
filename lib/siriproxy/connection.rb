@@ -1152,6 +1152,9 @@ class SiriProxy::Connection < EventMachine::Connection
   end
 
   def prep_received_object(object)
+    if object["class"] == "FinishSpeech" or object["class"] == "SpeechRecognized"
+      @block_rest_of_session = false
+    end
     if object["refId"] == self.last_ref_id && @block_rest_of_session
       puts "[Info - Dropping Object from Apple] #{object["class"]}" if $LOG_LEVEL > 1
       pp object if $LOG_LEVEL > 3
@@ -1480,6 +1483,7 @@ class SiriProxy::Connection < EventMachine::Connection
                 @assistant.key_id=0
               end
               @assistant.devicetype=self.other_connection.devicetype
+              @assistant.deviceOS=self.other_connection.iOS
               @assistant.last_ip=self.other_connection.clientip
               pp self.other_connection.client if $LOG_LEVEL > 2
 
@@ -1501,6 +1505,21 @@ class SiriProxy::Connection < EventMachine::Connection
                   $keyDao.update_used(self.other_connection.key)
                   puts "[Client - SiriProxy] NEW Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"
 
+                elsif self.other_connection.client!=nil and self.other_connection.client.fname!=nil
+                  @oldclient.fname=self.other_connection.client.fname #in case they ever change this
+                  @oldclient.nickname=self.other_connection.client.nickname #in case they ever change this
+                  @oldclient.appleDBid=self.other_connection.client.appleDBid
+                  @oldclient.appleAccountid=self.other_connection.client.appleAccountid
+                  @oldclient.devicetype=self.other_connection.client.devicetype #For users with multiple devices on same Apple Account
+                  @oldclient.deviceOS=self.other_connection.iOS #For users with multiple devices on same Apple Account
+                  @oldclient.last_ip=self.other_connection.clientip
+                  $clientsDao.update(@oldclient)
+                  @assistant.client_apple_account_id=@oldclient.appleAccountid
+                  $assistantDao.createassistant(@assistant)
+                  puts "[Client - SiriProxy] Created Assistant ID #{@assistant.assistantid} using key [#{self.other_connection.key.id}]"
+                  $keyDao.update_used(self.other_connection.key)
+                  puts "[Client - SiriProxy] OLD Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"
+                  
                 elsif @client!=nil and @client.fname!=nil
                   @oldclient.fname=@client.fname #in case they ever change this
                   @oldclient.nickname=@client.nickname #in case they ever change this
