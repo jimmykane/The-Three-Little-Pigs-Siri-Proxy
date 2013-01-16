@@ -1519,7 +1519,13 @@ class SiriProxy::Connection < EventMachine::Connection
                   puts "[Client - SiriProxy] Created Assistant ID #{@assistant.assistantid} using key [#{self.other_connection.key.id}]"
                   $keyDao.update_used(self.other_connection.key)
                   puts "[Client - SiriProxy] OLD Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"
-                  
+                  plugin_manager.user_assistant = @assistant.assistantid
+                  plugin_manager.user_appleid = @oldclient.appleAccountid
+                  plugin_manager.user_fname = @oldclient.fname
+                  plugin_manager.user_nickname = @oldclient.nickname
+                  plugin_manager.user_devicetype = @oldclient.devicetype
+                  plugin_manager.user_deviceOS = @oldclient.deviceOS
+                  plugin_manager.user_lastIP = @oldclient.last_ip
                 elsif @client!=nil and @client.fname!=nil
                   @oldclient.fname=@client.fname #in case they ever change this
                   @oldclient.nickname=@client.nickname #in case they ever change this
@@ -1534,7 +1540,13 @@ class SiriProxy::Connection < EventMachine::Connection
                   puts "[Client - SiriProxy] Created Assistant ID #{@assistant.assistantid} using key [#{self.other_connection.key.id}]"
                   $keyDao.update_used(self.other_connection.key)
                   puts "[Client - SiriProxy] OLD Client [#{self.other_connection.client.appleAccountid}] created Assistantid [#{@assistant.assistantid}]"
-
+                  plugin_manager.user_assistant = @assistant.assistantid
+                  plugin_manager.user_appleid = @oldclient.appleAccountid
+                  plugin_manager.user_fname = @oldclient.fname
+                  plugin_manager.user_nickname = @oldclient.nickname
+                  plugin_manager.user_devicetype = @oldclient.devicetype
+                  plugin_manager.user_deviceOS = @oldclient.deviceOS
+                  plugin_manager.user_lastIP = @oldclient.last_ip
                 end
               end
             end
