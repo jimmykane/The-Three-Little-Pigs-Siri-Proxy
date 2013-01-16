@@ -1378,7 +1378,7 @@ class SiriProxy::Connection < EventMachine::Connection
             @assistant.assistantid=@loadedassistant
             @assistant.speechid=@loadedspeechid
             @assistant.client_apple_account_id=@client.appleAccountid
-            if @key.id != nil
+            if @key != nil and @key.id != nil
               @assistant.key_id=@key.id
             else
               @assistant.key_id=0
