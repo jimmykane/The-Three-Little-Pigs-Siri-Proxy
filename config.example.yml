@@ -53,6 +53,10 @@ server2: 'your.siri.proxy.server.com'
 # thus denying access
 private_server: 'OFF'
 
+#In case of private_server is set to 'ON': This automaticaly sets key-donating devices like iPhone 4S/5 as invalid and they
+#must be set to true in database, if private_to_all_devices is 'ON'. Default: 'OFF'
+private_to_all_devices: 'OFF'
+
 #To make a Public server - less public, where the client needs to be in database, make clients_must_be_in_database true.
 #Note: The client will have to delete their com.apple.assistant.plist before they use your server.
 clients_must_be_in_database: false
