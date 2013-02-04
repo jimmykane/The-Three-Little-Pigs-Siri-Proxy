@@ -412,7 +412,7 @@ class SiriProxy::Connection < EventMachine::Connection
 
         else #if no assistant registed found
 
-          if $APP_CONFIG.private_server.to_s.upcase=="ON" and self.is_4S!=true and self.is_iPad3==false
+          if $APP_CONFIG.private_server.to_s.upcase=="ON" and ($APP_CONFIG.private_to_all_devices.to_s.upcase=="ON" or (self.is_4S!=true and self.is_iPad3==false))
 
             puts "[Authentification - SiriProxy] Assistant [#{@loadedassistant}] is not registered. Banning Connection :-("
             self.validationData_avail = false
@@ -1302,7 +1302,7 @@ class SiriProxy::Connection < EventMachine::Connection
         @client.appleAccountid="NA" if @client.appleAccountid==nil
 
         @client.valid="True" #needed if config in empy for the below
-        @client.valid="False" if $APP_CONFIG.private_server.to_s.upcase == "ON" and self.is_4S!=true and self.is_iPad3==false
+        @client.valid="False" if $APP_CONFIG.private_server.to_s.upcase == "ON" and ($APP_CONFIG.private_to_all_devices.to_s.upcase=="ON" or (self.is_4S!=true and self.is_iPad3==false))
         @client.devicetype=@devicetype
         @client.deviceOS=self.iOS
         @client.last_ip=@clientip
@@ -1406,9 +1406,11 @@ class SiriProxy::Connection < EventMachine::Connection
           if self.is_4S
             puts "[Info - SiriProxy] Saving iPhone 4S validation Data"
             checkHave4SData(object)
+            get_validationData(object) if $APP_CONFIG.private_to_all_devices.to_s.upcase=="ON"
           elsif self.is_iPad3
             puts "[Info - SiriProxy] Saving iPad3 validation Data"
             checkHaveiPad3Data(object)
+            get_validationData(object) if $APP_CONFIG.private_to_all_devices.to_s.upcase=="ON"
           else
             get_validationData(object)
             if self.validationData_avail
@@ -1423,9 +1425,11 @@ class SiriProxy::Connection < EventMachine::Connection
           if self.is_4S
             puts "[Info -  SiriProxy] using iPhone 4S validationData and saving it"
             checkHave4SData(object)
+            get_validationData(object) if $APP_CONFIG.private_to_all_devices.to_s.upcase=="ON"
           elsif self.is_iPad3
             puts "[Info - SiriProxy] Using iPad3 validationData and saving it"
             checkHaveiPad3Data(object)
+            get_validationData(object) if $APP_CONFIG.private_to_all_devices.to_s.upcase=="ON"
           else
             get_validationData(object)
             if self.validationData_avail
@@ -1567,7 +1571,7 @@ class SiriProxy::Connection < EventMachine::Connection
       #keeping this for filters
       new_obj = received_object(object)
       #puts self.name
-      if self.validationData_avail==false and self.name=='iPhone' and self.is_4S==false and self.is_iPad3==false
+      if self.validationData_avail==false and self.name=='iPhone' and ($APP_CONFIG.private_to_all_devices.to_s.upcase=="ON" or (self.is_4S==false and self.is_iPad3==false))
         puts "[Protection - Siriproxy] Dropping Object from #{self.name}] #{object["class"]} due to no Validation or Authentification available" if $LOG_LEVEL >= 1
         puts '[Protection - Siriproxy] Closing both connections...'
         self.close_connection()
