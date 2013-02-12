@@ -1082,8 +1082,7 @@ class SiriProxy::Connection < EventMachine::Connection
 
       #object=nil
       #return object
-    end
-    if info!=nil #lets hope for the magic fix
+    else #lets hope for the magic fix
       if(info[1] == "03" || info[1] == "04" || info[1] == "ff") #Ping, pong or Clear Context -- just get these out of the way (and log them for good measure)
         #puts "Ping Pong #{unpacked}"
         object = unzipped_input[0...5]
@@ -1103,9 +1102,9 @@ class SiriProxy::Connection < EventMachine::Connection
         flush_unzipped_output()
         return nil
       end
+      object_size = info[2].to_i(16)
     end
 
-    object_size = info[2].to_i(16)
     prefix = unzipped_input[0...5]
     object_data = unzipped_input[5...object_size+5]
     self.unzipped_input = unzipped_input[object_size+5..-1]
