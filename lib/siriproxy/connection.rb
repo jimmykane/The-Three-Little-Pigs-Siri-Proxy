@@ -58,6 +58,7 @@ class SiriProxy::Connection < EventMachine::Connection
     else
       self.validationData_avail = false
     end
+    $bugflash = false
   end
 
   #Changes
@@ -1041,6 +1042,10 @@ class SiriProxy::Connection < EventMachine::Connection
         new_object = prep_received_object(object) #give the world a chance to mess with folks
 
         inject_object_to_output_stream(new_object) if new_object != nil #might be nil if "the world" decides to rid us of the object
+      elsif $bugflash
+  	    $bugflash = false
+		    self.unzipped_input = ""
+        break
       end
     end
   end
@@ -1080,8 +1085,8 @@ class SiriProxy::Connection < EventMachine::Connection
       $stderr.puts "bug flash on info"      #here lies the stupid bug!!!!!!!!!!!!!!!
       $stderr.puts unpacked
 
-      #object=nil
-      #return object
+      $bugflash = true
+      return nil
     else #lets hope for the magic fix
       if(info[1] == "03" || info[1] == "04" || info[1] == "ff") #Ping, pong or Clear Context -- just get these out of the way (and log them for good measure)
         #puts "Ping Pong #{unpacked}"
