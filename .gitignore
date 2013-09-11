@@ -1,6 +1,7 @@
 server.passless.crt
 server.passless.key
 .DS_Store
+Thumbs.db
 demoCA/
 newkey.pem
 newreq.pem

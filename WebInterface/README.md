@@ -15,7 +15,7 @@ E: info[@]wouterds[.]be
 
 T: www.twitter.com/wouterds
 
-Last update: 22-02-2012
+Last update: 07-07-2013
 
 This is the webinterface which is for the public to get info & stats but also for the administrators to control things.
 In this major release the web interface is changed a lot.
@@ -31,6 +31,7 @@ Updates
 * Installer
 * Several bugfixes
 * Code cleaned up
+* Improve load/response time
 * Very extended admin panel
 	* General
 		* Website properties
