@@ -82,6 +82,23 @@
             return false;
         }
     }
+    
+    //getassistants from key
+    function getaccountid($assistantsid) {
+        extract($GLOBALS);
+        $query = 'SELECT * FROM `assistants` WHERE assistantid="'.$assistantsid.'"';
+        $results = $db->MakeQuery($query);
+        if(mysql_num_rows($results) > 0) {
+            while($data = mysql_fetch_array($results)) {
+                $clientaccountid = $data['client_apple_account_id'];
+            }
+            return $clientaccountid;
+        }
+        else {
+            return false;
+        }
+    }
+
     // getassistants(id from a key record)
     function getassistants($keyid) {
         extract($GLOBALS);
